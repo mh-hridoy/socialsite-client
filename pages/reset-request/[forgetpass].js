@@ -54,12 +54,7 @@ const ResetRequest = () => {
     try {
      const {data} =  await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/reset-password`,
-        { resetCode: veriCode, password },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { resetCode: veriCode, password }
       )
 
       setIsLoading(false)
@@ -98,13 +93,7 @@ const ResetRequest = () => {
       try {
         await axios.post(
           `${process.env.NEXT_PUBLIC_MAIN_PROXY}/verify-code`,
-          { resetCode: veriCode },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        )
+          { resetCode: veriCode })
         
         setLoading(false)
       } catch (e) {

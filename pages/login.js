@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect } from "react"
+import React, { useState } from "react"
 import { Formik, Field } from "formik"
 import {
   Box,
@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react"
 import * as Yup from "yup"
 import { useRouter } from "next/router"
-import { useSelector, useDispatch } from "react-redux"
+import {  useDispatch } from "react-redux"
 import axios from "axios"
 import { login } from "../store/userInfoSlice"
 import UnAuth from "../components/base/UnAuth"
@@ -45,7 +45,6 @@ const Login = () => {
   const [isForget, setIsForget] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  // const user = useSelector((state) => state.user.user)
   const toast = useToast({ position: "top" })
   const dispatch = useDispatch()
 
@@ -56,12 +55,7 @@ const Login = () => {
     try {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/login`,
-        values,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        values
       )
       dispatch(login(data))
       localStorage.setItem("user", JSON.stringify(data))
@@ -92,12 +86,7 @@ const Login = () => {
     try {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/reset-request`,
-        values,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        values
       )
       setIsLoading(false)
       setIsForget(!isForget)

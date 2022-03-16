@@ -46,16 +46,13 @@ const SideBar = () => {
   ]
 
   const logoutHandler = async () => {
- 
-
     try {
       setIsLoading(true)
-      await axios(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`)
+      await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`)
 
       dispatch(logout({ user: null, token: "" }))
       localStorage.removeItem("user")
-            setIsLoading(false)
+      setIsLoading(false)
 
       router.push("/login")
       toast({
@@ -134,7 +131,8 @@ const SideBar = () => {
               gap={2}
               alignItems={"center"}
             >
-              <MdOutlineLogout /> {isLoading ? <Spinner size={"sm"} /> : "Logout"}
+              <MdOutlineLogout />{" "}
+              {isLoading ? <Spinner size={"sm"} /> : "Logout"}
             </WrapItem>
           </Wrap>
         </Wrap>

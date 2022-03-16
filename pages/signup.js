@@ -16,7 +16,6 @@ import {
   AlertTitle,
   useToast,
 } from "@chakra-ui/react"
-import { useDispatch } from "react-redux"
 
 import * as Yup from "yup"
 
@@ -46,11 +45,7 @@ const Signup = () => {
     setIsLoading(true)
 
     try {
-      const {data} = await axios.post(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/signup`, values, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+      const {data} = await axios.post(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/signup`, values)
       setIsLoading(false)
       toast({
         status: "success",
