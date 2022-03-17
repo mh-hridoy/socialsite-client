@@ -66,6 +66,7 @@ const Header = () => {
   return (
     <>
       <Flex
+      zIndex={100}
         position="sticky"
         width="100%"
         bg={useColorModeValue("#fff", "#1A202C")}

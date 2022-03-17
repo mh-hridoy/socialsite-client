@@ -5,8 +5,10 @@ import UserAccount from '../../components/base/UserAccount'
 const UserId = () => {
 
   return (
-    <Flex w={"100%"} mt={10} mr={[0, 100, 150]}>
-      <UserAccount/>
+    <Flex alignItems={"center"} justifyContent="center" w={"100%"} pt={5}>
+      <Flex w={["90%", "90%", "75%"]}>
+        <UserAccount />
+      </Flex>
     </Flex>
   )
 }
