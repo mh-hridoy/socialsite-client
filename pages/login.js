@@ -55,7 +55,11 @@ const Login = () => {
     try {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/login`,
-        values
+        values, {
+              headers: {
+                "Content-Type": "application/json",
+              }, withCredentials: true
+            }
       )
       dispatch(login(data))
       localStorage.setItem("user", JSON.stringify(data))
@@ -86,7 +90,13 @@ const Login = () => {
     try {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/reset-request`,
-        values
+        values,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
       )
       setIsLoading(false)
       setIsForget(!isForget)

@@ -48,7 +48,12 @@ const SideBar = () => {
   const logoutHandler = async () => {
     try {
       setIsLoading(true)
-      await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`)
+      await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      })
 
       dispatch(logout({ user: null, token: "" }))
       localStorage.removeItem("user")

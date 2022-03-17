@@ -17,7 +17,13 @@ const verifyEmailHandler = async()=> {
   try {
     await axios.post(
       `${process.env.NEXT_PUBLIC_MAIN_PROXY}/verify-email`,
-      { verifyCode: veriCode }
+      { verifyCode: veriCode },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
     )
       setIsLoading(false)
       toast({
@@ -49,7 +55,14 @@ const checkCode = async () => {
   try {
     await axios.post(
       `${process.env.NEXT_PUBLIC_MAIN_PROXY}/check-verify-email`,
-      { verifyCode: veriCode } )
+      { verifyCode: veriCode },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    )
 
     setLoading(false)
   } catch (e) {

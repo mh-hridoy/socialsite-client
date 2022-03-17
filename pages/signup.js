@@ -45,7 +45,16 @@ const Signup = () => {
     setIsLoading(true)
 
     try {
-      const {data} = await axios.post(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/signup`, values)
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/signup`,
+        values,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      )
       setIsLoading(false)
       toast({
         status: "success",
