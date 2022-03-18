@@ -16,6 +16,7 @@ import {
   AlertTitle,
   useToast,
 } from "@chakra-ui/react"
+import PhoneInput from "react-phone-input-2"
 
 import * as Yup from "yup"
 
@@ -38,16 +39,24 @@ const signupSchema = Yup.object().shape({
 
 const Signup = () => {
   const [isLoading, setIsLoading] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState("")
   const router = useRouter()
   const toast = useToast({ position: "top" })
 
+  const phoneNumberHandler = (e) => {
+    setPhoneNumber(e)
+  }
+
   const signupHandler = async (values) => {
+    // if (!setPhoneNumber) return
+
+    
     setIsLoading(true)
 
     try {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/signup`,
-        values,
+        { ...values, phoneNumber },
         {
           headers: {
             "Content-Type": "application/json",
@@ -59,8 +68,7 @@ const Signup = () => {
       toast({
         status: "success",
         duration: 3000,
-        title:
-          data.message,
+        title: data.message,
       })
       router.push("/login")
     } catch (e) {
@@ -178,6 +186,27 @@ const Signup = () => {
                             <AlertTitle>{errors.password}</AlertTitle>
                           </Alert>
                         )}
+                      </FormControl>
+
+                      <FormControl>
+                        <FormLabel htmlFor="password">Phone Number</FormLabel>
+                        <Field
+                          value={phoneNumber}
+                          as={PhoneInput}
+                          onChange={(e) => phoneNumberHandler(e)}
+                          id="phone"
+                          inputStyle={{
+                            border: "1px solid #EDF2F7",
+                            backgroundColor: "#EDF2F7",
+                            width: "100%",
+                            height: 40,
+                          }}
+                          name="phone"
+                          type="tel"
+                          country={"us"}
+                          variant="filled"
+                        />
+                        {/* phone number error will be here */}
                       </FormControl>
 
                       <Button

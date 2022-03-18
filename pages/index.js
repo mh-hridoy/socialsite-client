@@ -1,10 +1,17 @@
 import AuthRoute from "../components/base/AuthRoute";
 import {Flex} from "@chakra-ui/react"
+import CreateNewFeed from "../components/custom/CreateNewFeed";
 
 export default function Home() {
   return (
     <AuthRoute>
-      <Flex mr={[0, 100, 150]} width={"100%"} >create post & feeds</Flex>
+      <Flex alignItems={"center"} justifyContent="center" marginBottom={5}  w={"100%"} pt={5}>
+        <Flex w={["90%", "90%", "75%"]}>
+
+        <CreateNewFeed/>
+        
+         </Flex>
+      </Flex>
     </AuthRoute>
   )
 }

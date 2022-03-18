@@ -8,6 +8,8 @@ import {
   withDefaultColorScheme,
 
 } from "@chakra-ui/react"
+import "react-phone-input-2/lib/style.css"
+import "emoji-mart/css/emoji-mart.css"
 
 import StoreProvider from '../store'
 import SideBar from '../components/base/SideBar'
