@@ -191,15 +191,45 @@ const Signup = () => {
                       <FormControl>
                         <FormLabel htmlFor="password">Phone Number</FormLabel>
                         <Field
+                        
                           value={phoneNumber}
                           as={PhoneInput}
                           onChange={(e) => phoneNumberHandler(e)}
                           id="phone"
+                          inputClass="contactClass"
+                          dropdownClass="contactDropDown"
                           inputStyle={{
-                            border: "1px solid #EDF2F7",
-                            backgroundColor: "#EDF2F7",
+                            border: `1px solid ${useColorModeValue(
+                              "#EDF2F7",
+                              "transparent"
+                            )}`,
+                            backgroundColor: useColorModeValue(
+                              "#EDF2F7",
+                              "#ffffff0A"
+                            ),
                             width: "100%",
                             height: 40,
+                          }}
+                          dropdownStyle={{
+                            border: `1px solid ${useColorModeValue(
+                              "#EDF2F7",
+                              "transparent"
+                            )}`,
+                            backgroundColor: useColorModeValue(
+                              "#EDF2F7",
+                              "#1A202C"
+                            ),
+                            color: useColorModeValue("#ff552f", "#ff552f"),
+                          }}
+                          buttonStyle={{
+                            border: `1px solid ${useColorModeValue(
+                              "#EDF2F7",
+                              "transparent"
+                            )}`,
+                            backgroundColor: useColorModeValue(
+                              "#EDF2F7",
+                              "#ffffff0A"
+                            ),
                           }}
                           name="phone"
                           type="tel"

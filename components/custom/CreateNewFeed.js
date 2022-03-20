@@ -1,14 +1,21 @@
-import React, {useState} from "react"
-import { Flex, Textarea, Button, Text, useColorModeValue, useColorMode } from "@chakra-ui/react"
+import React, {useState, useRef} from "react"
+import { Flex, Textarea, Button, Text, FormControl,
+FormLabel,
+Input, useColorMode } from "@chakra-ui/react"
 import { MdOutlineImage, MdOutlineEmojiEmotions } from "react-icons/md"
 import FeedCard from "./FeedCard"
 import { Picker } from "emoji-mart"
 
-
-
 const CreateNewFeed = () => {
 const [showEmoji, setShowEmoji] = useState(false)
   const { colorMode } = useColorMode()
+  const [feedText, setFeedText] = useState("")
+  const feedImageFeed = useRef(null)
+
+  const emojiHandler = (emoji)=> {
+    setFeedText(feedText + emoji)
+
+  }
 
   var autoExpand = function (field) {
     field.style.height = "inherit"
@@ -44,6 +51,8 @@ const [showEmoji, setShowEmoji] = useState(false)
             onInput={areaHandler}
             variant={"unstyled"}
             height="auto"
+            value={feedText}
+            onChange={(e)=> setFeedText(e.target.value)}
             maxH="50vh"
             borderBottom={"1px"}
             borderColor={"gray.100"}
@@ -67,23 +76,23 @@ const [showEmoji, setShowEmoji] = useState(false)
           px={5}
         >
           <Flex gap={5} position="relative">
-            <MdOutlineImage cursor={"pointer"} size={23} />
+            <FormLabel htmlFor="file">
+              {" "}
+              <MdOutlineImage cursor={"pointer"} size={23} />
+            </FormLabel>
+            <Input id="file" multiple accept="jpeg/jpg/image/*" hidden type="file" />
             <MdOutlineEmojiEmotions
-              color={
-                showEmoji
-                  ? useColorModeValue("#ff552f")
-                  : useColorModeValue("#000", "#fff")
-              }
+              color={showEmoji && "#ff552f"}
               onClick={() => setShowEmoji(!showEmoji)}
               cursor={"pointer"}
               size={23}
             />
             {showEmoji && (
               <Picker
-              native={true}
-              
-              showPreview={false}
-              showSkinTones={false}
+              onSelect={(e) => emojiHandler(e.native)}
+                native={true}
+                showPreview={false}
+                showSkinTones={false}
                 theme={colorMode == "light" ? "light" : "dark"}
                 style={{ position: "absolute", bottom: -360, zIndex: 99 }}
               />

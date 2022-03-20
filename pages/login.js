@@ -11,6 +11,7 @@ import {
   Heading,
   Input,
   VStack,
+  Spinner,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -19,7 +20,7 @@ import {
 } from "@chakra-ui/react"
 import * as Yup from "yup"
 import { useRouter } from "next/router"
-import {  useDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import axios from "axios"
 import { login } from "../store/userInfoSlice"
 import UnAuth from "../components/base/UnAuth"
@@ -47,19 +48,22 @@ const Login = () => {
   const router = useRouter()
   const toast = useToast({ position: "top" })
   const dispatch = useDispatch()
-
-    
+  const [verifyMessage, setVerifyMessage] = useState(null)
+  const [userID, setUserId] = useState(null)
+  const [verifyLoading, setVerifyLoading] = useState(false)
   const loginHandler = async (values) => {
     setIsLoading(true)
 
     try {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/login`,
-        values, {
-              headers: {
-                "Content-Type": "application/json",
-              }, withCredentials: true
-            }
+        values,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
       )
       dispatch(login(data))
       localStorage.setItem("user", JSON.stringify(data))
@@ -72,20 +76,60 @@ const Login = () => {
       })
     } catch (e) {
       setIsLoading(false)
-      const errorMsg = e.response
-        ? e.response.data.message
-        : "Something went wrong!!!"
 
-      toast({
-        status: "error",
-        duration: 5000,
-        title: errorMsg,
-      })
+      const errorMsg = e.response && e.response.data.message
+
+      if (errorMsg.indexOf("Your email is not verified") == 0) {
+        setVerifyMessage("Please verify your email to continue...")
+        setUserId(errorMsg.split(".")[1])
+      } else {
+        toast({
+          status: "error",
+          duration: 5000,
+          title: errorMsg || "Something went wrong!!!",
+        })
+      }
     }
   }
 
-  const requestReset = async(values) => {
-      setIsLoading(true)
+  const requestVerify = async () => {
+    setVerifyLoading(!verifyLoading)
+
+    try {
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/request-verify-email`,
+        { id: userID },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      )
+    setVerifyLoading(!verifyLoading)
+    setVerifyMessage(null)
+    setUserId(null)
+      toast({
+        status: "success",
+        duration: 3000,
+        title: data,
+      })
+    } catch (e) {
+    setVerifyLoading(!verifyLoading)
+
+      const errorMsg = e.response && e.response.data.message
+      toast({
+        status: "error",
+        duration: 5000,
+        title: errorMsg || "Something went wrong!!!",
+      })
+    }
+
+
+  }
+
+  const requestReset = async (values) => {
+    setIsLoading(true)
 
     try {
       const { data } = await axios.post(
@@ -107,23 +151,20 @@ const Login = () => {
       })
     } catch (e) {
       setIsLoading(false)
-      const errorMsg = e.response
-        ? e.response.data.message
-        : "Something went wrong!!!"
 
+      const errorMsg = e.response && e.response.data.message
       toast({
         status: "error",
         duration: 5000,
-        title: errorMsg,
+        title: errorMsg || "Something went wrong!!!",
       })
     }
-
   }
 
   return (
     <UnAuth>
       <Flex
-      width={"100%"}
+        width={"100%"}
         minH={"100vh"}
         justify={"center"}
         bg={useColorModeValue("gray.50", "gray.800")}
@@ -158,6 +199,17 @@ const Login = () => {
                 {({ handleSubmit, errors, touched }) => (
                   <form onSubmit={handleSubmit}>
                     <VStack spacing={4} align="flex-start">
+                      {verifyMessage !== null && (
+                        <Alert fontSize={12} fontWeight={600} status="warning">
+                          <AlertIcon />
+                          {verifyMessage}
+                          {verifyLoading ? (
+                            <Spinner size="sm" color="buttonColor" ml={2} />
+                          ) : (
+                            <a style={{marginLeft: 2}} onClick={requestVerify}>verify now</a>
+                          )}
+                        </Alert>
+                      )}
                       <FormControl>
                         <FormLabel htmlFor="email">Email Address</FormLabel>
                         <Field
@@ -261,7 +313,12 @@ const Login = () => {
                         Back to login?
                       </a>
 
-                      <Button isLoading={isLoading} type="submit" bg="buttonColor" isFullWidth>
+                      <Button
+                        isLoading={isLoading}
+                        type="submit"
+                        bg="buttonColor"
+                        isFullWidth
+                      >
                         Submit
                       </Button>
                     </VStack>

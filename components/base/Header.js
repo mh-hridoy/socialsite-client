@@ -14,6 +14,7 @@ import {
   Show,
 } from "@chakra-ui/react"
 import { MdOutlineDarkMode } from "react-icons/md"
+import {BsSun} from 'react-icons/bs'
 import {useRouter} from 'next/router'
 import {
   MdOutlineFeed,
@@ -66,7 +67,7 @@ const Header = () => {
   return (
     <>
       <Flex
-      zIndex={100}
+        zIndex={100}
         position="sticky"
         width="100%"
         bg={useColorModeValue("#fff", "#1A202C")}
@@ -83,12 +84,22 @@ const Header = () => {
         <Spacer />
         <Box>
           <HStack spacing={[18, 25]}>
-            <MdOutlineDarkMode
-              color={`${colorMode == "dark" ? "#fff" : "#1A202C"}`}
-              onClick={() => toggleColorMode()}
-              cursor="pointer"
-              size={25}
-            />
+            {colorMode == "dark" ? (
+              <BsSun
+                color={`${colorMode == "dark" ? "#fff" : "#1A202C"}`}
+                onClick={() => toggleColorMode()}
+                cursor="pointer"
+                size={25}
+              />
+            ) : (
+              <MdOutlineDarkMode
+                color={`${colorMode == "dark" ? "#fff" : "#1A202C"}`}
+                onClick={() => toggleColorMode()}
+                cursor="pointer"
+                size={25}
+              />
+            )}
+
             {user !== null && (
               <Show below="md">
                 <MdOutlineFeed

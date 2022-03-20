@@ -41,26 +41,7 @@ const UserAccount = () => {
       >
         <Text fontWeight={600}>Total Post: 100</Text>
 
-        <Text
-          alignItems="center"
-          justifyContent="center"
-          gap={2}
-          display="flex"
-          fontWeight={600}
-        >
-          Email Verified:{" "}
-          {user && user.isEmailVarified ? (
-            <MdVerified size={22} color="#ff552f" />
-          ) : (
-            <a
-              onClick={() =>
-                router.push(`/account/verify/${user.emailVerifyCode}`)
-              }
-            >
-              Verify now
-            </a>
-          )}
-        </Text>
+      
       </Flex>
 
       <Text mr={5} mt={8} fontWeight={600}>
