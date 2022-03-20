@@ -1,7 +1,18 @@
 import React, {useState, useRef} from "react"
-import { Flex, Textarea, Button, Text, FormControl,
-FormLabel,
-Input, useColorMode } from "@chakra-ui/react"
+import {
+  Flex,
+  Textarea,
+  Button,
+  Text,
+  FormLabel,
+  Input,
+  useColorMode,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverArrow,
+  PopoverCloseButton,
+} from "@chakra-ui/react"
 import { MdOutlineImage, MdOutlineEmojiEmotions } from "react-icons/md"
 import FeedCard from "./FeedCard"
 import { Picker } from "emoji-mart"
@@ -10,12 +21,22 @@ const CreateNewFeed = () => {
 const [showEmoji, setShowEmoji] = useState(false)
   const { colorMode } = useColorMode()
   const [feedText, setFeedText] = useState("")
-  const feedImageFeed = useRef(null)
+  const [currentSelection, setCurrentSelection] = useState(0)
+  const feedTextRef = useRef(null)
 
   const emojiHandler = (emoji)=> {
-    setFeedText(feedText + emoji)
+    const emoWithText = [
+      feedText.slice(0, currentSelection),
+      emoji,
+      feedText.slice(currentSelection),
+    ].join("")
+    setFeedText(emoWithText)
 
   }
+
+  const textHandler = (e)=> {
+    setFeedText(e.target.value)
+  } 
 
   var autoExpand = function (field) {
     field.style.height = "inherit"
@@ -37,6 +58,10 @@ const [showEmoji, setShowEmoji] = useState(false)
     autoExpand(event.target)
   }
 
+  const fileHandler = (e) => {
+    console.log(e.target.files)
+  }
+
   return (
     <Flex direction="column" gap={5} width="100%">
       <Flex
@@ -50,10 +75,14 @@ const [showEmoji, setShowEmoji] = useState(false)
           <Textarea
             onInput={areaHandler}
             variant={"unstyled"}
+            ref={feedTextRef}
             height="auto"
             value={feedText}
-            onChange={(e)=> setFeedText(e.target.value)}
+            onChange={textHandler}
             maxH="50vh"
+            onSelectCapture={(e) =>
+              setCurrentSelection(e.target.selectionStart)
+            }
             borderBottom={"1px"}
             borderColor={"gray.100"}
             px={5}
@@ -80,23 +109,35 @@ const [showEmoji, setShowEmoji] = useState(false)
               {" "}
               <MdOutlineImage cursor={"pointer"} size={23} />
             </FormLabel>
-            <Input id="file" multiple accept="jpeg/jpg/image/*" hidden type="file" />
-            <MdOutlineEmojiEmotions
-              color={showEmoji && "#ff552f"}
-              onClick={() => setShowEmoji(!showEmoji)}
-              cursor={"pointer"}
-              size={23}
+            <Input
+              id="file"
+              onChange={fileHandler}
+              multiple
+              accept="jpeg/jpg/image/*"
+              hidden
+              type="file"
             />
-            {showEmoji && (
-              <Picker
-              onSelect={(e) => emojiHandler(e.native)}
-                native={true}
-                showPreview={false}
-                showSkinTones={false}
-                theme={colorMode == "light" ? "light" : "dark"}
-                style={{ position: "absolute", bottom: -360, zIndex: 99 }}
-              />
-            )}
+           
+
+            <Popover _focus={{ boxShadow: "none" }}>
+              <PopoverTrigger>
+                <MdOutlineEmojiEmotions
+                  onClick={() => setShowEmoji(!showEmoji)}
+                  cursor={"pointer"}
+                  size={23}
+                />
+              </PopoverTrigger>
+              <PopoverContent mt={10} _focus={{ boxShadow: "none" }}>
+                <PopoverArrow />
+                <Picker
+                  onSelect={(e) => emojiHandler(e.native)}
+                  native={true}
+                  showPreview={false}
+                  showSkinTones={false}
+                  theme={colorMode == "light" ? "light" : "dark"}
+                />
+              </PopoverContent>
+            </Popover>
           </Flex>
 
           <Button size={"sm"} fontSize={16} bg="buttonColor">
