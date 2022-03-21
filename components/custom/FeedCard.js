@@ -1,12 +1,11 @@
 import React from 'react'
 import { Flex, Avatar, Text } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
-import testImage from "../../public/testimage.jpeg"
 import { BsHeart } from "react-icons/bs"
 import { AiOutlineComment } from "react-icons/ai"
-import Image from "next/image"
 import Masonry from "react-masonry-css"
 import dateFormat from "dateformat"
+import PhotoAlbum from "react-photo-album"
 
 const FeedCard = ({item}) => {
       const user = useSelector((state) => state.user.user)
@@ -16,6 +15,8 @@ const FeedCard = ({item}) => {
         700: 1
       
       }
+
+
 
 
   return (
@@ -59,6 +60,7 @@ const FeedCard = ({item}) => {
             pr={4}
             marginBottom={10}
           >
+          
             {item.images && item.images.length !== 0 && (
               <>
                 {item.images.length == 1 ? (
