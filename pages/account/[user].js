@@ -14,7 +14,7 @@ const UserId = () => {
     const [userData, setUserData]= useState(null)
   const router = useRouter()
 
-    const userId = router.query.user
+    const userAccountId = router.query.user
 
   useEffect(() => {
     //
@@ -28,7 +28,7 @@ const UserId = () => {
   const fetchInitData = async () => {
     try {
       const { data } = await axios(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-my-posts/${userId}`,
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-my-posts/${userAccountId}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -55,7 +55,7 @@ const UserId = () => {
   const getUserData = async () => {
       try {
         const { data } = await axios(
-          `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-user-info/${userId}`,
+          `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-user-info/${userAccountId}`,
           {
             headers: {
               "Content-Type": "application/json",
