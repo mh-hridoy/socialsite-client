@@ -1,10 +1,8 @@
 import React from "react"
 import { Flex, Avatar, Text } from "@chakra-ui/react"
-import { useSelector } from "react-redux"
 import FeedCard from "../custom/FeedCard"
 
 const UserAccount = ({ post, user }) => {
-  const user = useSelector((state) => state.user.user)
 
   return (
     <Flex w={"100%"} mb={10} gap={4} direction="column">
