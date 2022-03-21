@@ -22,7 +22,7 @@ const SideBar = () => {
   const router = useRouter()
   const user = useSelector((state) => state.user.user)
   const dispatch = useDispatch()
-  const toast = useToast({ position: "top" })
+  const toast = useToast({ position: "top", isClosable: true })
   const [isLoading, setIsLoading] = useState(false)
   const pathName = window.location.pathname
 

@@ -41,7 +41,7 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState("")
   const router = useRouter()
-  const toast = useToast({ position: "top" })
+  const toast = useToast({ position: "top", isClosable: true })
 
   const phoneNumberHandler = (e) => {
     setPhoneNumber(e)

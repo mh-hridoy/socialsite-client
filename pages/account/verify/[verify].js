@@ -7,7 +7,7 @@ import {useRouter} from 'next/router'
 const VerifyPage = () => {
   const [loading, setLoading] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  const toast = useToast({ position: "top" })
+  const toast = useToast({ position: "top", isClosable: true })
   const router = useRouter()
 const code = window.location.pathname.split("/")
 const veriCode = code[code.length - 1]

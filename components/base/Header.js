@@ -32,7 +32,7 @@ const Header = () => {
   const user = useSelector((state) => state.user.user )
   const pathName = global.window && window.location.pathname
   const [isLoading, setIsLoading] = useState(false)
-  const toast = useToast({position: "top"})
+  const toast = useToast({ position: "top", isClosable: true })
 
 
   const logoutHandler = async () => {

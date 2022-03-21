@@ -43,7 +43,7 @@ const ResetRequest = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const toast = useToast({ position: "top" })
+  const toast = useToast({ position: "top", isClosable: true })
   const code = window.location.pathname.split("/")
   const veriCode = code[code.length - 1]
 

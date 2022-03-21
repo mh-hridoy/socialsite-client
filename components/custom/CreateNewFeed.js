@@ -1,4 +1,4 @@
-import React, {useState, useRef} from "react"
+import React, { useState } from "react"
 import {
   Flex,
   Textarea,
@@ -11,32 +11,39 @@ import {
   PopoverTrigger,
   PopoverContent,
   PopoverArrow,
-  PopoverCloseButton,
+  
+  useToast
 } from "@chakra-ui/react"
 import { MdOutlineImage, MdOutlineEmojiEmotions } from "react-icons/md"
 import FeedCard from "./FeedCard"
 import { Picker } from "emoji-mart"
-
+import Resizer from "react-image-file-resizer"
+import {AiOutlineDelete} from 'react-icons/ai'
+import axios from 'axios'
+import { useSelector } from "react-redux"
 const CreateNewFeed = () => {
-const [showEmoji, setShowEmoji] = useState(false)
+  const [showEmoji, setShowEmoji] = useState(false)
   const { colorMode } = useColorMode()
   const [feedText, setFeedText] = useState("")
   const [currentSelection, setCurrentSelection] = useState(0)
-  const feedTextRef = useRef(null)
-
-  const emojiHandler = (emoji)=> {
+  const [isLoading, setIsLoading] = useState(false)
+  const [images, setImages] = useState([])
+    const toast = useToast({ position: "top", isClosable: true })
+const token = useSelector((state) => state.user.token)
+const user = useSelector((state) => state.user.user)
+  const emojiHandler = (emoji) => {
     const emoWithText = [
       feedText.slice(0, currentSelection),
       emoji,
       feedText.slice(currentSelection),
     ].join("")
     setFeedText(emoWithText)
-
   }
 
-  const textHandler = (e)=> {
+
+  const textHandler = (e) => {
     setFeedText(e.target.value)
-  } 
+  }
 
   var autoExpand = function (field) {
     field.style.height = "inherit"
@@ -59,8 +66,94 @@ const [showEmoji, setShowEmoji] = useState(false)
   }
 
   const fileHandler = (e) => {
-    console.log(e.target.files)
+    const files = [...e.target.files]
+    handleImages(files)
   }
+
+  const handleImages = (files) => {
+
+    files.map((file) => {
+      Resizer.imageFileResizer(
+        file,
+        600,
+        600,
+        "JPEG",
+        200,
+        0,
+        (uri) => {
+
+          return setImages([ ...images,
+            {
+              name:
+                file.name.split(".").shift() +
+                Date.now() +
+                file.name.split(".").pop(),
+              type: file.type || "image/jpeg",
+              data: uri,
+            },
+          ])
+        },
+        "base64"
+      )
+    })
+
+
+  }
+
+  const postHandler = async () => {
+    setIsLoading(true)
+
+    if(feedText || images.length !== 0 ){
+     try {
+       const { data } = await axios.post(
+         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/new-post`,
+         { text: feedText, images, user: user._id },
+         {
+           headers: {
+             "Content-Type": "application/json",
+             Authorization: `Bearer ${token}`,
+           },
+           withCredentials: true,
+         }
+       )
+             setIsLoading(false)
+             setFeedText("")
+             setImages([])
+
+       toast({
+         status: "success",
+         duration: 3000,
+         title: data,
+       })
+     } catch (e) {
+      setIsLoading(false)
+
+       const errorMsg = e.response && e.response.data.message
+       toast({
+         status: "error",
+         duration: 5000,
+         title: errorMsg || "Something went wrong!!!",
+       })
+     }
+    }else{
+      setIsLoading(false)
+      toast({
+        status: "info",
+        duration: 3000,
+        title: "Status or Image is required.",
+      })
+
+    }
+
+
+  }
+
+  const removeImage = (inx) => {
+    const allImages = [...images]
+    allImages.splice(inx, 1)
+    setImages([...allImages])
+  }
+
 
   return (
     <Flex direction="column" gap={5} width="100%">
@@ -75,7 +168,7 @@ const [showEmoji, setShowEmoji] = useState(false)
           <Textarea
             onInput={areaHandler}
             variant={"unstyled"}
-            ref={feedTextRef}
+            fontSize={14}
             height="auto"
             value={feedText}
             onChange={textHandler}
@@ -87,12 +180,63 @@ const [showEmoji, setShowEmoji] = useState(false)
             borderColor={"gray.100"}
             px={5}
             pt={2}
-            marginBottom={10}
+            marginBottom={images.length == 0 && 10}
             placeholder="What's happening?"
             width={"100%"}
             resize="none"
           />
         </Flex>
+
+        {/* show images */}
+        {images.length !== 0 && (
+          <Flex
+            height={"70px"}
+            width={"100%"}
+            wrap={"wrap"}
+            gap={5}
+            marginBottom={12}
+            overflow="auto"
+            pl={5}
+          >
+            {images.map((image, inx) => {
+              return (
+                <div
+                  key={inx}
+                  style={{
+                    height: "100%",
+                    width: "100px",
+                    position: "relative",
+                  }}
+                >
+                  <img
+                    alt={image.name}
+                    src={image.data}
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      border: "1px solid gray",
+                    }}
+                  />
+                  <div
+                    onClick={() => removeImage(inx)}
+                    style={{
+                      position: "absolute",
+                      cursor: "pointer",
+                      borderRadius: "50%",
+                      backgroundColor: "#fff",
+                      padding: "2px",
+                      top: 0,
+                      right: -10,
+                    }}
+                  >
+                    <AiOutlineDelete color="#ff552f" size={18} />
+                  </div>
+                </div>
+              )
+            })}
+            {/* images with delete icon */}
+          </Flex>
+        )}
         <Flex
           position="absolute"
           bottom={0}
@@ -112,12 +256,10 @@ const [showEmoji, setShowEmoji] = useState(false)
             <Input
               id="file"
               onChange={fileHandler}
-              multiple
               accept="jpeg/jpg/image/*"
               hidden
               type="file"
             />
-           
 
             <Popover _focus={{ boxShadow: "none" }}>
               <PopoverTrigger>
@@ -140,7 +282,7 @@ const [showEmoji, setShowEmoji] = useState(false)
             </Popover>
           </Flex>
 
-          <Button size={"sm"} fontSize={16} bg="buttonColor">
+          <Button isLoading={isLoading} onClick={postHandler} size={"sm"} fontSize={16} bg="buttonColor">
             Post
           </Button>
         </Flex>

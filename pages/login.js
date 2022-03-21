@@ -46,7 +46,7 @@ const Login = () => {
   const [isForget, setIsForget] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
-  const toast = useToast({ position: "top" })
+  const toast = useToast({ position: "top", isClosable: true })
   const dispatch = useDispatch()
   const [verifyMessage, setVerifyMessage] = useState(null)
   const [userID, setUserId] = useState(null)
