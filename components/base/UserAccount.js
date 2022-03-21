@@ -5,12 +5,9 @@ import {MdVerified} from 'react-icons/md'
 import {useRouter} from 'next/router'
 import FeedCard from "../custom/FeedCard"
 
-const UserAccount = () => {
+const UserAccount = ({ post, user }) => {
   const user = useSelector((state) => state.user.user)
   const router = useRouter()
-
-
-  
 
   return (
     <Flex w={"100%"} mb={10} gap={4} direction="column">
@@ -25,11 +22,11 @@ const UserAccount = () => {
           _hover={{ border: "2px solid #ff552f" }}
           cursor="pointer"
           size={"xl"}
-          name={user && user.fullName}
+          name={user.fullName}
           src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
         ></Avatar>
         <Text fontWeight={600} fontSize={25}>
-          {user && user.fullName}
+          {user.fullName}
         </Text>
       </Flex>
 
@@ -39,23 +36,17 @@ const UserAccount = () => {
         alignItems={"center"}
         justifyContent="space-evenly"
       >
-        <Text fontWeight={600}>Total Post: 100</Text>
-
-      
+        <Text fontWeight={600}>Total Post: {post.length || 0}</Text>
       </Flex>
 
       <Text mr={5} mt={8} fontWeight={600}>
         Posts:
       </Text>
-
-      <FeedCard/>
-      <FeedCard/>
-      <FeedCard/>
-      <FeedCard/>
-      <FeedCard/>
-      <FeedCard/>
-
-
+      {post && post.length !== 0 ? (
+        post.map((item, inx) => <FeedCard key={inx} item={item} />)
+      ) : (
+        <Text>There's no activity.</Text>
+      )}
     </Flex>
   )
 }

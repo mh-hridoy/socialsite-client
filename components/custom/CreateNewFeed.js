@@ -11,15 +11,13 @@ import {
   PopoverTrigger,
   PopoverContent,
   PopoverArrow,
-  
-  useToast
+  useToast,
 } from "@chakra-ui/react"
 import { MdOutlineImage, MdOutlineEmojiEmotions } from "react-icons/md"
-import FeedCard from "./FeedCard"
 import { Picker } from "emoji-mart"
 import Resizer from "react-image-file-resizer"
-import {AiOutlineDelete} from 'react-icons/ai'
-import axios from 'axios'
+import { AiOutlineDelete } from "react-icons/ai"
+import axios from "axios"
 import { useSelector } from "react-redux"
 const CreateNewFeed = () => {
   const [showEmoji, setShowEmoji] = useState(false)
@@ -28,9 +26,10 @@ const CreateNewFeed = () => {
   const [currentSelection, setCurrentSelection] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [images, setImages] = useState([])
-    const toast = useToast({ position: "top", isClosable: true })
-const token = useSelector((state) => state.user.token)
-const user = useSelector((state) => state.user.user)
+  const toast = useToast({ position: "top", isClosable: true })
+  const token = useSelector((state) => state.user.token)
+  const user = useSelector((state) => state.user.user)
+
   const emojiHandler = (emoji) => {
     const emoWithText = [
       feedText.slice(0, currentSelection),
@@ -39,7 +38,6 @@ const user = useSelector((state) => state.user.user)
     ].join("")
     setFeedText(emoWithText)
   }
-
 
   const textHandler = (e) => {
     setFeedText(e.target.value)
@@ -71,7 +69,6 @@ const user = useSelector((state) => state.user.user)
   }
 
   const handleImages = (files) => {
-
     files.map((file) => {
       Resizer.imageFileResizer(
         file,
@@ -81,8 +78,8 @@ const user = useSelector((state) => state.user.user)
         200,
         0,
         (uri) => {
-
-          return setImages([ ...images,
+          return setImages([
+            ...images,
             {
               name:
                 file.name.split(".").shift() +
@@ -96,56 +93,51 @@ const user = useSelector((state) => state.user.user)
         "base64"
       )
     })
-
-
   }
 
   const postHandler = async () => {
     setIsLoading(true)
 
-    if(feedText || images.length !== 0 ){
-     try {
-       const { data } = await axios.post(
-         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/new-post`,
-         { text: feedText, images, user: user._id },
-         {
-           headers: {
-             "Content-Type": "application/json",
-             Authorization: `Bearer ${token}`,
-           },
-           withCredentials: true,
-         }
-       )
-             setIsLoading(false)
-             setFeedText("")
-             setImages([])
+    if (feedText || images.length !== 0) {
+      try {
+        const { data } = await axios.post(
+          `${process.env.NEXT_PUBLIC_MAIN_PROXY}/new-post`,
+          { text: feedText, images, user: user._id },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
+        )
+        setIsLoading(false)
+        setFeedText("")
+        setImages([])
 
-       toast({
-         status: "success",
-         duration: 3000,
-         title: data,
-       })
-     } catch (e) {
-      setIsLoading(false)
+        toast({
+          status: "success",
+          duration: 3000,
+          title: data,
+        })
+      } catch (e) {
+        setIsLoading(false)
 
-       const errorMsg = e.response && e.response.data.message
-       toast({
-         status: "error",
-         duration: 5000,
-         title: errorMsg || "Something went wrong!!!",
-       })
-     }
-    }else{
+        const errorMsg = e.response && e.response.data.message
+        toast({
+          status: "error",
+          duration: 5000,
+          title: errorMsg || "Something went wrong!!!",
+        })
+      }
+    } else {
       setIsLoading(false)
       toast({
         status: "info",
         duration: 3000,
         title: "Status or Image is required.",
       })
-
     }
-
-
   }
 
   const removeImage = (inx) => {
@@ -153,7 +145,6 @@ const user = useSelector((state) => state.user.user)
     allImages.splice(inx, 1)
     setImages([...allImages])
   }
-
 
   return (
     <Flex direction="column" gap={5} width="100%">
@@ -282,7 +273,13 @@ const user = useSelector((state) => state.user.user)
             </Popover>
           </Flex>
 
-          <Button isLoading={isLoading} onClick={postHandler} size={"sm"} fontSize={16} bg="buttonColor">
+          <Button
+            isLoading={isLoading}
+            onClick={postHandler}
+            size={"sm"}
+            fontSize={16}
+            bg="buttonColor"
+          >
             Post
           </Button>
         </Flex>
@@ -291,11 +288,6 @@ const user = useSelector((state) => state.user.user)
       <Text fontWeight={600} mb={2}>
         Recent posts:
       </Text>
-      <FeedCard />
-      <FeedCard />
-      <FeedCard />
-      <FeedCard />
-      <FeedCard />
     </Flex>
   )
 }
