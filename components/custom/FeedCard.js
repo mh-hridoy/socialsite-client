@@ -1,26 +1,37 @@
-import React from 'react'
+import React, { useState } from "react"
 import { Flex, Avatar, Text } from "@chakra-ui/react"
-import { useSelector } from "react-redux"
 import { BsHeart } from "react-icons/bs"
 import { AiOutlineComment } from "react-icons/ai"
 import Masonry from "react-masonry-css"
 import dateFormat from "dateformat"
-import PhotoAlbum from "react-photo-album"
+import GalleryModal from "./GalleryModal"
 
-const FeedCard = ({item}) => {
-      const user = useSelector((state) => state.user.user)
+const FeedCard = ({ item }) => {
+  const [currentImageArray, setCurrentImageArray] = useState([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedItem, setSelectedItem] = useState(0)
 
-      const breakpointColumnsObj = {
-        default: 2,
-        700: 1
-      
-      }
+  const breakpointColumnsObj = {
+    default: 2,
+    700: 1,
+  }
 
-
-
+  const galleryHandler = (inx) => {
+    setIsModalOpen(!isModalOpen)
+setSelectedItem(inx)
+    setCurrentImageArray([...item.images])
+  }
 
   return (
     <>
+      <GalleryModal
+        isModalOpen={isModalOpen}
+        setCurrentImageArray={setCurrentImageArray}
+        setIsModalOpen={setIsModalOpen}
+        currentImageArray={currentImageArray}
+        selectedItem={selectedItem}
+        setSelectedItem={setSelectedItem}
+      />
       <Flex direction={"column"} gap={4}>
         <Flex
           direction={"column"}
@@ -52,6 +63,7 @@ const FeedCard = ({item}) => {
           <Text py={3} pl={10} pr={4} fontSize={13}>
             {item.text}
           </Text>
+
           <Flex
             py={3}
             pl={10}
@@ -60,20 +72,32 @@ const FeedCard = ({item}) => {
             pr={4}
             marginBottom={10}
           >
-          
             {item.images && item.images.length !== 0 && (
               <>
                 {item.images.length == 1 ? (
-                  <img alt={item.images[0].name} src={item.images[0].img} />
+                  <img
+                    onClick={() => {
+                      setCurrentImageArray([...item.images])
+                      setIsModalOpen(!isModalOpen)
+                    }}
+                    style={{ cursor: "pointer" }}
+                    alt={item.images[0].name}
+                    src={item.images[0].img}
+                  />
                 ) : (
                   <Masonry
                     breakpointCols={breakpointColumnsObj}
                     className="my-masonry-grid"
-                    style={{ gap: 2 }}
                     columnClassName="my-masonry-grid_column"
                   >
                     {item.images.map((item, inx) => (
-                      <img key={inx} alt={item.name} src={item.img} />
+                      <img
+                        onClick={() => galleryHandler(inx)}
+                        style={{ cursor: "pointer", margin: 2 }}
+                        key={inx}
+                        alt={item.name}
+                        src={item.img}
+                      />
                     ))}
                   </Masonry>
                 )}

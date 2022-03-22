@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react"
 import "react-phone-input-2/lib/style.css"
 import "emoji-mart/css/emoji-mart.css"
+import "react-responsive-carousel/lib/styles/carousel.min.css" 
 
 import StoreProvider from '../store'
 import SideBar from '../components/base/SideBar'
@@ -66,19 +67,15 @@ function MyApp({ Component, pageProps }) {
   return (
     <StoreProvider>
       <ChakraProvider theme={theme}>
-        {/* Header */}
         <Header />
 
-        <Show above="md">
           <Flex>
-            <SideBar />
+            <Show above="md">
+              <SideBar />
+            </Show>
             <Component {...pageProps} />
           </Flex>
-        </Show>
 
-        <Show below="md">
-          <Component {...pageProps} />
-        </Show>
         {/* No footers */}
       </ChakraProvider>
     </StoreProvider>
