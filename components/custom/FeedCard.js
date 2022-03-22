@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Flex, Avatar, Text } from "@chakra-ui/react"
+import { Flex, Avatar, Text, TagLabel, Tag } from "@chakra-ui/react"
 import { BsHeart } from "react-icons/bs"
 import { AiOutlineComment } from "react-icons/ai"
 import Masonry from "react-masonry-css"
@@ -18,9 +18,11 @@ const FeedCard = ({ item }) => {
 
   const galleryHandler = (inx) => {
     setIsModalOpen(!isModalOpen)
-setSelectedItem(inx)
+    setSelectedItem(inx)
     setCurrentImageArray([...item.images])
   }
+
+  console.log(item)
 
   return (
     <>
@@ -63,6 +65,19 @@ setSelectedItem(inx)
           <Text py={3} pl={10} pr={4} fontSize={13}>
             {item.text}
           </Text>
+
+          {item.tags && (
+            <Flex marginLeft={10} gap={5}>
+            {item.tags.map((item, inx) => {
+              return (
+                  <Tag cursor={"pointer"} key={inx} variant="outline" size="md" colorScheme="gray">
+                    <TagLabel>#{item}</TagLabel>
+                  </Tag>
+              )
+            })}
+              
+            </Flex>
+          )}
 
           <Flex
             py={3}

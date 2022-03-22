@@ -19,6 +19,8 @@ import Resizer from "react-image-file-resizer"
 import { AiOutlineDelete } from "react-icons/ai"
 import axios from "axios"
 import { useSelector } from "react-redux"
+import Select from "react-select"
+
 const CreateNewFeed = () => {
   const [showEmoji, setShowEmoji] = useState(false)
   const { colorMode } = useColorMode()
@@ -29,6 +31,17 @@ const CreateNewFeed = () => {
   const toast = useToast({ position: "top", isClosable: true })
   const token = useSelector((state) => state.user.token)
   const user = useSelector((state) => state.user.user)
+  const [selectedTag, setSelectedTag] = useState([])
+
+  const selectOption = [
+    { value: "general", label: "General" },
+    { value: "technology", label: "Technology" },
+    { value: "development", label: "Development" },
+    { value: "programming", label: "Programming" },
+    { value: "places", label: "Places" },
+    { value: "universe", label: "Universe" },
+    { value: "nature", label: "Nature" },
+  ]
 
   const emojiHandler = (emoji) => {
     const emoWithText = [
@@ -97,12 +110,16 @@ const CreateNewFeed = () => {
 
   const postHandler = async () => {
     setIsLoading(true)
+    const tags = []
+    if (selectedTag.length !== 0) {
+      selectedTag.map((item) => tags.push(item.value))
+    }
 
     if (feedText || images.length !== 0) {
       try {
         const { data } = await axios.post(
           `${process.env.NEXT_PUBLIC_MAIN_PROXY}/new-post`,
-          { text: feedText, images, user: user._id },
+          { text: feedText, images, user: user._id, tags },
           {
             headers: {
               "Content-Type": "application/json",
@@ -114,7 +131,7 @@ const CreateNewFeed = () => {
         setIsLoading(false)
         setFeedText("")
         setImages([])
-
+        setSelectedTag([])
         toast({
           status: "success",
           duration: 3000,
@@ -146,6 +163,23 @@ const CreateNewFeed = () => {
     setImages([...allImages])
   }
 
+  const customStyles = {
+    option: (provided) => ({
+      ...provided,
+      padding: 10,
+      fontSize: 14,
+    }),
+    control: () => ({
+      marginBottom: 10,
+    }),
+    singleValue: (provided, state) => {
+      const opacity = state.isDisabled ? 0.5 : 1
+      const transition = "opacity 300ms"
+
+      return { ...provided, opacity, transition }
+    },
+  }
+
   return (
     <Flex direction="column" gap={5} width="100%">
       <Flex
@@ -155,7 +189,7 @@ const CreateNewFeed = () => {
         direction="column"
         width="100%"
       >
-        <Flex>
+        <Flex direction="column" marginBottom={images.length == 0 ? 10 : 0}>
           <Textarea
             onInput={areaHandler}
             variant={"unstyled"}
@@ -171,16 +205,24 @@ const CreateNewFeed = () => {
             borderColor={"gray.100"}
             px={5}
             pt={2}
-            marginBottom={images.length == 0 && 10}
             placeholder="What's happening?"
             width={"100%"}
             resize="none"
+          />
+
+          <Select
+            styles={customStyles}
+            placeholder="Select tags..."
+            onChange={(e) => setSelectedTag(e)}
+            isMulti={true}
+            options={selectOption}
           />
         </Flex>
 
         {/* show images */}
         {images.length !== 0 && (
           <Flex
+            marginTop={4}
             height={"70px"}
             width={"100%"}
             wrap={"wrap"}
