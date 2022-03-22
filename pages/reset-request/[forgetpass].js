@@ -44,8 +44,7 @@ const ResetRequest = () => {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const toast = useToast({ position: "top", isClosable: true })
-  const code = window.location.pathname.split("/")
-  const veriCode = code[code.length - 1]
+  let veriCode;
 
   const resetHandler = async (values) => {
     const {password} = values
@@ -86,6 +85,8 @@ const ResetRequest = () => {
   
 
   useEffect(() => {
+    const code = window.location.pathname.split("/")
+    veriCode = code[code.length - 1]
     checkCode()
   }, [])
 

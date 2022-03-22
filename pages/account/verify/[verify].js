@@ -9,8 +9,7 @@ const VerifyPage = () => {
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast({ position: "top", isClosable: true })
   const router = useRouter()
-const code = window.location.pathname.split("/")
-const veriCode = code[code.length - 1]
+  let veriCode;
 
 const verifyEmailHandler = async()=> {
   setIsLoading(true)
@@ -48,6 +47,8 @@ const verifyEmailHandler = async()=> {
 }
 
 useEffect(() => {
+  const code = window.location.pathname.split("/")
+  veriCode = code[code.length - 1]
   checkCode()
 }, [])
 
