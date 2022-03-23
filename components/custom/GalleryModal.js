@@ -39,7 +39,7 @@ setSelectedItem
           <Carousel selectedItem={selectedItem}>
             {currentImageArray.map((item, inx) => {
               return (
-                <div style={{height: 400}} key={inx}>
+                <div style={{height: 400, overflow: "auto"}} key={inx}>
                   <img alt={item.name} src={item.img} />
                 </div>
               )

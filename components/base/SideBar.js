@@ -35,7 +35,7 @@ const SideBar = () => {
     {
       name: "My Account",
       Icon: MdOutlineAccountCircle,
-      uri: `/account/${user !== null && user._id}`,
+      uri: `/account/myaccount/${user !== null && user._id}`,
     },
 
     {

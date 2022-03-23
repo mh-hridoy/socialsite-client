@@ -131,6 +131,7 @@ const CreateNewFeed = () => {
         setIsLoading(false)
         setFeedText("")
         setImages([])
+        
         setSelectedTag([])
         toast({
           status: "success",
@@ -215,6 +216,7 @@ const CreateNewFeed = () => {
             placeholder="Select tags..."
             onChange={(e) => setSelectedTag(e)}
             isMulti={true}
+            
             options={selectOption}
           />
         </Flex>

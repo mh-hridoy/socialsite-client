@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react'
 import { Flex, useToast, Spinner } from "@chakra-ui/react"
-import UserAccount from '../../components/base/UserAccount'
+import UserAccount from '../../../components/base/UserAccount'
 import {useSelector, useDispatch} from 'react-redux'
 import {useRouter} from 'next/router'
-import {logout} from '../../store/userInfoSlice'
+import {logout} from '../../../store/userInfoSlice'
 import axios from 'axios'
 import io from "socket.io-client"
 
@@ -59,11 +59,6 @@ const UserId = () => {
       })
     }
   }
-
-  useEffect(() => {
-  const isUser=router.query.user == user._id
-    if (fetchUser && isUser) router.push(`/account/myaccount/${user._id}`)
-  }, [fetchUser])
 
   //setup socket
 useEffect(() => {

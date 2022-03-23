@@ -47,14 +47,15 @@ const ResetRequest = () => {
   let veriCode;
 
   const resetHandler = async (values) => {
+    const verifyCode = router.query.forgetpass
     const {password} = values
     setIsLoading(true)
 
     try {
-     const {data} =  await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/reset-password`,
-        { resetCode: veriCode, password }
-      )
+     const { data } = await axios.post(
+       `${process.env.NEXT_PUBLIC_MAIN_PROXY}/reset-password`,
+       { resetCode: verifyCode, password }
+     )
 
       setIsLoading(false)
       toast({

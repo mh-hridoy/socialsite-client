@@ -12,11 +12,13 @@ const VerifyPage = () => {
   let veriCode;
 
 const verifyEmailHandler = async()=> {
+  const verifyCode = router.query.verify
+  
   setIsLoading(true)
   try {
     await axios.post(
       `${process.env.NEXT_PUBLIC_MAIN_PROXY}/verify-email`,
-      { verifyCode: veriCode },
+      { verifyCode: verifyCode },
       {
         headers: {
           "Content-Type": "application/json",

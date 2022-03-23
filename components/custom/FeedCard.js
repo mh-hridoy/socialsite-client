@@ -1,20 +1,39 @@
-import React, { useState } from "react"
-import { Flex, Avatar, Text, TagLabel, Tag } from "@chakra-ui/react"
-import { BsHeart } from "react-icons/bs"
+import React, { useState, useEffect } from "react"
+import {
+  Flex,
+  Avatar,
+  Text,
+  TagLabel,
+  Tag,
+  useToast,
+  useColorModeValue,
+} from "@chakra-ui/react"
+import { BsHeart, BsHeartFill } from "react-icons/bs"
 import { AiOutlineComment } from "react-icons/ai"
 import Masonry from "react-masonry-css"
 import dateFormat from "dateformat"
 import GalleryModal from "./GalleryModal"
+import { useRouter } from "next/router"
+import axios from "axios"
+import { useSelector } from "react-redux"
 
-const FeedCard = ({ item }) => {
+const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(0)
-
+  const token = useSelector((state) => state.user.token)
+  const user = useSelector((state) => state.user.user)
+  const router = useRouter()
+  const toast = useToast({ position: "top", isClosable: true })
+  const [item, setItem] = useState(props.item)
   const breakpointColumnsObj = {
     default: 2,
     700: 1,
   }
+
+  useEffect(() => {
+      setItem(props.item)
+  }, [props.item])
 
   const galleryHandler = (inx) => {
     setIsModalOpen(!isModalOpen)
@@ -22,7 +41,65 @@ const FeedCard = ({ item }) => {
     setCurrentImageArray([...item.images])
   }
 
-  console.log(item)
+  const likeHandler = async () => {
+    const newItem = {...item}
+    newItem.totalReact = newItem.totalReact + 1
+    newItem.reactedByUser.push(user._id)
+
+    setItem(newItem)
+    
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-like`,
+        { userId: user._id, postId: item._id },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      )
+    } catch (e) {
+      const errorMsg = e.response && e.response.data.message
+      console.log(errorMsg)
+      // toast({
+      //   status: "error",
+      //   duration: 5000,
+      //   title: "Something went wrong!!!",
+      // })
+    }
+  }
+
+  const unLikeHandler = async () => {
+    const newItem = { ...item }
+    newItem.totalReact = newItem.totalReact - 1
+    const indexOfUser = newItem.reactedByUser.indexOf((item) => item == user._id )
+    newItem.reactedByUser.splice(indexOfUser, 1)
+
+    setItem(newItem)
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-unlike`,
+        { userId: user._id, postId: item._id },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      )
+    } catch (e) {
+      const errorMsg = e.response && e.response.data.message
+      console.log(errorMsg)
+      // toast({
+      //   status: "error",
+      //   duration: 5000,
+      //   title: "Something went wrong!!!",
+      // })
+    }
+  }
 
   return (
     <>
@@ -44,13 +121,23 @@ const FeedCard = ({ item }) => {
           width={"100%"}
           rounded="md"
         >
-          <Flex gap={2}>
+          <Flex
+            gap={2}
+            cursor="pointer"
+            onClick={() =>
+              router.push(
+                item.user == user._id
+                  ? `/account/myaccount/${item.user._id}`
+                  : `/account/${item.user._id}`
+              )
+            }
+          >
             <Avatar
               _hover={{ border: "2px solid #ff552f" }}
               cursor="pointer"
               size={"sm"}
               name={item.user.fullName}
-              src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+              // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
             ></Avatar>
             <Flex direction="column">
               <Text color="buttonColor" fontWeight={600} fontSize={15}>
@@ -68,14 +155,19 @@ const FeedCard = ({ item }) => {
 
           {item.tags && (
             <Flex marginLeft={10} gap={5}>
-            {item.tags.map((item, inx) => {
-              return (
-                  <Tag cursor={"pointer"} key={inx} variant="outline" size="md" colorScheme="gray">
+              {item.tags.map((item, inx) => {
+                return (
+                  <Tag
+                    cursor={"pointer"}
+                    key={inx}
+                    variant="outline"
+                    size="md"
+                    colorScheme="gray"
+                  >
                     <TagLabel>#{item}</TagLabel>
                   </Tag>
-              )
-            })}
-              
+                )
+              })}
             </Flex>
           )}
 
@@ -128,8 +220,6 @@ const FeedCard = ({ item }) => {
             width={"100%"}
             borderTop="1px"
             borderColor={"gray.300"}
-            px={4}
-            py={2}
           >
             <Flex
               width={"100%"}
@@ -139,19 +229,36 @@ const FeedCard = ({ item }) => {
               alignItems="center"
               justifyContent="center"
               cursor="pointer"
+              px={4}
+              py={2}
+              onClick={
+                item.reactedByUser &&
+                item.reactedByUser.includes(user && user._id)
+                  ? unLikeHandler
+                  : likeHandler
+              }
             >
-              <BsHeart size={20} />
-              <Text>100</Text>
+              {item.reactedByUser &&
+              item.reactedByUser.includes(user && user._id) ? (
+                <BsHeartFill color="#ff552f" />
+              ) : (
+                <BsHeart size={18} />
+              )}
+              <Text fontSize={14}>
+                {(item.reactedByUser && item.reactedByUser.length) || 0}
+              </Text>
             </Flex>
             <Flex
               width={"100%"}
               cursor="pointer"
+              px={4}
+              py={2}
               gap={4}
               alignItems="center"
               justifyContent="center"
             >
-              <AiOutlineComment size={22} />
-              <Text>100</Text>
+              <AiOutlineComment size={20} />
+              <Text fontSize={14}>100</Text>
             </Flex>
           </Flex>
         </Flex>

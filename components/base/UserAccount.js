@@ -18,7 +18,7 @@ const UserAccount = ({ post, user }) => {
           cursor="pointer"
           size={"xl"}
           name={user.fullName}
-          src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+          // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
         ></Avatar>
         <Text fontWeight={600} fontSize={25}>
           {user.fullName}
@@ -38,7 +38,7 @@ const UserAccount = ({ post, user }) => {
         Posts:
       </Text>
       {post && post.length !== 0 ? (
-        post.map((item, inx) => <FeedCard key={inx} item={item} />)
+        post.map((item, inx) => <FeedCard key={inx} inx={inx} item={item} />)
       ) : (
         <Text>There's no activity.</Text>
       )}

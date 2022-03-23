@@ -128,12 +128,12 @@ const Header = () => {
               <Show below="md">
                 <Flex gap={10} alignItems="center" justifyContent={"center"}>
                   <Avatar
-                    onClick={() => router.push(`/account/${user._id}`)}
+                    onClick={() => router.push(`/account/myaccount/${user._id}`)}
                     cursor={"pointer"}
                     border={pathName.includes(user._id) && "2px solid #ff552f"}
                     size={"sm"}
                     name={user && user.fullName}
-                    src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                    // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
                   ></Avatar>
                   {!isLoading ? (
                     <MdOutlineLogout
