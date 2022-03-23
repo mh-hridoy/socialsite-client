@@ -1,0 +1,90 @@
+
+import React, { useState } from 'react'
+import { Flex, Input, Button, Text } from "@chakra-ui/react"
+import SingleComments from './SingleComments'
+import { useSelector } from 'react-redux'
+import axios from 'axios'
+
+const CommentsOfFeed = ({ postId, comments }) => {
+  const [commentText, setCommentText] = useState("")
+  const user = useSelector((state) => state.user.user)
+  const token = useSelector((state) => state.user.token)
+  const [loading, setLoading] = useState(false)
+
+  const commentHandler = async () => {
+    try {
+      setLoading(true)
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/create-comment`,
+        { userId: user._id, text: commentText, postId: postId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      )
+      setCommentText("")
+      setLoading(false)
+    } catch (e) {
+      setLoading(false)
+      const errorMsg = e.response && e.response.data.message
+      console.log(errorMsg)
+    }
+  }
+
+  return (
+    <Flex
+      transform={"translateY(-12px)"}
+      rounded="md"
+      px={4}
+      maxHeight={400}
+      overflow={"auto"}
+      border="1px"
+      borderColor="gray.300"
+      direction="column"
+      position="relative"
+      widht="100%"
+    >
+      <Flex
+        paddingTop={4}
+        position="sticky"
+        zIndex={10}
+        top={0}
+        backgroundColor="white"
+        alignItems="center"
+        justifyContent="center"
+        gap={2}
+      >
+        <Input
+          _focus={{ boxShadow: "none" }}
+          size={"sm"}
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+          type="text"
+          placeholder="What's in your mind?"
+          width={"100%"}
+        />
+        <Button
+          isLoading={loading}
+          onClick={commentHandler}
+          bg={"buttonColor"}
+          size="sm"
+        >
+          Comment
+        </Button>
+      </Flex>
+
+      {comments && comments.length == 0 && <Text marginTop={4} textAlign={"center"} fontSize={14} opacity={0.7} >No comments yet!</Text>}
+
+      <Flex mt={4} direction="column">
+        {comments.map((item, inx) => {
+          return <SingleComments key={inx} item={item} />
+        })}
+      </Flex>
+    </Flex>
+  )
+}
+
+export default CommentsOfFeed

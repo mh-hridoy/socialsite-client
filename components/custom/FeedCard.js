@@ -6,9 +6,9 @@ import {
   TagLabel,
   Tag,
   useToast,
-  useColorModeValue,
 } from "@chakra-ui/react"
 import { BsHeart, BsHeartFill } from "react-icons/bs"
+import {IoIosArrowDown} from 'react-icons/io'
 import { AiOutlineComment } from "react-icons/ai"
 import Masonry from "react-masonry-css"
 import dateFormat from "dateformat"
@@ -16,6 +16,7 @@ import GalleryModal from "./GalleryModal"
 import { useRouter } from "next/router"
 import axios from "axios"
 import { useSelector } from "react-redux"
+import CommentsOfFeed from "./CommentsOfFeed"
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -26,6 +27,9 @@ const FeedCard = (props) => {
   const router = useRouter()
   const toast = useToast({ position: "top", isClosable: true })
   const [item, setItem] = useState(props.item)
+  const [showComment, setShowComment] = useState(false)
+
+
   const breakpointColumnsObj = {
     default: 2,
     700: 1,
@@ -249,6 +253,7 @@ const FeedCard = (props) => {
               </Text>
             </Flex>
             <Flex
+              onClick={() => setShowComment(!showComment)}
               width={"100%"}
               cursor="pointer"
               px={4}
@@ -258,10 +263,21 @@ const FeedCard = (props) => {
               justifyContent="center"
             >
               <AiOutlineComment size={20} />
-              <Text fontSize={14}>100</Text>
+              <Text fontSize={14}>
+                {item.comments && item.comments.length || 0}
+              </Text>
+              <IoIosArrowDown/>
             </Flex>
           </Flex>
         </Flex>
+        {showComment && (
+          <CommentsOfFeed
+            // item={item}
+            // setItem={setItem}
+            comments={item.comments}
+            postId={item._id}
+          />
+        )}
       </Flex>
     </>
   )
