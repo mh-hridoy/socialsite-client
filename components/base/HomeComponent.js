@@ -1,15 +1,18 @@
-import React, {useRef} from 'react'
-import { Flex } from "@chakra-ui/react"
+import React from "react"
+import { Flex, Text, Spinner } from "@chakra-ui/react"
 import CreateNewFeed from "../custom/CreateNewFeed"
 import AllPost from "../custom/AllPost"
-
-
-const HomeComponent = ({ homeData }) => {
-  const homeRef = useRef(null)
-
+import {useRouter} from "next/router"
+const HomeComponent = ({
+  homeData,
+  setPage,
+  page,
+  totalPage,
+  fetchingHomeData,
+}) => {
+  const router = useRouter()
   return (
     <Flex
-    ref={homeRef}
       alignItems={"center"}
       justifyContent="center"
       marginBottom={5}
@@ -18,7 +21,29 @@ const HomeComponent = ({ homeData }) => {
     >
       <Flex w={["90%", "90%", "75%"]} direction={"column"} gap={4}>
         <CreateNewFeed />
-        <AllPost post={homeData} />
+        <AllPost
+          // setFetchData={setFetchData}
+          setPage={setPage}
+          totalPage={totalPage}
+          page={page}
+          post={homeData}
+        />
+        {fetchingHomeData && page != 1 && (
+          <Flex
+            mt={2}
+            alignItems="center"
+            justifyContent={"center"}
+            width={"100%"}
+          >
+            <Spinner color={"#ff552f"} size={"sm"} />
+          </Flex>
+        )}
+        {!fetchingHomeData && totalPage == page && (
+          <Text mt={5} textAlign={"center"} fontSize={14} opacity={0.7}>
+            There's nothing to show!{" "}
+            <a onClick={() => router.push("/")}>Please go back to top</a>
+          </Text>
+        )}
       </Flex>
     </Flex>
   )

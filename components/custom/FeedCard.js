@@ -29,7 +29,6 @@ const FeedCard = (props) => {
   const [item, setItem] = useState(props.item)
   const [showComment, setShowComment] = useState(false)
 
-
   const breakpointColumnsObj = {
     default: 2,
     700: 1,
@@ -115,7 +114,7 @@ const FeedCard = (props) => {
         selectedItem={selectedItem}
         setSelectedItem={setSelectedItem}
       />
-      <Flex direction={"column"} gap={4}>
+      <Flex ref={props.lastFeedRef ? props.lastFeedRef : null  } direction={"column"} gap={4}>
         <Flex
           direction={"column"}
           position={"relative"}
@@ -264,9 +263,9 @@ const FeedCard = (props) => {
             >
               <AiOutlineComment size={20} />
               <Text fontSize={14}>
-                {item.comments && item.comments.length || 0}
+                {(item.comments && item.comments.length) || 0}
               </Text>
-              <IoIosArrowDown/>
+              <IoIosArrowDown />
             </Flex>
           </Flex>
         </Flex>

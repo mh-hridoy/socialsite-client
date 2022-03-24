@@ -99,16 +99,12 @@ const setupAllData = (post) => {
   // console.log(post)
   setHomeData((prev) => {
     const newArray = [...prev]
-    // find if the post already exist
     const indexOfNewPost = newArray.findIndex((item) => item._id == post._id)
-    //if exist replace it with the existingone
     if (indexOfNewPost != -1) {
       newArray[indexOfNewPost] = post
     } else {
       newArray.unshift(post)
     }
-    //else add it to the array
-
     return [...new Set(newArray)]
   })
 }

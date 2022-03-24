@@ -11,9 +11,18 @@ import {
 import "react-phone-input-2/lib/style.css"
 import "emoji-mart/css/emoji-mart.css"
 import "react-responsive-carousel/lib/styles/carousel.min.css" 
+import ProgressBar from "@badrap/bar-of-progress"
+import Router from "next/router"
 
 import StoreProvider from '../store'
 import SideBar from '../components/base/SideBar'
+
+const progress = new ProgressBar({
+  size: 2,
+  color: "#ff552f",
+  className: "bar-of-progress",
+  delay: 100,
+})
 
 const colors = {
   white: "#fff",
@@ -64,6 +73,10 @@ const theme = extendTheme(
 
 
 function MyApp({ Component, pageProps }) {
+  Router.events.on("routeChangeStart", progress.start)
+  Router.events.on("routeChangeComplete", progress.finish)
+  Router.events.on("routeChangeError", progress.finish)
+  
   return (
     <StoreProvider>
       <ChakraProvider theme={theme}>

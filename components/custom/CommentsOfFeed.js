@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react'
-import { Flex, Input, Button, Text } from "@chakra-ui/react"
+import { Flex, Input, Button, Text, useColorModeValue } from "@chakra-ui/react"
 import SingleComments from './SingleComments'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
@@ -52,7 +52,7 @@ const CommentsOfFeed = ({ postId, comments }) => {
         position="sticky"
         zIndex={10}
         top={0}
-        backgroundColor="white"
+        backgroundColor={useColorModeValue("#fff", "#1A202C")}
         alignItems="center"
         justifyContent="center"
         gap={2}
@@ -76,7 +76,11 @@ const CommentsOfFeed = ({ postId, comments }) => {
         </Button>
       </Flex>
 
-      {comments && comments.length == 0 && <Text marginTop={4} textAlign={"center"} fontSize={14} opacity={0.7} >No comments yet!</Text>}
+      {comments && comments.length == 0 && (
+        <Text marginTop={4} textAlign={"center"} fontSize={14} opacity={0.7}>
+          No comments yet!
+        </Text>
+      )}
 
       <Flex mt={4} direction="column">
         {comments.map((item, inx) => {
