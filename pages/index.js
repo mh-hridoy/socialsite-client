@@ -22,7 +22,7 @@ useEffect(() => {
       query: { token: token},
     })
     socket.on("posts", (data) => {
-      // console.log(data)
+      console.log(data)
       setupAllData(data)
     })
 

@@ -1,12 +1,15 @@
-import React from 'react'
+import React, {useRef} from 'react'
 import { Flex } from "@chakra-ui/react"
 import CreateNewFeed from "../custom/CreateNewFeed"
 import AllPost from "../custom/AllPost"
 
 
 const HomeComponent = ({ homeData }) => {
+  const homeRef = useRef(null)
+
   return (
     <Flex
+    ref={homeRef}
       alignItems={"center"}
       justifyContent="center"
       marginBottom={5}
