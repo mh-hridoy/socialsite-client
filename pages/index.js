@@ -6,6 +6,7 @@ import { useRouter } from "next/router"
 import HomeComponent from "../components/base/HomeComponent"
 import io from "socket.io-client"
 import { logout } from "../store/userInfoSlice"
+import { storeFeed } from "../store/feedSlice"
 
 export default function Home() {
   const token = useSelector((state) => state.user.token)
@@ -61,6 +62,7 @@ export default function Home() {
         newArray.unshift(post)
       }
       //else add it to the array
+      dispatch(storeFeed({data : newArray}))
 
       return [...new Set(newArray)]
     })
@@ -87,6 +89,7 @@ export default function Home() {
           const newArray = [...homeData, ...data.post]
           const withoutDup = [...new Set(newArray)]
           setHomeData(withoutDup)
+               dispatch(storeFeed({ data: newArray }))
 
           setTotalPage(data.totalPage)
         setFetchingHomeData(false)

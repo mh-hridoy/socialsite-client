@@ -20,15 +20,12 @@ export const userInfoSlice = createSlice({
     logout: (state, action) => {
       return { user: action.payload.user, token: action.payload.token }
     },
+ 
     
   },
 })
 
 // Action creators are generated for each case reducer function
-export const {
-  login,
-  logout,
-  
-} = userInfoSlice.actions
+export const { login, logout } = userInfoSlice.actions
 
 export default userInfoSlice.reducer

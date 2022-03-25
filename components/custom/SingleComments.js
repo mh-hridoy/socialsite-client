@@ -3,6 +3,7 @@ import { Flex, Avatar, Text } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
 import dateFormat from "dateformat"
 import {useRouter} from "next/router"
+import { MdVerified } from "react-icons/md"
 
 
 const SingleComments = ({item}) => {
@@ -10,8 +11,13 @@ const SingleComments = ({item}) => {
     const router = useRouter()
 
   return (
-    <Flex marginBottom={3} paddingBottom={2} borderBottom="1px"
-        borderColor="gray.200" direction={"column"}>
+    <Flex
+      marginBottom={3}
+      paddingBottom={2}
+      borderBottom="1px"
+      borderColor="gray.200"
+      direction={"column"}
+    >
       <Flex
         columnGap={2}
         cursor="pointer"
@@ -31,9 +37,21 @@ const SingleComments = ({item}) => {
           // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
         ></Avatar>
         <Flex marginBottom={2} direction="column">
-          <Text color="buttonColor" fontWeight={600} fontSize={15}>
-            {item.userName}
+        
+          <Text
+            display={"flex"}
+            color="#ff552f"
+            alignItems="center"
+            gap={2}
+            fontWeight={600}
+            fontSize={15}
+          >
+            {item.userName}{" "}
+            {item.isUserVerified && item.isUserVerified == true && (
+              <MdVerified />
+            )}
           </Text>
+
           <Text fontSize={12} opacity={"0.7"}>
             {dateFormat(item.createdAt, "dddd, mmmm dS, yyyy, h:MM TT")}
           </Text>

@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit"
 import userInfoSlice from "./userInfoSlice"
+import feedSlice from "./feedSlice"
 import { Provider } from "react-redux"
 import {  useEffect } from "react"
 import { login, logout } from "./userInfoSlice"
@@ -8,8 +9,7 @@ import axios from "axios"
 const store = configureStore({
   reducer: {
     user: userInfoSlice,
-
-   
+    feed: feedSlice,
   },
 })
 

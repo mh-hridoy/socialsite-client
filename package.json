@@ -30,6 +30,7 @@
     "react-responsive-carousel": "^3.2.23",
     "react-select": "^5.2.2",
     "socket.io-client": "^4.4.1",
+    "underscore": "^1.13.2",
     "yup": "^0.32.11"
   },
   "devDependencies": {

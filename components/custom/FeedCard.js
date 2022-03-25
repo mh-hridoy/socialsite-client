@@ -17,6 +17,8 @@ import { useRouter } from "next/router"
 import axios from "axios"
 import { useSelector } from "react-redux"
 import CommentsOfFeed from "./CommentsOfFeed"
+import { MdVerified } from "react-icons/md"
+import _ from "underscore"
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -45,11 +47,16 @@ const FeedCard = (props) => {
   }
 
   const likeHandler = async () => {
-    const newItem = {...item}
-    newItem.totalReact = newItem.totalReact + 1
-    newItem.reactedByUser.push(user._id)
 
-    setItem(newItem)
+    const modItem = _.clone(item)
+    modItem.totalReact = modItem.totalReact + 1
+
+    const reactedByUser = [...modItem.reactedByUser]
+
+    reactedByUser.push(user._id)
+    modItem.reactedByUser = [...new Set(reactedByUser)]
+
+    setItem(modItem)
     
     try {
       await axios.post(
@@ -65,7 +72,7 @@ const FeedCard = (props) => {
       )
     } catch (e) {
       const errorMsg = e.response && e.response.data.message
-      console.log(errorMsg)
+      // console.log(errorMsg)
       // toast({
       //   status: "error",
       //   duration: 5000,
@@ -75,12 +82,25 @@ const FeedCard = (props) => {
   }
 
   const unLikeHandler = async () => {
-    const newItem = { ...item }
-    newItem.totalReact = newItem.totalReact - 1
-    const indexOfUser = newItem.reactedByUser.indexOf((item) => item == user._id )
-    newItem.reactedByUser.splice(indexOfUser, 1)
+    const modItem = _.clone(item)
+    modItem.totalReact = modItem.totalReact - 1
 
-    setItem(newItem)
+    const reactedByUser = [...modItem.reactedByUser]
+    const indexOfUser = reactedByUser.indexOf(
+      (item) => item == user._id
+    )
+reactedByUser.splice(indexOfUser, 1)
+    modItem.reactedByUser = [...new Set(reactedByUser)]
+
+    setItem(modItem)
+
+
+    // const newItem = { ...item }
+    // newItem.totalReact = newItem.totalReact - 1
+    // const indexOfUser = newItem.reactedByUser.indexOf((item) => item == user._id )
+    // newItem.reactedByUser.splice(indexOfUser, 1)
+
+    // setItem(newItem)
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-unlike`,
@@ -95,7 +115,7 @@ const FeedCard = (props) => {
       )
     } catch (e) {
       const errorMsg = e.response && e.response.data.message
-      console.log(errorMsg)
+      // console.log(errorMsg)
       // toast({
       //   status: "error",
       //   duration: 5000,
@@ -114,7 +134,11 @@ const FeedCard = (props) => {
         selectedItem={selectedItem}
         setSelectedItem={setSelectedItem}
       />
-      <Flex ref={props.lastFeedRef ? props.lastFeedRef : null  } direction={"column"} gap={4}>
+      <Flex
+        ref={props.lastFeedRef ? props.lastFeedRef : null}
+        direction={"column"}
+        gap={4}
+      >
         <Flex
           direction={"column"}
           position={"relative"}
@@ -139,13 +163,27 @@ const FeedCard = (props) => {
               _hover={{ border: "2px solid #ff552f" }}
               cursor="pointer"
               size={"sm"}
-              name={item.user.fullName}
+              name={
+                item.user && item.user.fullName
+                  ? item.user.fullName
+                  : "Not A User"
+              }
               // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
             ></Avatar>
             <Flex direction="column">
-              <Text color="buttonColor" fontWeight={600} fontSize={15}>
-                {item.user.fullName}
+              
+              <Text
+                display={"flex"}
+                color="#ff552f"
+                alignItems="center"
+                gap={2}
+                fontWeight={600}
+                fontSize={15}
+              >
+                {item.user ? item.user.fullName : "Not A User"}{" "}
+                {item.user && item.user.isVerified == true && <MdVerified />}
               </Text>
+
               <Text fontSize={12} opacity={"0.7"}>
                 {dateFormat(item.createdAt, "dddd, mmmm dS, yyyy, h:MM TT")}
               </Text>
