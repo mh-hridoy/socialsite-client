@@ -31,7 +31,7 @@ const StoreProvider = (props) => {
     console.log(res.config, res.config.__isRetryRequest)
     if (
       res.status === 401 ||
-      (res.data.message == "invalid token" &&
+      (res.data.message == "invalid token" || "jwt expired" &&
         res.config &&
         !res.config.__isRetryRequest)
     ) {

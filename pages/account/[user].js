@@ -73,6 +73,7 @@ const UserId = (props) => {
       })
       socket.on("uesrPosts", (data) => {
         // console.log(data)
+        console.log(data)
         setupAllData(data)
       })
 

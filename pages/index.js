@@ -47,12 +47,11 @@ export default function Home(props) {
     }
   }, [!loading])
 
-
   useEffect(() => {
     setFetchData(true)
   }, [])
 
-  useEffect(()=> {
+  useEffect(() => {
     props.setHeaderName("Home")
   }, [])
 
@@ -68,7 +67,7 @@ export default function Home(props) {
         newArray.unshift(post)
       }
       //else add it to the array
-      dispatch(storeFeed({data : newArray}))
+      dispatch(storeFeed({ data: newArray }))
 
       return [...new Set(newArray)]
     })
@@ -95,15 +94,15 @@ export default function Home(props) {
           const newArray = [...homeData, ...data.post]
           const withoutDup = [...new Set(newArray)]
           setHomeData(withoutDup)
-               dispatch(storeFeed({ data: newArray }))
+          dispatch(storeFeed({ data: newArray }))
 
           setTotalPage(data.totalPage)
-        setFetchingHomeData(false)
+          setFetchingHomeData(false)
 
           setLoading(false)
         } catch (e) {
           router.push("/login")
-                  setFetchingHomeData(false)
+          setFetchingHomeData(false)
 
           const errorMsg = e.response && e.response.data.message
           // console.log(errorMsg)
@@ -115,7 +114,6 @@ export default function Home(props) {
 
     return () => setFetchData(false)
   }, [fetchData == true, page])
-
 
   return (
     <>
