@@ -6,12 +6,12 @@ import {
   TagLabel,
   Tag,
   useToast,
+  useColorModeValue,
 } from "@chakra-ui/react"
 import { BsHeart, BsHeartFill } from "react-icons/bs"
 import {IoIosArrowDown} from 'react-icons/io'
 import { AiOutlineComment } from "react-icons/ai"
 import Masonry from "react-masonry-css"
-import dateFormat from "dateformat"
 import GalleryModal from "./GalleryModal"
 import { useRouter } from "next/router"
 import axios from "axios"
@@ -19,6 +19,7 @@ import { useSelector } from "react-redux"
 import CommentsOfFeed from "./CommentsOfFeed"
 import { MdVerified } from "react-icons/md"
 import _ from "underscore"
+import timeAgo from '../utils/DateConverter'
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -30,6 +31,7 @@ const FeedCard = (props) => {
   const toast = useToast({ position: "top", isClosable: true })
   const [item, setItem] = useState(props.item)
   const [showComment, setShowComment] = useState(false)
+  
 
   const breakpointColumnsObj = {
     default: 2,
@@ -38,6 +40,7 @@ const FeedCard = (props) => {
 
   useEffect(() => {
       setItem(props.item)
+
   }, [props.item])
 
   const galleryHandler = (inx) => {
@@ -138,13 +141,16 @@ reactedByUser.splice(indexOfUser, 1)
         ref={props.lastFeedRef ? props.lastFeedRef : null}
         direction={"column"}
         gap={4}
+        // borderTop="1px"
+        borderBottom="1px"
+        borderColor={useColorModeValue("gray.200", "#333")}
       >
         <Flex
           direction={"column"}
           position={"relative"}
           p={4}
-          border="1px"
-          borderColor={"gray.300"}
+          // border="1px"
+          // borderColor={"gray.300"}
           width={"100%"}
           rounded="md"
         >
@@ -155,12 +161,12 @@ reactedByUser.splice(indexOfUser, 1)
               router.push(
                 item.user == user._id
                   ? `/account/myaccount/${item.user._id}`
-                  : `/account/${item.user._id}`
+                  : `/account/${item && item.user._id}`
               )
             }
           >
             <Avatar
-              _hover={{ border: "2px solid #ff552f" }}
+              _hover={{ border: "2px solid rgb(29, 155, 240)" }}
               cursor="pointer"
               size={"sm"}
               name={
@@ -170,27 +176,27 @@ reactedByUser.splice(indexOfUser, 1)
               }
               // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
             ></Avatar>
-            <Flex direction="column">
-              
+            <Flex alignItems="center" gap={4} >
               <Text
                 display={"flex"}
-                color="#ff552f"
                 alignItems="center"
                 gap={2}
                 fontWeight={600}
-                fontSize={15}
+                fontSize={16}
               >
                 {item.user ? item.user.fullName : "Not A User"}{" "}
-                {item.user && item.user.isVerified == true && <MdVerified />}
+                {item.user && item.user.isVerified == true && (
+                  <MdVerified color="rgb(29, 155, 240)" />
+                )}
               </Text>
 
-              <Text fontSize={12} opacity={"0.7"}>
-                {dateFormat(item.createdAt, "dddd, mmmm dS, yyyy, h:MM TT")}
+              <Text fontSize={12} fontWeight={500} opacity={"0.7"}>
+                {timeAgo(item.createdAt)}
               </Text>
             </Flex>
           </Flex>
 
-          <Text py={3} pl={10} pr={4} fontSize={13}>
+          <Text pl={10} pr={4} fontSize={15}>
             {item.text}
           </Text>
 
@@ -228,7 +234,7 @@ reactedByUser.splice(indexOfUser, 1)
                       setCurrentImageArray([...item.images])
                       setIsModalOpen(!isModalOpen)
                     }}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", borderRadius: "20px" }}
                     alt={item.images[0].name}
                     src={item.images[0].img}
                   />
@@ -241,7 +247,11 @@ reactedByUser.splice(indexOfUser, 1)
                     {item.images.map((item, inx) => (
                       <img
                         onClick={() => galleryHandler(inx)}
-                        style={{ cursor: "pointer", margin: 2 }}
+                        style={{
+                          cursor: "pointer",
+                          margin: 2,
+                          borderRadius: "20px",
+                        }}
                         key={inx}
                         alt={item.name}
                         src={item.img}
@@ -258,19 +268,21 @@ reactedByUser.splice(indexOfUser, 1)
             position={"absolute"}
             bottom={0}
             left={0}
+            alignItems="center"
+            justifyContent={"center"}
             width={"100%"}
-            borderTop="1px"
-            borderColor={"gray.300"}
+            // border="1px"
+            // borderColor={"gray.300"}
           >
             <Flex
-              width={"100%"}
-              borderRight="1px"
+              // width={"100%"}
+              // borderRight="1px"
               gap={4}
-              borderColor={"gray.300"}
+              // borderColor={"gray.300"}
               alignItems="center"
               justifyContent="center"
               cursor="pointer"
-              px={4}
+              px={10}
               py={2}
               onClick={
                 item.reactedByUser &&
@@ -281,7 +293,7 @@ reactedByUser.splice(indexOfUser, 1)
             >
               {item.reactedByUser &&
               item.reactedByUser.includes(user && user._id) ? (
-                <BsHeartFill color="#ff552f" />
+                <BsHeartFill color="rgb(29, 155, 240)" />
               ) : (
                 <BsHeart size={18} />
               )}
@@ -291,9 +303,9 @@ reactedByUser.splice(indexOfUser, 1)
             </Flex>
             <Flex
               onClick={() => setShowComment(!showComment)}
-              width={"100%"}
+              // width={"100%"}
               cursor="pointer"
-              px={4}
+              px={10}
               py={2}
               gap={4}
               alignItems="center"
@@ -321,3 +333,4 @@ reactedByUser.splice(indexOfUser, 1)
 }
 
 export default FeedCard
+

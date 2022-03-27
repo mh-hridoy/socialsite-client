@@ -1,14 +1,15 @@
 import React, {useState, useEffect} from 'react'
-import { Flex, useToast, Spinner } from "@chakra-ui/react"
+import { Flex, useToast, Spinner, useColorModeValue } from "@chakra-ui/react"
 import UserAccount from '../../../components/base/UserAccount'
 import {useSelector, useDispatch} from 'react-redux'
 import {useRouter} from 'next/router'
 import {logout} from '../../../store/userInfoSlice'
 import axios from 'axios'
 import io from "socket.io-client"
+import WithHeader from '../../../components/custom/WithHeader'
 
 
-const UserId = () => {
+const UserId = (props) => {
     const [loading, setLoading] = useState(true)
   const token = useSelector((state) => state.user.token)
   const user = useSelector((state) => state.user.user)
@@ -17,6 +18,8 @@ const UserId = () => {
     const [userData, setUserData]= useState(null)
   const router = useRouter()
   const [fetchUser, setFfetchUser] = useState(false)
+    const [totalPost, setTotalPost] = useState(0)
+
   const dispatch = useDispatch()
 
 
@@ -136,17 +139,34 @@ const setupAllData = (post) => {
       }
   }
 
+  useEffect(() => {
+    props.setHeaderName("My Account")
+  }, [])
+
 
   return (
     <>
-      <Flex alignItems={"center"} justifyContent="center" w={"100%"} pt={5}>
-        <Flex w={["90%", "90%", "75%"]}>
+      <Flex w={"100%"} alignItems={"center"} justifyContent="center">
+        <Flex minWidth={"100%"}>
           {loading ? (
-            <Flex alignItems={"center"} justifyContent="center" width={"100%"}>
-              <Spinner color={"#ff552f"} size={"xl"} />
+            <Flex
+              height="100vh"
+              alignItems={"center"}
+              justifyContent="center"
+              width={"100%"}
+            >
+              <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
             </Flex>
           ) : (
-            <UserAccount post={homeData} user={userData} />
+            <Flex direction="column" minWidth={"100%"}>
+              <WithHeader totalPost={totalPost} headerName={props.headerName}>
+                <UserAccount
+                  setTotalPost={setTotalPost}
+                  post={homeData}
+                  user={userData}
+                />
+              </WithHeader>
+            </Flex>
           )}
         </Flex>
       </Flex>

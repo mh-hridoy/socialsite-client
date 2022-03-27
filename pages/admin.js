@@ -62,12 +62,12 @@ const Admin = () => {
           alignItems="center"
           justifyContent="center"
         >
-          <Spinner color="#ff552f" size="xl" />
+          <Spinner color="rgb(29, 155, 240)" size="xl" />
         </Flex>
       ) : (
         <Flex width={"100%"} alignItems="center" justifyContent="center">
           <Flex direction="column" gap={5} width={["100%", "95%", "80%"]}>
-            <Text textAlign={"center"} textColor="#ff552f" fontSize={22}>
+            <Text textAlign={"center"} textColor="rgb(29, 155, 240)" fontSize={22}>
               List of Users And Controls!
             </Text>
 

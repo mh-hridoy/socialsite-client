@@ -20,10 +20,14 @@ const AuthRoute = ({ children }) => {
           height={"90vh"}
           minW={"100vw"}
         >
-          <Spinner size={"xl"} />
+          <Spinner size={"xl"} color="rgb(29, 155, 240)" />
         </Flex>
       ) : (
-        <div style={{paddingRight : "50px", width: "100%",  paddingLeft: "20px"}}>{children}</div>
+        <div
+          style={{ paddingRight: "50px", width: "100%", paddingLeft: "20px" }}
+        >
+          {children}
+        </div>
       )}
     </>
   )

@@ -1,4 +1,4 @@
-import { Flex, Spinner } from "@chakra-ui/react"
+import { Flex, Spinner, Text } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import axios from "axios"
@@ -7,8 +7,9 @@ import HomeComponent from "../components/base/HomeComponent"
 import io from "socket.io-client"
 import { logout } from "../store/userInfoSlice"
 import { storeFeed } from "../store/feedSlice"
+import WithHeader from "../components/custom/WithHeader"
 
-export default function Home() {
+export default function Home(props) {
   const token = useSelector((state) => state.user.token)
   const [homeData, setHomeData] = useState([])
   const [loading, setLoading] = useState(true)
@@ -46,8 +47,13 @@ export default function Home() {
     }
   }, [!loading])
 
+
   useEffect(() => {
     setFetchData(true)
+  }, [])
+
+  useEffect(()=> {
+    props.setHeaderName("Home")
   }, [])
 
   const setupAllData = (post) => {
@@ -120,16 +126,18 @@ export default function Home() {
           height={"80vh"}
           width={"100%"}
         >
-          <Spinner color={"#ff552f"} size={"xl"} />
+          <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
         </Flex>
       ) : (
-        <HomeComponent
-          fetchingHomeData={fetchingHomeData}
-          totalPage={totalPage}
-          page={page}
-          setPage={setPage}
-          homeData={homeData}
-        />
+        <WithHeader headerName={props.headerName}>
+          <HomeComponent
+            fetchingHomeData={fetchingHomeData}
+            totalPage={totalPage}
+            page={page}
+            setPage={setPage}
+            homeData={homeData}
+          />
+        </WithHeader>
       )}
     </>
   )

@@ -19,7 +19,7 @@ const RssFeed = () => {
           height={"80vh"}
           width={"100%"}
         >
-          <Spinner color={"#ff552f"} size={"xl"} />
+          <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
         </Flex>
       ) : (
         <>

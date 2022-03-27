@@ -219,7 +219,7 @@ const Signup = () => {
                               "#EDF2F7",
                               "#1A202C"
                             ),
-                            color: useColorModeValue("#ff552f", "#ff552f"),
+                            color: useColorModeValue("rgb(29, 155, 240)", "rgb(29, 155, 240)"),
                           }}
                           buttonStyle={{
                             border: `1px solid ${useColorModeValue(

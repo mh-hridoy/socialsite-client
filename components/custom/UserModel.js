@@ -1,5 +1,12 @@
 import React, { useState } from "react"
-import { Flex, Text, Button, Avatar, useToast } from "@chakra-ui/react"
+import {
+  Flex,
+  Text,
+  Button,
+  Avatar,
+  useToast,
+  useColorModeValue,
+} from "@chakra-ui/react"
 import { useSelector } from "react-redux"
 import { useRouter } from "next/router"
 import { MdVerified } from "react-icons/md"
@@ -125,9 +132,8 @@ const UserModel = ({ user }) => {
       padding={4}
       boxShadow="sm"
       rounded="md"
-      _hover={{ bg: "gray.100" }}
       border={"1px"}
-      borderColor="gray.300"
+      borderColor={useColorModeValue("gray.200", "#333")}
       alignItems={"center"}
       justifyContent="space-between"
     >
@@ -143,7 +149,7 @@ const UserModel = ({ user }) => {
         cursor="pointer"
       >
         <Avatar
-          _hover={{ border: "2px solid #ff552f" }}
+          _hover={{ border: "2px solid rgb(29, 155, 240)" }}
           cursor="pointer"
           size={"sm"}
           name={user.fullName}
@@ -152,14 +158,16 @@ const UserModel = ({ user }) => {
         ></Avatar>
         <Text
           display={"flex"}
-          color="#ff552f"
+          color="rgb(29, 155, 240)"
           alignItems="center"
           gap={2}
           fontWeight={600}
           fontSize={15}
         >
           {user.fullName}{" "}
-          {user.isVerified && user.isVerified == true && <MdVerified />}
+          {user.isVerified && user.isVerified == true && (
+            <MdVerified color="rgb(29, 155, 240)" />
+          )}
         </Text>
       </Flex>
 

@@ -1,4 +1,3 @@
-import Header from '../components/base/Header'
 import '../styles/globals.css'
 import {
   ChakraProvider,
@@ -16,10 +15,12 @@ import Router from "next/router"
 
 import StoreProvider from '../store'
 import SideBar from '../components/base/SideBar'
+import { useState } from 'react'
+import RightSideBar from '../components/custom/RightSideBar'
 
 const progress = new ProgressBar({
   size: 2,
-  color: "#ff552f",
+  color: "rgb(29, 180, 240",
   className: "bar-of-progress",
   delay: 100,
 })
@@ -28,7 +29,7 @@ const colors = {
   white: "#fff",
   dark: "#000",
   textColor: "#212121",
-  buttonColor: "#ff552f",
+  buttonColor: "rgb(29, 180, 240)",
 }
 
 const theme = extendTheme(
@@ -45,9 +46,8 @@ const theme = extendTheme(
             transform: "scale(0.9)",
           },
           _hover: {
-            backgroundColor: "#fff",
-            border: "1px solid #ff552f",
-            color: "buttonColor",
+            backgroundColor: "rgb(29, 155, 240)",
+            color: "white",
           },
         },
       },
@@ -55,7 +55,7 @@ const theme = extendTheme(
     styles: {
       global: {
         a: {
-          color: "#ff552f",
+          color: "rgb(29, 155, 240)",
           cursor: "pointer",
           _hover: {
             textDecoration: "underline",
@@ -73,21 +73,34 @@ const theme = extendTheme(
 
 
 function MyApp({ Component, pageProps }) {
+  const [headerName, setHeaderName] = useState("Home")
+
+
   Router.events.on("routeChangeStart", progress.start)
   Router.events.on("routeChangeComplete", progress.finish)
   Router.events.on("routeChangeError", progress.finish)
+
+
   
   return (
     <StoreProvider>
       <ChakraProvider theme={theme}>
-        <Header />
+        {/* <Header /> */}
 
-          <Flex>
-            <Show above="md">
-              <SideBar />
-            </Show>
-            <Component {...pageProps} />
+        <Flex>
+          <SideBar />
+          <Flex direction="column" width={"100%"}>
+            
+            <Component
+              headerName={headerName}
+              setHeaderName={setHeaderName}
+              {...pageProps}
+            />
           </Flex>
+          <Show above="md">
+           <RightSideBar/>
+          </Show>
+        </Flex>
 
         {/* No footers */}
       </ChakraProvider>

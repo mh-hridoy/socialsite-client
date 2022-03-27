@@ -1,5 +1,5 @@
 import React from "react"
-import { Flex, Text, Spinner } from "@chakra-ui/react"
+import { Flex, Text, Spinner, useColorModeValue } from "@chakra-ui/react"
 import CreateNewFeed from "../custom/CreateNewFeed"
 import AllPost from "../custom/AllPost"
 import {useRouter} from "next/router"
@@ -18,9 +18,15 @@ const HomeComponent = ({
       marginBottom={5}
       w={"100%"}
       pt={5}
+      borderRight={"1px"}
+      borderLeft={"1px"}
+      borderColor={useColorModeValue("gray.200", "#333")}
     >
-      <Flex w={["90%", "90%", "75%"]} direction={"column"} gap={4}>
-        <CreateNewFeed />
+      <Flex w={"100%"} direction={"column"} gap={4}>
+        <CreateNewFeed name="file2" />
+        {/* <Text fontWeight={600} mb={2}>
+          Recent posts:
+        </Text> */}
         <AllPost
           // setFetchData={setFetchData}
           setPage={setPage}
@@ -35,7 +41,7 @@ const HomeComponent = ({
             justifyContent={"center"}
             width={"100%"}
           >
-            <Spinner color={"#ff552f"} size={"sm"} />
+            <Spinner color={"rgb(29, 155, 240)"} size={"sm"} />
           </Flex>
         )}
         {!fetchingHomeData && totalPage == page && (

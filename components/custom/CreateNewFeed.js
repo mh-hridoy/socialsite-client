@@ -10,6 +10,7 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
+  useColorModeValue,
   PopoverArrow,
   useToast,
 } from "@chakra-ui/react"
@@ -21,7 +22,7 @@ import axios from "axios"
 import { useSelector } from "react-redux"
 import Select from "react-select"
 
-const CreateNewFeed = () => {
+const CreateNewFeed = ({ setIsModalOpen , name}) => {
   const [showEmoji, setShowEmoji] = useState(false)
   const { colorMode } = useColorMode()
   const [feedText, setFeedText] = useState("")
@@ -131,7 +132,7 @@ const CreateNewFeed = () => {
         setIsLoading(false)
         setFeedText("")
         setImages([])
-        
+            setIsModalOpen(false)
         setSelectedTag([])
         toast({
           status: "success",
@@ -142,11 +143,12 @@ const CreateNewFeed = () => {
         setIsLoading(false)
 
         const errorMsg = e.response && e.response.data.message
-        toast({
-          status: "error",
-          duration: 5000,
-          title: errorMsg || "Something went wrong!!!",
-        })
+        // console.log(errorMsg)
+        // toast({
+        //   status: "error",
+        //   duration: 5000,
+        //   title: errorMsg || "Something went wrong!!!",
+        // })
       }
     } else {
       setIsLoading(false)
@@ -164,15 +166,28 @@ const CreateNewFeed = () => {
     setImages([...allImages])
   }
 
+  // console.log(images)
+
   const customStyles = {
     option: (provided) => ({
       ...provided,
       padding: 10,
       fontSize: 14,
     }),
+    menu: (provided) => ({
+      ...provided,
+      color: "rgb(29, 155, 240)",
+      backgroundColor: useColorModeValue("#fff", "#1A202C"),
+    }),
     control: () => ({
       marginBottom: 10,
     }),
+    placeholder: (provided) => ({
+      ...provided,
+      fontSize: 14,
+      opacity: 0.6,
+    }),
+
     singleValue: (provided, state) => {
       const opacity = state.isDisabled ? 0.5 : 1
       const transition = "opacity 300ms"
@@ -184,8 +199,8 @@ const CreateNewFeed = () => {
   return (
     <Flex direction="column" gap={5} width="100%">
       <Flex
-        border="1px"
-        borderColor={"gray.200"}
+        borderBottom="1px"
+        borderColor={useColorModeValue("gray.200", "#333")}
         position="relative"
         direction="column"
         width="100%"
@@ -193,8 +208,9 @@ const CreateNewFeed = () => {
         <Flex direction="column" marginBottom={images.length == 0 ? 10 : 0}>
           <Textarea
             onInput={areaHandler}
+            border="none"
             variant={"unstyled"}
-            fontSize={14}
+            fontSize={16}
             height="auto"
             value={feedText}
             onChange={textHandler}
@@ -203,7 +219,7 @@ const CreateNewFeed = () => {
               setCurrentSelection(e.target.selectionStart)
             }
             borderBottom={"1px"}
-            borderColor={"gray.100"}
+            borderColor={useColorModeValue("gray.200", "#333")}
             px={5}
             pt={2}
             placeholder="What's happening?"
@@ -213,10 +229,10 @@ const CreateNewFeed = () => {
 
           <Select
             styles={customStyles}
+            input={{ backgroundColor: "rgb(29, 155, 240)" }}
             placeholder="Select tags..."
             onChange={(e) => setSelectedTag(e)}
             isMulti={true}
-            
             options={selectOption}
           />
         </Flex>
@@ -264,7 +280,7 @@ const CreateNewFeed = () => {
                       right: -10,
                     }}
                   >
-                    <AiOutlineDelete color="#ff552f" size={18} />
+                    <AiOutlineDelete color="rgb(29, 155, 240)" size={18} />
                   </div>
                 </div>
               )
@@ -284,12 +300,12 @@ const CreateNewFeed = () => {
           px={5}
         >
           <Flex gap={5} position="relative">
-            <FormLabel htmlFor="file">
+            <FormLabel htmlFor={name ? name : "file"}>
               {" "}
               <MdOutlineImage cursor={"pointer"} size={23} />
             </FormLabel>
             <Input
-              id="file"
+              id={name ? name : "file"}
               onChange={fileHandler}
               accept="jpeg/jpg/image/*"
               hidden
@@ -328,10 +344,6 @@ const CreateNewFeed = () => {
           </Button>
         </Flex>
       </Flex>
-
-      <Text fontWeight={600} mb={2}>
-        Recent posts:
-      </Text>
     </Flex>
   )
 }

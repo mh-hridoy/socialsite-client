@@ -41,8 +41,8 @@ const CommentsOfFeed = ({ postId, comments }) => {
       px={4}
       maxHeight={400}
       overflow={"auto"}
-      border="1px"
-      borderColor="gray.300"
+      borderBottom="1px"
+      borderColor={useColorModeValue("gray.200", "#333")}
       direction="column"
       position="relative"
       widht="100%"
@@ -67,6 +67,7 @@ const CommentsOfFeed = ({ postId, comments }) => {
           width={"100%"}
         />
         <Button
+          disabled={!commentText}
           isLoading={loading}
           onClick={commentHandler}
           bg={"buttonColor"}
@@ -83,7 +84,7 @@ const CommentsOfFeed = ({ postId, comments }) => {
       )}
 
       <Flex mt={4} direction="column">
-        {comments.map((item, inx) => {
+        {comments && comments.map((item, inx) => {
           return <SingleComments key={inx} item={item} />
         })}
       </Flex>

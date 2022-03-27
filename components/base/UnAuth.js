@@ -20,7 +20,7 @@ const UnAuth = ({children}) => {
           justifyContent="center"
           height={"90vh"}
         >
-          <Spinner size={"xl"} />
+          <Spinner color="rgb(29, 155, 240)" size={"xl"} />
         </Flex>
       ) : (
         children

@@ -1,9 +1,9 @@
 import React from 'react'
-import { Flex, Avatar, Text } from "@chakra-ui/react"
+import { Flex, Avatar, Text, useColorModeValue } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
-import dateFormat from "dateformat"
 import {useRouter} from "next/router"
 import { MdVerified } from "react-icons/md"
+import timeAgo from "../utils/DateConverter"
 
 
 const SingleComments = ({item}) => {
@@ -15,7 +15,7 @@ const SingleComments = ({item}) => {
       marginBottom={3}
       paddingBottom={2}
       borderBottom="1px"
-      borderColor="gray.200"
+      borderColor={useColorModeValue("gray.200", "#333")}
       direction={"column"}
     >
       <Flex
@@ -30,17 +30,15 @@ const SingleComments = ({item}) => {
         }
       >
         <Avatar
-          _hover={{ border: "2px solid #ff552f" }}
+          _hover={{ border: "2px solid rgb(29, 155, 240)" }}
           cursor="pointer"
           size={"sm"}
           name={item.userName}
           // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
         ></Avatar>
         <Flex marginBottom={2} direction="column">
-        
           <Text
             display={"flex"}
-            color="#ff552f"
             alignItems="center"
             gap={2}
             fontWeight={600}
@@ -48,12 +46,12 @@ const SingleComments = ({item}) => {
           >
             {item.userName}{" "}
             {item.isUserVerified && item.isUserVerified == true && (
-              <MdVerified />
+              <MdVerified color="rgb(29, 155, 240)" />
             )}
           </Text>
 
           <Text fontSize={12} opacity={"0.7"}>
-            {dateFormat(item.createdAt, "dddd, mmmm dS, yyyy, h:MM TT")}
+            {timeAgo(item.createdAt)}
           </Text>
         </Flex>
       </Flex>
