@@ -12,11 +12,11 @@ import "emoji-mart/css/emoji-mart.css"
 import "react-responsive-carousel/lib/styles/carousel.min.css" 
 import ProgressBar from "@badrap/bar-of-progress"
 import Router from "next/router"
-
 import StoreProvider from '../store'
 import SideBar from '../components/base/SideBar'
 import { useState } from 'react'
 import RightSideBar from '../components/custom/RightSideBar'
+
 
 const progress = new ProgressBar({
   size: 2,

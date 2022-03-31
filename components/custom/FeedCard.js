@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import {
   Flex,
   Avatar,
@@ -9,7 +9,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react"
 import { BsHeart, BsHeartFill } from "react-icons/bs"
-import {IoIosArrowDown} from 'react-icons/io'
+import { IoIosArrowDown } from "react-icons/io"
 import { AiOutlineComment } from "react-icons/ai"
 import Masonry from "react-masonry-css"
 import GalleryModal from "./GalleryModal"
@@ -19,7 +19,7 @@ import { useSelector } from "react-redux"
 import CommentsOfFeed from "./CommentsOfFeed"
 import { MdVerified } from "react-icons/md"
 import _ from "underscore"
-import timeAgo from '../utils/DateConverter'
+import timeAgo from "../utils/DateConverter"
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -31,16 +31,14 @@ const FeedCard = (props) => {
   const toast = useToast({ position: "top", isClosable: true })
   const [item, setItem] = useState(props.item)
   const [showComment, setShowComment] = useState(false)
-  
-
+  const videoRef = useRef(null)
   const breakpointColumnsObj = {
     default: 2,
     700: 1,
   }
 
   useEffect(() => {
-      setItem(props.item)
-
+    setItem(props.item)
   }, [props.item])
 
   const galleryHandler = (inx) => {
@@ -50,7 +48,6 @@ const FeedCard = (props) => {
   }
 
   const likeHandler = async () => {
-
     const modItem = _.clone(item)
     modItem.totalReact = modItem.totalReact + 1
 
@@ -60,7 +57,7 @@ const FeedCard = (props) => {
     modItem.reactedByUser = [...new Set(reactedByUser)]
 
     setItem(modItem)
-    
+
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-like`,
@@ -89,14 +86,11 @@ const FeedCard = (props) => {
     modItem.totalReact = modItem.totalReact - 1
 
     const reactedByUser = [...modItem.reactedByUser]
-    const indexOfUser = reactedByUser.indexOf(
-      (item) => item == user._id
-    )
-reactedByUser.splice(indexOfUser, 1)
+    const indexOfUser = reactedByUser.indexOf((item) => item == user._id)
+    reactedByUser.splice(indexOfUser, 1)
     modItem.reactedByUser = [...new Set(reactedByUser)]
 
     setItem(modItem)
-
 
     // const newItem = { ...item }
     // newItem.totalReact = newItem.totalReact - 1
@@ -149,8 +143,6 @@ reactedByUser.splice(indexOfUser, 1)
           direction={"column"}
           position={"relative"}
           p={4}
-          // border="1px"
-          // borderColor={"gray.300"}
           width={"100%"}
           rounded="md"
         >
@@ -176,11 +168,11 @@ reactedByUser.splice(indexOfUser, 1)
               }
               // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
             ></Avatar>
-            <Flex alignItems="center" gap={4} >
+            <Flex alignItems="center" gap={4}>
               <Text
                 display={"flex"}
                 alignItems="center"
-                gap={2}
+                // gap={2}
                 fontWeight={600}
                 fontSize={16}
               >
@@ -229,34 +221,79 @@ reactedByUser.splice(indexOfUser, 1)
             {item.images && item.images.length !== 0 && (
               <>
                 {item.images.length == 1 ? (
-                  <img
-                    onClick={() => {
-                      setCurrentImageArray([...item.images])
-                      setIsModalOpen(!isModalOpen)
-                    }}
-                    style={{ cursor: "pointer", borderRadius: "20px" }}
-                    alt={item.images[0].name}
-                    src={item.images[0].img}
-                  />
+                  item.images[0].type.includes("image") ? (
+                    <img
+                      onClick={() => {
+                        setCurrentImageArray([...item.images])
+                        setIsModalOpen(!isModalOpen)
+                      }}
+                      style={{ cursor: "pointer", borderRadius: "20px" }}
+                      alt={item.images[0].name}
+                      src={item.images[0].img}
+                    />
+                  ) : (
+                    item.images[0].type.includes("video") && (
+                      <video
+                        ref={videoRef}
+                        // onClick={(e) => {
+
+                        //   setCurrentImageArray([...item.images])
+                        //   setIsModalOpen(!isModalOpen)
+                        // }}
+
+                        style={{
+                          cursor: "pointer",
+                          borderRadius: "20px",
+                          height: "300px",
+                          widht: "100%",
+                        }}
+                        src={item.images[0].img}
+                        controls={true}
+                        autoPlay={false}
+                      ></video>
+                    )
+                  )
                 ) : (
                   <Masonry
                     breakpointCols={breakpointColumnsObj}
                     className="my-masonry-grid"
                     columnClassName="my-masonry-grid_column"
                   >
-                    {item.images.map((item, inx) => (
-                      <img
-                        onClick={() => galleryHandler(inx)}
-                        style={{
-                          cursor: "pointer",
-                          margin: 2,
-                          borderRadius: "20px",
-                        }}
-                        key={inx}
-                        alt={item.name}
-                        src={item.img}
-                      />
-                    ))}
+                    {item.images.map((image, inx) =>
+                      image.type.includes("image") ? (
+                        <img
+                          onClick={() => galleryHandler(inx)}
+                          style={{
+                            cursor: "pointer",
+                            margin: 2,
+                            borderRadius: "20px",
+
+                            objectFit: "cover",
+                            objectPosition: "center",
+                          }}
+                          key={inx}
+                          alt={image.name}
+                          src={image.img}
+                        />
+                      ) : (
+                        image.type.includes("video") && (
+                          <video
+                            // onClick={() => galleryHandler(inx)}
+                            style={{
+                              cursor: "pointer",
+                              borderRadius: "20px",
+
+                              objectFit: "cover",
+                              objectPosition: "center",
+                            }}
+                            src={image.img}
+                            key={inx}
+                            controls={true}
+                            autoPlay={false}
+                          ></video>
+                        )
+                      )
+                    )}
                   </Masonry>
                 )}
               </>
@@ -271,14 +308,9 @@ reactedByUser.splice(indexOfUser, 1)
             alignItems="center"
             justifyContent={"center"}
             width={"100%"}
-            // border="1px"
-            // borderColor={"gray.300"}
           >
             <Flex
-              // width={"100%"}
-              // borderRight="1px"
               gap={4}
-              // borderColor={"gray.300"}
               alignItems="center"
               justifyContent="center"
               cursor="pointer"
@@ -323,6 +355,7 @@ reactedByUser.splice(indexOfUser, 1)
           <CommentsOfFeed
             // item={item}
             // setItem={setItem}
+            setHomeData={props.setHomeData}
             comments={item.comments}
             postId={item._id}
           />
@@ -333,4 +366,3 @@ reactedByUser.splice(indexOfUser, 1)
 }
 
 export default FeedCard
-

@@ -22,7 +22,7 @@ import axios from "axios"
 import { useSelector } from "react-redux"
 import Select from "react-select"
 
-const CreateNewFeed = ({ setIsModalOpen , name}) => {
+const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
   const [showEmoji, setShowEmoji] = useState(false)
   const { colorMode } = useColorMode()
   const [feedText, setFeedText] = useState("")
@@ -79,7 +79,51 @@ const CreateNewFeed = ({ setIsModalOpen , name}) => {
 
   const fileHandler = (e) => {
     const files = [...e.target.files]
-    handleImages(files)
+    // console.log(files[0])
+    if (files[0]?.size > 50000000) {
+      return toast({
+        status: "error",
+        duration: 3000,
+        title: "File size cannot be over 50mb",
+      })
+    }
+
+    if (files[0]?.type.includes("x-matroska")) {
+      return toast({
+        status: "error",
+        duration: 3000,
+        title: "You cannot upload mkv files",
+      })
+    }
+
+    if (files[0]?.type == "" || files[0]?.type.indexOf("image") == 0) {
+      // console.log(files[0])
+      handleImages(files)
+    } else if (files[0]?.type.indexOf("video") == 0) {
+      videoHandler(files[0])
+    }
+  }
+
+  const videoHandler = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => {
+        return setImages([
+          ...images,
+          {
+            name:
+              file.name.split(".").shift() +
+              Date.now() +
+              file.name.split(".").pop(),
+            type: file.type,
+            img: reader.result,
+          },
+        ])
+      }
+      // resolve(reader.result)
+      reader.onerror = (error) => reject(error)
+    })
   }
 
   const handleImages = (files) => {
@@ -89,7 +133,7 @@ const CreateNewFeed = ({ setIsModalOpen , name}) => {
         600,
         600,
         "JPEG",
-        200,
+        100,
         0,
         (uri) => {
           return setImages([
@@ -100,7 +144,7 @@ const CreateNewFeed = ({ setIsModalOpen , name}) => {
                 Date.now() +
                 file.name.split(".").pop(),
               type: file.type || "image/jpeg",
-              data: uri,
+              img: uri,
             },
           ])
         },
@@ -108,6 +152,58 @@ const CreateNewFeed = ({ setIsModalOpen , name}) => {
       )
     })
   }
+
+  // const postHandler = async () => {
+  //   setIsLoading(true)
+  //   const tags = []
+  //   if (selectedTag.length !== 0) {
+  //     selectedTag.map((item) => tags.push(item.value))
+  //   }
+
+  //   if (feedText || images.length !== 0) {
+  //     try {
+  //       const { data } = await axios.post(
+  //         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/new-post`,
+  //         { text: feedText, images, user: user._id, tags },
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //           withCredentials: true,
+  //         }
+  //       )
+  //       setFeedText("")
+  //       setImages([])
+  //       // const oldData = [...homeData]
+  //       // const newData = [data, ...oldData]
+  //       // setHomeData([...new Set(newData)])
+  //       toast({
+  //         status: "success",
+  //         duration: 3000,
+  //         title: "Post created!",
+  //       })
+  //       setIsLoading(false)
+  //     } catch (e) {
+  //       setIsLoading(false)
+
+  //       const errorMsg = e.response && e.response.data.message
+  //       // console.log(errorMsg)
+  //       // toast({
+  //       //   status: "error",
+  //       //   duration: 5000,
+  //       //   title: errorMsg || "Something went wrong!!!",
+  //       // })
+  //     }
+  //   } else {
+  //     setIsLoading(false)
+  //     toast({
+  //       status: "info",
+  //       duration: 3000,
+  //       title: "Status or Image is required.",
+  //     })
+  //   }
+  // }
 
   const postHandler = async () => {
     setIsLoading(true)
@@ -129,15 +225,24 @@ const CreateNewFeed = ({ setIsModalOpen , name}) => {
             withCredentials: true,
           }
         )
-        setIsLoading(false)
         setFeedText("")
         setImages([])
-            setIsModalOpen(false)
         setSelectedTag([])
+
+        if (setIsModalOpen != undefined) {
+          
+          setIsModalOpen(false)
+        } else {
+          const oldData = [...homeData]
+          const newData = [data, ...oldData]
+          setHomeData([...new Set(newData)])
+        }
+
+        setIsLoading(false)
         toast({
           status: "success",
           duration: 3000,
-          title: data,
+          title: "Post has been created!",
         })
       } catch (e) {
         setIsLoading(false)
@@ -259,15 +364,31 @@ const CreateNewFeed = ({ setIsModalOpen , name}) => {
                     position: "relative",
                   }}
                 >
-                  <img
-                    alt={image.name}
-                    src={image.data}
-                    style={{
-                      height: "100%",
-                      width: "100%",
-                      border: "1px solid gray",
-                    }}
-                  />
+                  {image.type.includes("image") ? (
+                    <img
+                      alt={image.name}
+                      src={image.img}
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        border: "1px solid gray",
+                      }}
+                    />
+                  ) : null}
+
+                  {image.type.includes("video") ? (
+                    <video
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        border: "1px solid gray",
+                      }}
+                      src={image.img}
+                      controls={false}
+                      autoPlay={false}
+                    ></video>
+                  ) : null}
+
                   <div
                     onClick={() => removeImage(inx)}
                     style={{
@@ -300,17 +421,18 @@ const CreateNewFeed = ({ setIsModalOpen , name}) => {
           px={5}
         >
           <Flex gap={5} position="relative">
-            <FormLabel htmlFor={name ? name : "file"}>
+            <FormLabel htmlFor={name}>
               {" "}
               <MdOutlineImage cursor={"pointer"} size={23} />
             </FormLabel>
             <Input
-              id={name ? name : "file"}
+              id={name}
               onChange={fileHandler}
-              accept="jpeg/jpg/image/*"
+              accept="image/*, video/*, .mkv"
               hidden
               type="file"
             />
+            {/* x-matroska */}
 
             <Popover _focus={{ boxShadow: "none" }}>
               <PopoverTrigger>

@@ -51,6 +51,7 @@ const Login = () => {
   const [verifyMessage, setVerifyMessage] = useState(null)
   const [userID, setUserId] = useState(null)
   const [verifyLoading, setVerifyLoading] = useState(false)
+  
   const loginHandler = async (values) => {
     setIsLoading(true)
 
@@ -78,7 +79,7 @@ const Login = () => {
       setIsLoading(false)
 
       const errorMsg = e.response && e.response.data.message
-
+      // console.log(errorMsg)
       if (errorMsg.indexOf("Your email is not verified") == 0) {
         setVerifyMessage("Please verify your email to continue...")
         setUserId(errorMsg.split(".")[1])

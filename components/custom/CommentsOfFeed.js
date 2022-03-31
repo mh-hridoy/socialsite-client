@@ -4,8 +4,9 @@ import { Flex, Input, Button, Text, useColorModeValue } from "@chakra-ui/react"
 import SingleComments from './SingleComments'
 import { useSelector } from 'react-redux'
 import axios from 'axios'
+import _ from "underscore"
 
-const CommentsOfFeed = ({ postId, comments }) => {
+const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
   const [commentText, setCommentText] = useState("")
   const user = useSelector((state) => state.user.user)
   const token = useSelector((state) => state.user.token)
@@ -14,7 +15,7 @@ const CommentsOfFeed = ({ postId, comments }) => {
   const commentHandler = async () => {
     try {
       setLoading(true)
-      await axios.post(
+      const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/create-comment`,
         { userId: user._id, text: commentText, postId: postId },
         {
@@ -25,6 +26,18 @@ const CommentsOfFeed = ({ postId, comments }) => {
           withCredentials: true,
         }
       )
+      setHomeData((prev) => {
+        const allPost = [...prev]
+        const indexOfPost = allPost.findIndex((item) => item._id == postId)
+        const currentPost = _.clone(allPost[indexOfPost])
+        const postComment = _.clone(currentPost.comments)
+        postComment.unshift(data)
+        
+        currentPost.comments = [...new Set(postComment)]
+        allPost[indexOfPost] = currentPost
+       return [...new Set(allPost)]
+
+      })
       setCommentText("")
       setLoading(false)
     } catch (e) {
@@ -84,9 +97,10 @@ const CommentsOfFeed = ({ postId, comments }) => {
       )}
 
       <Flex mt={4} direction="column">
-        {comments && comments.map((item, inx) => {
-          return <SingleComments key={inx} item={item} />
-        })}
+        {comments &&
+          comments.map((item, inx) => {
+            return <SingleComments key={inx} item={item} />
+          })}
       </Flex>
     </Flex>
   )

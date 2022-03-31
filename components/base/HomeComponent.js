@@ -9,6 +9,7 @@ const HomeComponent = ({
   page,
   totalPage,
   fetchingHomeData,
+  setHomeData,
 }) => {
   const router = useRouter()
   return (
@@ -23,7 +24,7 @@ const HomeComponent = ({
       borderColor={useColorModeValue("gray.200", "#333")}
     >
       <Flex w={"100%"} direction={"column"} gap={4}>
-        <CreateNewFeed name="file2" />
+        <CreateNewFeed homeData={homeData} setHomeData={setHomeData} name="file" />
         {/* <Text fontWeight={600} mb={2}>
           Recent posts:
         </Text> */}
@@ -33,6 +34,7 @@ const HomeComponent = ({
           totalPage={totalPage}
           page={page}
           post={homeData}
+          setHomeData={setHomeData}
         />
         {fetchingHomeData && page != 1 && (
           <Flex

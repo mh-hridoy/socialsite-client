@@ -2,7 +2,7 @@ import React, { useState, useCallback, useRef } from "react"
 import FeedCard from "./FeedCard"
 import { Text } from "@chakra-ui/react"
 
-const AllPost = ({ post, setPage, page, totalPage }) => {
+const AllPost = ({ post, setPage, page, totalPage, setHomeData }) => {
   const feedRef = useRef(null)
 
   const lastFeedRef = useCallback(
@@ -24,15 +24,22 @@ const AllPost = ({ post, setPage, page, totalPage }) => {
     [page]
   )
 
-    // console.log(page)
+  // console.log(post)
   return (
     <>
       {post && post.length !== 0 ? (
         post.map((item, inx) => {
           if (post.length == inx + 1) {
-            return <FeedCard lastFeedRef={lastFeedRef} key={inx} item={item} />
+            return (
+              <FeedCard
+                setHomeData={setHomeData}
+                lastFeedRef={lastFeedRef}
+                key={inx}
+                item={item}
+              />
+            )
           } else {
-            return <FeedCard key={inx} item={item} />
+            return <FeedCard setHomeData={setHomeData} key={inx} item={item} />
           }
         })
       ) : (

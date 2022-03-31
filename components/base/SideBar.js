@@ -116,7 +116,9 @@ const [isModalOpen, setIsModalOpen] = useState(false)
           <ModalCloseButton _focus={{ boxShadow: "none" }} />
           <CreateNewFeed
             name="file2"
+            isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}
+            
           />
         </ModalContent>
       </Modal>
@@ -228,6 +230,8 @@ const [isModalOpen, setIsModalOpen] = useState(false)
             }}
             px={2}
             py={2}
+            alignItems="center"
+            justifyContent={"center"}
             gap={2}
             cursor="pointer"
             rounded="full"

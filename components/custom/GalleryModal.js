@@ -1,16 +1,15 @@
-import React from 'react'
+import React from "react"
 import {
-  Flex,
-  Text,
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
-  ModalBody,
+  Flex,
   ModalCloseButton,
+  useColorModeValue,
+  
+  Image,
 } from "@chakra-ui/react"
 import { Carousel } from "react-responsive-carousel"
-
 
 const GalleryModal = ({
   isModalOpen,
@@ -18,13 +17,14 @@ const GalleryModal = ({
   setCurrentImageArray,
   currentImageArray,
   selectedItem,
-setSelectedItem
+  setSelectedItem,
 }) => {
+
+
   return (
     <>
       <Modal
-        size={"5xl"}
-        
+        size={"full"}
         isOpen={isModalOpen}
         onClose={() => {
           setCurrentImageArray([])
@@ -33,18 +33,51 @@ setSelectedItem
         }}
       >
         <ModalOverlay />
-        <ModalContent maxHeight={"90%"} padding={10}>
-          <ModalCloseButton _focus={{ boxShadow: "none" }} />
-
+        <ModalContent
+          shadow={"none"}
+          alignItems={"center"}
+          justifyContent="center"
+          bg="none"
+          width={["100%", "100%", "90%"]}
+        >
+          <ModalCloseButton
+          zIndex={200}
+            bg={useColorModeValue("white", "black")}
+            _focus={{ boxShadow: "none" }}
+          />
           <Carousel selectedItem={selectedItem}>
             {currentImageArray.map((item, inx) => {
-              return (
-                <div style={{height: 400, overflow: "auto"}} key={inx}>
-                  <img alt={item.name} src={item.img} />
-                </div>
+              return item.type.includes("image") ? (
+                <Flex key={inx}>
+                  <Image
+                    objectFit="contain"
+                    height="600px"
+                    width={"600px"}
+                    border={"5px solid red"}
+                    objectPosition={"center"}
+                    alt={item.name}
+                    src={item.img}
+                  />
+                </Flex>
+              ) : (
+                item.type.includes("video") && (
+                  <video
+                    style={{ cursor: "pointer" }}
+                    src={item.img}
+                    controls={true}
+                    autoPlay={false}
+                  ></video>
+                )
               )
             })}
           </Carousel>
+
+      
+
+          {/* <Flex mt={5} >
+          
+
+          </Flex> */}
         </ModalContent>
       </Modal>
     </>

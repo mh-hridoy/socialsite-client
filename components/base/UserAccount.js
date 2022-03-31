@@ -1,14 +1,11 @@
 import React, { useEffect} from "react"
 import { Flex, Avatar, Text, useColorModeValue } from "@chakra-ui/react"
-import FeedCard from "../custom/FeedCard"
 import { MdVerified, MdCalendarToday } from "react-icons/md"
 import dateFormat from "dateformat"
+import AllPost from "../custom/AllPost"
 
-const UserAccount = ({ post, user, setTotalPost }) => {
+const UserAccount = ({ post, user, totalPage, page, setPage, setHomeData }) => {
 
-  useEffect(() => {
-    setTotalPost(post.length)
-  }, [])
 
 
   return (
@@ -58,21 +55,28 @@ const UserAccount = ({ post, user, setTotalPost }) => {
           )}
         </Text>
 
-        <Text display="flex" fontSize={14} alignItems="center" gap={2} opacity={0.8}>
+        <Text
+          display="flex"
+          fontSize={14}
+          alignItems="center"
+          gap={2}
+          opacity={0.8}
+        >
           <MdCalendarToday /> Joined at{" "}
-          {user &&
-            dateFormat(user.createdAt, "mmmm dS, yyyy")}
+          {user && dateFormat(user.createdAt, "mmmm dS, yyyy")}
         </Text>
       </Flex>
 
       <Text mr={5} p={2} mt={3} fontWeight={600}>
         Feeds:
       </Text>
-      {post && post.length !== 0 ? (
-        post.map((item, inx) => <FeedCard key={inx} inx={inx} item={item} />)
-      ) : (
-        <Text>There's no activity.</Text>
-      )}
+      <AllPost
+        setPage={setPage}
+        totalPage={totalPage}
+        page={page}
+        post={post}
+        setHomeData={setHomeData}
+      />
     </Flex>
   )
 }

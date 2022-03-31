@@ -27,11 +27,11 @@ const StoreProvider = (props) => {
   axios.interceptors.response.use((response) => {
     return response
   }, function (error) {
-    let res = error.response;
-    console.log(res.config, res.config.__isRetryRequest)
+    const res = error.response;
     if (
       res.status === 401 ||
-      (res.data.message == "invalid token" || "jwt expired" &&
+      res.data.message.indexOf("invalid token") == 0 ||
+      (res.data.message.indexOf("jwt expired") == 0 &&
         res.config &&
         !res.config.__isRetryRequest)
     ) {

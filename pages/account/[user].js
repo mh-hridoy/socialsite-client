@@ -1,24 +1,26 @@
-import React, {useState, useEffect} from 'react'
-import { Flex, useToast, Spinner, useColorModeValue } from "@chakra-ui/react"
-import UserAccount from '../../components/base/UserAccount'
-import {useSelector, useDispatch} from 'react-redux'
-import {useRouter} from 'next/router'
-import {logout} from '../../store/userInfoSlice'
-import axios from 'axios'
+import React, { useState, useEffect } from "react"
+import { Flex, useToast, Spinner, Text } from "@chakra-ui/react"
+import UserAccount from "../../components/base/UserAccount"
+import { useSelector, useDispatch } from "react-redux"
+import { useRouter } from "next/router"
+import { logout } from "../../store/userInfoSlice"
+import axios from "axios"
 import io from "socket.io-client"
-import WithHeader from '../../components/custom/WithHeader'
-
+import WithHeader from "../../components/custom/WithHeader"
 
 const UserId = (props) => {
   const [loading, setLoading] = useState(true)
   const token = useSelector((state) => state.user.token)
   const user = useSelector((state) => state.user.user)
   const toast = useToast({ position: "top", isClosable: true })
-  const [homeData, setHomeData] = useState(null)
+  const [homeData, setHomeData] = useState([])
   const [userData, setUserData] = useState(null)
   const router = useRouter()
   const [fetchUser, setFfetchUser] = useState(false)
   const [totalPost, setTotalPost] = useState(0)
+  const [totalPage, setTotalPage] = useState(null)
+  const [page, setPage] = useState(1)
+  const [fetchUserFeed, setFetchUserFeed] = useState(false)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -27,53 +29,57 @@ const UserId = (props) => {
 
   useEffect(() => {
     //
-    if (fetchUser) {
+    if (fetchUser == true) {
       getUserData()
     }
-
-    return () => setFfetchUser(false)
-  }, [fetchUser])
-
-  const fetchInitData = async (userAccountId) => {
-    try {
-      const { data } = await axios(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-my-posts/${userAccountId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-      setHomeData(data)
-      setLoading(false)
-    } catch (e) {
-      router.push("/")
-      const errorMsg = e.response && e.response.data.message
-      console.log(errorMsg)
-      toast({
-        status: "error",
-        duration: 5000,
-        title: "Invalid user!",
-      })
-    }
-  }
+  }, [fetchUser == true])
 
   useEffect(() => {
-    const isUser = router.query.user == user._id
-    if (fetchUser && isUser) router.push(`/account/myaccount/${user._id}`)
-  }, [fetchUser])
+    if (fetchUserFeed == true || page > 1) {
+      const code = window.location.pathname.split("/")
+      const userAccountId = code[code.length - 1]
+      const fetchUserFeed = async () => {
+        try {
+          const { data } = await axios(
+            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-my-posts/${userAccountId}?page=${page}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              withCredentials: true,
+            }
+          )
+          setFetchUserFeed(false)
+          const newArray = [...homeData, ...data.post]
+          const withoutDup = [...new Set(newArray)]
+          setHomeData(withoutDup)
+          setTotalPage(data.totalPage)
+          setTotalPost(data.postCount)
+          setLoading(false)
+        } catch (e) {
+          setFetchUserFeed(false)
+          // router.push("/")
+          const errorMsg = e.response && e.response.data.message
+          console.log(e)
+          toast({
+            status: "error",
+            duration: 5000,
+            title: "Invalid user!",
+          })
+        }
+      }
+      fetchUserFeed()
+    }
+  }, [fetchUserFeed == true, page])
 
   //setup socket
   useEffect(() => {
     if (!loading) {
       const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
-        query: { token: token, userId: user._id },
+        query: { token: token, userId: router.query.user },
       })
       socket.on("uesrPosts", (data) => {
-        // console.log(data)
-        console.log(data)
         setupAllData(data)
       })
 
@@ -98,16 +104,24 @@ const UserId = (props) => {
 
   const setupAllData = (post) => {
     // console.log(post)
-    setHomeData((prev) => {
-      const newArray = [...prev]
-      const indexOfNewPost = newArray.findIndex((item) => item._id == post._id)
-      if (indexOfNewPost != -1) {
-        newArray[indexOfNewPost] = post
-      } else {
-        newArray.unshift(post)
-      }
-      return [...new Set(newArray)]
-    })
+    setTimeout(() => {
+      setHomeData((prev) => {
+        const newArray = [...prev]
+        // find if the post already exist
+        const indexOfNewPost = newArray.findIndex(
+          (item) => item._id == post._id
+        )
+        //if exist replace it with the existingone
+        if (indexOfNewPost != -1) {
+          newArray[indexOfNewPost] = post
+        } else {
+          newArray.unshift(post)
+        }
+        //else add it to the array
+
+        return [...new Set(newArray)]
+      })
+    }, 1000)
   }
 
   const getUserData = async () => {
@@ -125,8 +139,11 @@ const UserId = (props) => {
         }
       )
       setUserData(data)
-      fetchInitData(userAccountId)
+      setFetchUserFeed(!fetchUserFeed)
+      setFfetchUser(false)
+      // fetchInitData(userAccountId)
     } catch (e) {
+      setFfetchUser(false)
       router.push("/login")
       const errorMsg = e.response && e.response.data.message
       console.log(errorMsg)
@@ -139,7 +156,7 @@ const UserId = (props) => {
   }
 
   useEffect(() => {
-    props.setHeaderName("User Account")
+    props.setHeaderName("My Account")
   }, [])
 
   return (
@@ -159,10 +176,38 @@ const UserId = (props) => {
             <Flex direction="column" minWidth={"100%"}>
               <WithHeader totalPost={totalPost} headerName={props.headerName}>
                 <UserAccount
-                  setTotalPost={setTotalPost}
                   post={homeData}
                   user={userData}
+                  page={page}
+                  setPage={setPage}
+                  totalPage={totalPage}
+                  setHomeData={setHomeData}
                 />
+                {!fetchUserFeed && totalPage != page && (
+                  <Flex
+                    mt={2}
+                    mb={5}
+                    alignItems="center"
+                    justifyContent={"center"}
+                    width={"100%"}
+                  >
+                    <Spinner color={"rgb(29, 155, 240)"} size={"sm"} />
+                  </Flex>
+                )}
+                {!fetchUserFeed && totalPage == page && (
+                  <Text
+                    mb={5}
+                    mt={5}
+                    textAlign={"center"}
+                    fontSize={14}
+                    opacity={0.7}
+                  >
+                    There's nothing to show!{" "}
+                    {/* <a onClick={() => router.push("/")}>
+                      Please go back to top
+                    </a> */}
+                  </Text>
+                )}
               </WithHeader>
             </Flex>
           )}
@@ -171,6 +216,6 @@ const UserId = (props) => {
     </>
   )
 }
-// 
+//
 
 export default UserId

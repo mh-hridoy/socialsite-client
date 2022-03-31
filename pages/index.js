@@ -1,4 +1,4 @@
-import { Flex, Spinner, Text } from "@chakra-ui/react"
+import { Flex, Spinner } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import axios from "axios"
@@ -25,6 +25,7 @@ export default function Home(props) {
         query: { token: token },
       })
       socket.on("posts", (data) => {
+        // console.log(data)
         setupAllData(data)
       })
 
@@ -38,7 +39,7 @@ export default function Home(props) {
 
             router.push("/login")
           } catch (e) {
-            console.log(e)
+            // console.log(e)
           }
         } else {
           socket.connect()
@@ -56,21 +57,28 @@ export default function Home(props) {
   }, [])
 
   const setupAllData = (post) => {
-    setHomeData((prev) => {
-      const newArray = [...prev]
-      // find if the post already exist
-      const indexOfNewPost = newArray.findIndex((item) => item._id == post._id)
-      //if exist replace it with the existingone
-      if (indexOfNewPost != -1) {
-        newArray[indexOfNewPost] = post
-      } else {
-        newArray.unshift(post)
-      }
-      //else add it to the array
-      dispatch(storeFeed({ data: newArray }))
+    setTimeout(() => {
+      // console.log("socket running")
+      setHomeData((prev) => {
+        const newArray = [...prev]
+        // find if the post already exist
+        const indexOfNewPost = newArray.findIndex(
+          (item) => item._id == post._id
+        )
+        // console.log(indexOfNewPost)
+        //if exist replace it with the existingone
+        if (indexOfNewPost != -1) {
+          newArray[indexOfNewPost] = post
+        } else {
+          newArray.unshift(post)
+        }
+        //else add it to the array
+        dispatch(storeFeed({ data: [...new Set(newArray)] }))
 
-      return [...new Set(newArray)]
-    })
+        return [...new Set(newArray)]
+      })
+    }, 3500)
+    
   }
 
   // console.log(homeData)
@@ -134,6 +142,7 @@ export default function Home(props) {
             page={page}
             setPage={setPage}
             homeData={homeData}
+            setHomeData={setHomeData}
           />
         </WithHeader>
       )}
