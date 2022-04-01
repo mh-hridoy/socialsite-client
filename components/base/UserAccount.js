@@ -359,7 +359,7 @@ const UserAccount = ({
               fontSize={12}
               variant="outline"
             >
-              {user.follower.includes(userAccount._id) == true
+              {user.follower.includes(userAccount?._id) == true
                 ? "Unfollow"
                 : "Follow"}
             </Button>
