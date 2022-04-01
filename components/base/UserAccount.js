@@ -350,7 +350,7 @@ const UserAccount = ({
           ) : (
             <Button
               onClick={
-                user.follower.includes(userAccount._id) == true
+                user.follower.includes(userAccount?._id) == true
                   ? unFollowHandler
                   : followHandler
               }
