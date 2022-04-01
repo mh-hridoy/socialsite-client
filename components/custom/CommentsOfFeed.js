@@ -12,7 +12,8 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
   const token = useSelector((state) => state.user.token)
   const [loading, setLoading] = useState(false)
 
-  const commentHandler = async () => {
+  const commentHandler = async (e) => {
+    e.stopPropagation()
     try {
       setLoading(true)
       const { data } = await axios.post(
@@ -73,8 +74,9 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
         <Input
           _focus={{ boxShadow: "none" }}
           size={"sm"}
+          onClick={(e) => e.stopPropagation()}
           value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
+          onChange={(e) => {e.stopPropagation(); setCommentText(e.target.value)}}
           type="text"
           placeholder="What's in your mind?"
           width={"100%"}

@@ -7,6 +7,11 @@ import {
   Tag,
   useToast,
   useColorModeValue,
+  Menu,
+  MenuButton,
+  Button,
+  MenuList,
+  MenuItem,
 } from "@chakra-ui/react"
 import { BsHeart, BsHeartFill } from "react-icons/bs"
 import { IoIosArrowDown } from "react-icons/io"
@@ -20,6 +25,7 @@ import CommentsOfFeed from "./CommentsOfFeed"
 import { MdVerified } from "react-icons/md"
 import _ from "underscore"
 import timeAgo from "../utils/DateConverter"
+import { BsThreeDotsVertical } from "react-icons/bs"
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -37,6 +43,7 @@ const FeedCard = (props) => {
     700: 1,
   }
 
+  // console.log(item)
   useEffect(() => {
     setItem(props.item)
   }, [props.item])
@@ -47,7 +54,8 @@ const FeedCard = (props) => {
     setCurrentImageArray([...item.images])
   }
 
-  const likeHandler = async () => {
+  const likeHandler = async (e) => {
+    e.stopPropagation()
     const modItem = _.clone(item)
     modItem.totalReact = modItem.totalReact + 1
 
@@ -81,7 +89,8 @@ const FeedCard = (props) => {
     }
   }
 
-  const unLikeHandler = async () => {
+  const unLikeHandler = async (e) => {
+    e.stopPropagation()
     const modItem = _.clone(item)
     modItem.totalReact = modItem.totalReact - 1
 
@@ -132,13 +141,57 @@ const FeedCard = (props) => {
         setSelectedItem={setSelectedItem}
       />
       <Flex
+        width={"100%"}
+        cursor={"pointer"}
+        onClick={() => router.push(`/post/${item._id}`)}
         ref={props.lastFeedRef ? props.lastFeedRef : null}
         direction={"column"}
         gap={4}
         // borderTop="1px"
         borderBottom="1px"
         borderColor={useColorModeValue("gray.200", "#333")}
+        position="relative"
       >
+        <Flex
+          position={"absolute"}
+          top={2}
+          zIndex={1}
+          right={4}
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+        >
+          <Menu zIndex={2}>
+            <MenuButton
+              variant="fill"
+              bg="transparent"
+              _active={{ bg: "transparent" }}
+              _hover={{ bg: "transparent" }}
+              as={Button}
+            >
+              <BsThreeDotsVertical zIndex={10} />
+            </MenuButton>
+            <MenuList>
+              <MenuItem
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${window.location.protocol}//${window.location.host}/post/${item._id}`
+                  )
+
+                  toast({
+                    status: "success",
+                    duration: 5000,
+                    title: "Link copied to the clipboard.",
+                  })
+                }}
+              >
+                {/* window.location.protocol + "//" + window.location.host +
+                "/post/" + + item._id */}
+                Share URL
+              </MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
         <Flex
           direction={"column"}
           position={"relative"}
@@ -146,46 +199,52 @@ const FeedCard = (props) => {
           width={"100%"}
           rounded="md"
         >
-          <Flex
-            gap={2}
-            cursor="pointer"
-            onClick={() =>
-              router.push(
-                item.user == user._id
-                  ? `/account/myaccount/${item.user._id}`
-                  : `/account/${item && item.user._id}`
-              )
-            }
-          >
-            <Avatar
-              _hover={{ border: "2px solid rgb(29, 155, 240)" }}
-              cursor="pointer"
-              size={"sm"}
-              name={
-                item.user && item.user.fullName
-                  ? item.user.fullName
-                  : "Not A User"
-              }
-              // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
-            ></Avatar>
-            <Flex alignItems="center" gap={4}>
-              <Text
-                display={"flex"}
-                alignItems="center"
-                // gap={2}
-                fontWeight={600}
-                fontSize={16}
-              >
-                {item.user ? item.user.fullName : "Not A User"}{" "}
-                {item.user && item.user.isVerified == true && (
-                  <MdVerified color="rgb(29, 155, 240)" />
-                )}
-              </Text>
-
-              <Text fontSize={12} fontWeight={500} opacity={"0.7"}>
-                {timeAgo(item.createdAt)}
-              </Text>
+          <Flex alignItems="center" gap={2}>
+            <Flex
+              gap={2}
+              onClick={(e) => {
+                e.stopPropagation()
+                router.push(
+                  item.user._id == user._id
+                    ? `/account/myaccount/${item.user._id}`
+                    : `/account/${item && item.user._id}`
+                )
+              }}
+            >
+              <Avatar
+                _hover={{ border: "2px solid rgb(29, 155, 240)" }}
+                cursor="pointer"
+                size={"sm"}
+                name={
+                  item.user && item.user.fullName
+                    ? item.user.fullName
+                    : "Not A User"
+                }
+                src={item.user?.profilePicture?.img}
+              ></Avatar>
+              <Flex alignItems="center" gap={4}>
+                <Text
+                  display={"flex"}
+                  alignItems="center"
+                  // gap={2}
+                  fontWeight={600}
+                  fontSize={16}
+                >
+                  {item.user ? item.user.fullName : "Not A User"}{" "}
+                  {item.user && item.user.isVerified == true && (
+                    <MdVerified color="rgb(29, 155, 240)" />
+                  )}
+                </Text>
+              </Flex>
             </Flex>
+            <Text
+              onClick={(e) => e.stopPropagation()}
+              fontSize={12}
+              fontWeight={500}
+              opacity={"0.7"}
+            >
+              {timeAgo(item.createdAt)}
+            </Text>
           </Flex>
 
           <Text pl={10} pr={4} fontSize={15}>
@@ -223,7 +282,8 @@ const FeedCard = (props) => {
                 {item.images.length == 1 ? (
                   item.images[0].type.includes("image") ? (
                     <img
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation()
                         setCurrentImageArray([...item.images])
                         setIsModalOpen(!isModalOpen)
                       }}
@@ -235,12 +295,7 @@ const FeedCard = (props) => {
                     item.images[0].type.includes("video") && (
                       <video
                         ref={videoRef}
-                        // onClick={(e) => {
-
-                        //   setCurrentImageArray([...item.images])
-                        //   setIsModalOpen(!isModalOpen)
-                        // }}
-
+                        onClick={(e) => e.stopPropagation()}
                         style={{
                           cursor: "pointer",
                           borderRadius: "20px",
@@ -262,7 +317,10 @@ const FeedCard = (props) => {
                     {item.images.map((image, inx) =>
                       image.type.includes("image") ? (
                         <img
-                          onClick={() => galleryHandler(inx)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            galleryHandler(inx)
+                          }}
                           style={{
                             cursor: "pointer",
                             margin: 2,
@@ -278,7 +336,7 @@ const FeedCard = (props) => {
                       ) : (
                         image.type.includes("video") && (
                           <video
-                            // onClick={() => galleryHandler(inx)}
+                            onClick={(e) => e.stopPropagation()}
                             style={{
                               cursor: "pointer",
                               borderRadius: "20px",
@@ -334,7 +392,10 @@ const FeedCard = (props) => {
               </Text>
             </Flex>
             <Flex
-              onClick={() => setShowComment(!showComment)}
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowComment(!showComment)
+              }}
               // width={"100%"}
               cursor="pointer"
               px={10}

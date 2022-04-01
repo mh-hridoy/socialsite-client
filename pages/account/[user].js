@@ -174,9 +174,10 @@ const UserId = (props) => {
             </Flex>
           ) : (
             <Flex direction="column" minWidth={"100%"}>
-              <WithHeader totalPost={totalPost} headerName={props.headerName}>
+              <WithHeader totalPost={totalPost} headerName={"User Account"}>
                 <UserAccount
                   post={homeData}
+                  setUserData={setUserData}
                   user={userData}
                   page={page}
                   setPage={setPage}

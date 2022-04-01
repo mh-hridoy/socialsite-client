@@ -185,6 +185,7 @@ const setupAllData = (post) => {
                 <UserAccount
                   post={homeData}
                   user={userData}
+                  setUserData={setUserData}
                   page={page}
                   setPage={setPage}
                   totalPage={totalPage}

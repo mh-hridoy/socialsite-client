@@ -243,7 +243,7 @@ const [isModalOpen, setIsModalOpen] = useState(false)
                 cursor="pointer"
                 size={"sm"}
                 name={user && user.fullName ? user.fullName : "Not A User"}
-                // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+                src={user?.profilePicture?.img}
               ></Avatar>
             </Show>
 

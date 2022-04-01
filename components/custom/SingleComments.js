@@ -13,6 +13,7 @@ const SingleComments = ({item}) => {
 
   return (
     <Flex
+    onClick={(e) => e.stopPropagation()}
       marginBottom={3}
       paddingBottom={2}
       borderBottom="1px"
@@ -22,12 +23,13 @@ const SingleComments = ({item}) => {
       <Flex
         columnGap={2}
         cursor="pointer"
-        onClick={() =>
+        onClick={(e) =>{
+          e.stopPropagation();
           router.push(
             item.user._id == user._id
               ? `/account/myaccount/${item.user._id}`
               : `/account/${item.user._id}`
-          )
+          )}
         }
       >
         <Avatar
@@ -35,7 +37,7 @@ const SingleComments = ({item}) => {
           cursor="pointer"
           size={"sm"}
           name={item.user.fullName}
-          // src="https://images.unsplash.com/photo-1647163927506-399a13f9f908?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1032&q=80"
+          src={item.user?.profilePicture?.img}
         ></Avatar>
         <Flex marginBottom={2} direction="column">
           <Text
