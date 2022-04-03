@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
 import {
   Flex,
   Avatar,
@@ -22,6 +22,8 @@ import { useRouter } from "next/router"
 import axios from "axios"
 import { MdOutlineFlipCameraIos } from "react-icons/md"
 import Resizer from "react-image-file-resizer"
+import ReactCrop from "react-image-crop"
+import countReaction from '../utils/countReaction'
 
 const UserAccount = ({
   post,
@@ -42,7 +44,19 @@ const UserAccount = ({
   const [nameValue, setNameValue] = useState("")
   const [bioValue, setBioValue] = useState("")
   const [manageLoading, setManageLoading] = useState(false)
+  const [profileModalOpen, setProfileModalOpen] = useState(false)
+  const [profileBeforeProcess, setProfileBeforeProcess] = useState(null)
+  const [ImageCrop, setImageCrop] = useState(null)
+  const [profileRawFile, setProfileRawFile] = useState(null)
+  const [crop, setCrop] = useState({
+    unit: "%",
+    x: 25,
+    y: 10,
+    width: 50,
+    height: 70,
+  })
 
+  // console.log(cropProfileImage)
   const unFollowHandler = async () => {
     try {
       setIsLoading(true)
@@ -67,6 +81,7 @@ const UserAccount = ({
       console.log(errorMsg)
     }
   }
+
 
   // console.log(user)
   const followHandler = async () => {
@@ -117,74 +132,124 @@ const UserAccount = ({
     )
   }
   const profileImageHandler = (e) => {
+    setProfileModalOpen(true)
     const file = e.target.files[0]
-    Resizer.imageFileResizer(
-      file,
-      600,
-      600,
-      "JPEG",
-      100,
-      0,
-      (uri) => {
-        return setProfileImage({
-          name:
-            file.name.split(".").shift() +
-            Date.now() +
-            file.name.split(".").pop(),
-          type: file.type || "image/jpeg",
-          img: uri,
-        })
-      },
-      "base64"
-    )
+setProfileRawFile(file)
+    setProfileBeforeProcess(URL.createObjectURL(file))
   }
 
-  // console.log(coverImage)
+  const processProfilePic = () => {
+    const canvas = document.createElement("canvas")
+
+    const scaleX = ImageCrop.naturalWidth / ImageCrop.width
+    const scaleY = ImageCrop.naturalHeight / ImageCrop.height
+    canvas.width = crop.width
+    canvas.height = crop.height
+    const ctx = canvas.getContext("2d")
+    const pixelRatio = window.devicePixelRatio
+    canvas.width = crop.width * pixelRatio
+    canvas.height = crop.height * pixelRatio
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+    ctx.imageSmoothingQuality = "low"
+        ctx.drawImage(
+          ImageCrop,
+          crop.x * scaleX,
+          crop.y * scaleY,
+          crop.width * scaleX,
+          crop.height * scaleY,
+          0,
+          0,
+          crop.width,
+          crop.height
+        )
+
+    const base64Image = canvas.toDataURL("image/jpeg")
+    setProfileImage({
+      name:
+        profileRawFile.name.split(".").shift() +
+        Date.now() +
+        profileRawFile.name.split(".").pop(),
+      type: "image/jpeg",
+      img: base64Image,
+    })
+
+
+    setProfileModalOpen(false)
+
+
+  }
+
 
   const userDataHandler = async () => {
-    const userData = {profileImage, coverImage, nameValue, bioValue }
-       try {
-         setManageLoading(true)
-         const { data } = await axios.post(
-           `${process.env.NEXT_PUBLIC_MAIN_PROXY}/manage-account/${userAccount._id}`,
-           userData,
-           {
-             headers: {
-               "Content-Type": "application/json",
-               Authorization: `Bearer ${token}`,
-             },
-             withCredentials: true,
-           }
-         )
+    const userData = { profileImage, coverImage, nameValue, bioValue }
+    try {
+      setManageLoading(true)
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/manage-account/${userAccount._id}`,
+        userData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      )
 
-         setUserData(data)
-         setManageLoading(false)
-         setNameValue("")
-         setCoverImage(null)
-         setProfileImage(null)
-         setBioValue("")
-         setIsModalOpen(!isModalOpen)
-       } catch (e) {
-         setManageLoading(false)
-        setIsModalOpen(!isModalOpen)
-         const errorMsg = e.response && e.response.data.message
-         console.log(errorMsg)
-       }
-
+      setUserData(data)
+      setManageLoading(false)
+      setNameValue("")
+      setCoverImage(null)
+      setProfileImage(null)
+      setBioValue("")
+      setIsModalOpen(!isModalOpen)
+    } catch (e) {
+      setManageLoading(false)
+      setIsModalOpen(!isModalOpen)
+      const errorMsg = e.response && e.response.data.message
+      console.log(errorMsg)
+    }
   }
-
+  // console.log(crop)
   return (
     <>
       <Modal
         size={"xl"}
+        isOpen={profileModalOpen}
+        onClose={() => {
+          setProfileImage(null)
+          setProfileModalOpen(!profileModalOpen)
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent p={5} py={10}>
+          <ModalCloseButton _focus={{ boxShadow: "none" }} />
+          <ReactCrop
+            src={profileBeforeProcess}
+            onImageLoaded={setImageCrop}
+            crop={crop}
+            onChange={setCrop}
+          ></ReactCrop>
+          <Flex marginTop={5} w={"100%"} justifyContent="end">
+            <Button bg="buttonColor" onClick={processProfilePic}>
+              Submit
+            </Button>
+          </Flex>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        size={"xl"}
         isOpen={isModalOpen}
         onClose={() => {
+          setProfileImage(null)
           setIsModalOpen(!isModalOpen)
         }}
       >
         <ModalOverlay />
         <ModalContent px={5}>
           <ModalCloseButton _focus={{ boxShadow: "none" }} />
+
           <Flex paddingRight={10} justifyContent="flex-end">
             <Button
               isLoading={manageLoading}
@@ -395,14 +460,14 @@ const UserAccount = ({
 
           <Flex mt={5} gap={5}>
             <Text display={"flex"} gap={2} fontSize={14} fontWeight={600}>
-              {user.following?.length}{" "}
+              {countReaction(user.following?.length)}
               <Text opacity={0.8} fontWeight={200}>
                 Followings
               </Text>
             </Text>
 
             <Text display={"flex"} gap={2} fontSize={14} fontWeight={600}>
-              {user.follower?.length}{" "}
+              {countReaction(user.follower?.length)}{" "}
               <Text opacity={0.8} fontWeight={200}>
                 Followers
               </Text>

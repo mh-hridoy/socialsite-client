@@ -16,7 +16,7 @@ import StoreProvider from '../store'
 import SideBar from '../components/base/SideBar'
 import { useState } from 'react'
 import RightSideBar from '../components/custom/RightSideBar'
-
+import "react-image-crop/dist/ReactCrop.css"
 
 const progress = new ProgressBar({
   size: 2,

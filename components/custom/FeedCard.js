@@ -26,6 +26,7 @@ import { MdVerified } from "react-icons/md"
 import _ from "underscore"
 import timeAgo from "../utils/DateConverter"
 import { BsThreeDotsVertical } from "react-icons/bs"
+import countReaction from '../utils/countReaction'
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -213,7 +214,7 @@ const FeedCard = (props) => {
                 e.stopPropagation()
               }}
             >
-              <Flex alignItems="center" justifyContent="flex-end"  >
+              <Flex alignItems="center" justifyContent="flex-end">
                 <Menu>
                   <MenuButton
                     variant="fill"
@@ -224,7 +225,7 @@ const FeedCard = (props) => {
                   >
                     <BsThreeDotsVertical />
                   </MenuButton>
-                  <MenuList>
+                  <MenuList fontSize={12}>
                     <MenuItem
                       onClick={() => {
                         navigator.clipboard.writeText(
@@ -240,8 +241,9 @@ const FeedCard = (props) => {
                     >
                       Share URL
                     </MenuItem>
-
-                    
+                    {item?.user?._id == user?._id && (
+                      <MenuItem>Delete</MenuItem>
+                    )}
                   </MenuList>
                 </Menu>
               </Flex>
@@ -362,60 +364,62 @@ const FeedCard = (props) => {
           </Flex>
 
           {/* footer of a post */}
-          <Flex
-            position={"absolute"}
-            bottom={0}
-            left={0}
-            alignItems="center"
-            justifyContent={"center"}
-            width={"100%"}
-          >
+          {user != null && (
             <Flex
-              gap={4}
+              position={"absolute"}
+              bottom={0}
+              left={0}
               alignItems="center"
-              justifyContent="center"
-              cursor="pointer"
-              px={10}
-              py={2}
-              onClick={
-                item.reactedByUser &&
-                item.reactedByUser.includes(user && user._id)
-                  ? unLikeHandler
-                  : likeHandler
-              }
+              justifyContent={"center"}
+              width={"100%"}
             >
-              {item.reactedByUser &&
-              item.reactedByUser.includes(user && user._id) ? (
-                <BsHeartFill color="rgb(29, 155, 240)" />
-              ) : (
-                <BsHeart size={18} />
-              )}
-              <Text fontSize={14}>
-                {(item.reactedByUser && item.reactedByUser.length) || 0}
-              </Text>
+              <Flex
+                gap={4}
+                alignItems="center"
+                justifyContent="center"
+                cursor="pointer"
+                px={10}
+                py={2}
+                onClick={
+                  item.reactedByUser &&
+                  item.reactedByUser.includes(user && user._id)
+                    ? unLikeHandler
+                    : likeHandler
+                }
+              >
+                {item.reactedByUser &&
+                item.reactedByUser.includes(user && user._id) ? (
+                  <BsHeartFill color="rgb(29, 155, 240)" />
+                ) : (
+                  <BsHeart size={18} />
+                )}
+                <Text fontSize={14}>
+                  {countReaction(item.reactedByUser?.length)}
+                </Text>
+              </Flex>
+              <Flex
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowComment(!showComment)
+                }}
+                // width={"100%"}
+                cursor="pointer"
+                px={10}
+                py={2}
+                gap={4}
+                alignItems="center"
+                justifyContent="center"
+              >
+                <AiOutlineComment size={20} />
+                <Text fontSize={14}>
+                  {countReaction(item.comments?.length)}
+                </Text>
+                <IoIosArrowDown />
+              </Flex>
             </Flex>
-            <Flex
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowComment(!showComment)
-              }}
-              // width={"100%"}
-              cursor="pointer"
-              px={10}
-              py={2}
-              gap={4}
-              alignItems="center"
-              justifyContent="center"
-            >
-              <AiOutlineComment size={20} />
-              <Text fontSize={14}>
-                {(item.comments && item.comments.length) || 0}
-              </Text>
-              <IoIosArrowDown />
-            </Flex>
-          </Flex>
+          )}
         </Flex>
-        {showComment && (
+        {showComment && user != null && (
           <CommentsOfFeed
             // item={item}
             // setItem={setItem}

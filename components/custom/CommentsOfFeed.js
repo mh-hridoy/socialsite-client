@@ -53,6 +53,7 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
       transform={"translateY(-12px)"}
       rounded="md"
       px={4}
+      minHeight={200}
       maxHeight={400}
       overflow={"auto"}
       borderBottom="1px"
@@ -60,6 +61,7 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
       direction="column"
       position="relative"
       widht="100%"
+      overflowX="hidden"
     >
       <Flex
         paddingTop={4}
