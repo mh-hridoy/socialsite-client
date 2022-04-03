@@ -89,8 +89,7 @@ function MyApp({ Component, pageProps }) {
 
         <Flex>
           <SideBar />
-          <Flex direction="column" width={"100%"}>
-            
+          <Flex width="100%" direction="column">
             <Component
               headerName={headerName}
               setHeaderName={setHeaderName}
@@ -98,7 +97,7 @@ function MyApp({ Component, pageProps }) {
             />
           </Flex>
           <Show above="md">
-           <RightSideBar/>
+            <RightSideBar />
           </Show>
         </Flex>
 

@@ -191,7 +191,7 @@ const setupAllData = (post) => {
                   totalPage={totalPage}
                   setHomeData={setHomeData}
                 />
-                {!fetchUserFeed && totalPage != page && (
+                {!fetchUserFeed && totalPage != page && loading && (
                   <Flex
                     mt={2}
                     mb={5}

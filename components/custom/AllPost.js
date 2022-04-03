@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from "react"
 import FeedCard from "./FeedCard"
-import { Text } from "@chakra-ui/react"
+import { Text, Flex } from "@chakra-ui/react"
 
 const AllPost = ({ post, setPage, page, totalPage, setHomeData }) => {
   const feedRef = useRef(null)
@@ -27,24 +27,28 @@ const AllPost = ({ post, setPage, page, totalPage, setHomeData }) => {
   // console.log(post)
   return (
     <>
-      {post && post.length !== 0 ? (
-        post.map((item, inx) => {
-          if (post.length == inx + 1) {
-            return (
-              <FeedCard
-                setHomeData={setHomeData}
-                lastFeedRef={lastFeedRef}
-                key={inx}
-                item={item}
-              />
-            )
-          } else {
-            return <FeedCard setHomeData={setHomeData} key={inx} item={item} />
-          }
-        })
-      ) : (
-        <Text>There's no activity.</Text>
-      )}
+        <Flex minWidth={"100%"} direction="column">
+          {post && post.length !== 0 ? (
+            post.map((item, inx) => {
+              if (post.length == inx + 1) {
+                return (
+                  <FeedCard
+                    setHomeData={setHomeData}
+                    lastFeedRef={lastFeedRef}
+                    key={inx}
+                    item={item}
+                  />
+                )
+              } else {
+                return (
+                  <FeedCard setHomeData={setHomeData} key={inx} item={item} />
+                )
+              }
+            })
+          ) : (
+            <Text>There's no activity.</Text>
+          )}
+        </Flex>
     </>
   )
 }

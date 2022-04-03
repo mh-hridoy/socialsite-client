@@ -25,9 +25,9 @@ const HomeComponent = ({
     >
       <Flex w={"100%"} direction={"column"} gap={4}>
         <CreateNewFeed homeData={homeData} setHomeData={setHomeData} name="file" />
-        {/* <Text fontWeight={600} mb={2}>
+        <Text fontWeight={600} mb={2}>
           Recent posts:
-        </Text> */}
+        </Text>
         <AllPost
           // setFetchData={setFetchData}
           setPage={setPage}

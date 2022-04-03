@@ -162,7 +162,7 @@ const UserId = (props) => {
   return (
     <>
       <Flex w={"100%"} alignItems={"center"} justifyContent="center">
-        <Flex minWidth={"100%"}>
+        <Flex w={"100%"}>
           {loading ? (
             <Flex
               height="100vh"
@@ -173,7 +173,10 @@ const UserId = (props) => {
               <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
             </Flex>
           ) : (
-            <Flex direction="column" minWidth={"100%"}>
+            <Flex
+             direction={"column"}
+              width={"100%"}
+            >
               <WithHeader totalPost={totalPost} headerName={"User Account"}>
                 <UserAccount
                   post={homeData}
@@ -184,7 +187,7 @@ const UserId = (props) => {
                   totalPage={totalPage}
                   setHomeData={setHomeData}
                 />
-                {!fetchUserFeed && totalPage != page && (
+                {!fetchUserFeed && totalPage != page && loading && (
                   <Flex
                     mt={2}
                     mb={5}

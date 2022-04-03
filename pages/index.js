@@ -1,4 +1,4 @@
-import { Flex, Spinner } from "@chakra-ui/react"
+import { Flex, Spinner, Text } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import axios from "axios"
@@ -78,7 +78,6 @@ export default function Home(props) {
         return [...new Set(newArray)]
       })
     }, 3500)
-    
   }
 
   // console.log(homeData)
@@ -125,27 +124,37 @@ export default function Home(props) {
 
   return (
     <>
-      {loading ? (
-        <Flex
-          alignItems={"center"}
-          justifyContent="center"
-          height={"80vh"}
-          width={"100%"}
-        >
-          <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
+      <Flex w={"100%"} alignItems={"center"} justifyContent="center">
+        <Flex minWidth={"100%"}>
+          {loading ? (
+            <Flex
+              height="100vh"
+              alignItems={"center"}
+              justifyContent="center"
+              width={"100%"}
+            >
+              <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
+            </Flex>
+          ) : (
+            <Flex
+              // border={"1px solid red"}
+              minWidth="100%"
+              direction="column"
+            >
+              <WithHeader headerName={props.headerName}>
+                <HomeComponent
+                  fetchingHomeData={fetchingHomeData}
+                  totalPage={totalPage}
+                  page={page}
+                  setPage={setPage}
+                  homeData={homeData}
+                  setHomeData={setHomeData}
+                />
+              </WithHeader>
+            </Flex>
+          )}
         </Flex>
-      ) : (
-        <WithHeader headerName={props.headerName}>
-          <HomeComponent
-            fetchingHomeData={fetchingHomeData}
-            totalPage={totalPage}
-            page={page}
-            setPage={setPage}
-            homeData={homeData}
-            setHomeData={setHomeData}
-          />
-        </WithHeader>
-      )}
+      </Flex>
     </>
   )
 }

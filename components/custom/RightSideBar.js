@@ -11,9 +11,7 @@ const RightSideBar = () => {
       {user != null ? (
         <Flex
           width={["5%", "10%", "20%", "50%", "70%"]}
-          alignItems="center"
-          justifyContent="start"
-          px={4}
+          
           position="sticky"
           top={0}
           zIndex={100}

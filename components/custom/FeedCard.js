@@ -153,46 +153,6 @@ const FeedCard = (props) => {
         position="relative"
       >
         <Flex
-          position={"absolute"}
-          top={2}
-          zIndex={1}
-          right={4}
-          onClick={(e) => {
-            e.stopPropagation()
-          }}
-        >
-          <Menu zIndex={2}>
-            <MenuButton
-              variant="fill"
-              bg="transparent"
-              _active={{ bg: "transparent" }}
-              _hover={{ bg: "transparent" }}
-              as={Button}
-            >
-              <BsThreeDotsVertical zIndex={10} />
-            </MenuButton>
-            <MenuList>
-              <MenuItem
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    `${window.location.protocol}//${window.location.host}/post/${item._id}`
-                  )
-
-                  toast({
-                    status: "success",
-                    duration: 5000,
-                    title: "Link copied to the clipboard.",
-                  })
-                }}
-              >
-                {/* window.location.protocol + "//" + window.location.host +
-                "/post/" + + item._id */}
-                Share URL
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-        <Flex
           direction={"column"}
           position={"relative"}
           p={4}
@@ -245,6 +205,49 @@ const FeedCard = (props) => {
             >
               {timeAgo(item.createdAt)}
             </Text>
+
+            {/* problem start */}
+            <div
+              style={{ flex: 1 }}
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+            >
+              <Flex alignItems="center" justifyContent="flex-end"  >
+                <Menu>
+                  <MenuButton
+                    variant="fill"
+                    bg="transparent"
+                    _active={{ bg: "transparent" }}
+                    _hover={{ bg: "transparent" }}
+                    as={Button}
+                  >
+                    <BsThreeDotsVertical />
+                  </MenuButton>
+                  <MenuList>
+                    <MenuItem
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `${window.location.protocol}//${window.location.host}/post/${item._id}`
+                        )
+
+                        toast({
+                          status: "success",
+                          duration: 5000,
+                          title: "Link copied to the clipboard.",
+                        })
+                      }}
+                    >
+                      Share URL
+                    </MenuItem>
+
+                    
+                  </MenuList>
+                </Menu>
+              </Flex>
+            </div>
+
+            {/* problem end */}
           </Flex>
 
           <Text pl={10} pr={4} fontSize={15}>
