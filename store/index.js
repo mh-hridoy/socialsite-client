@@ -28,6 +28,7 @@ const StoreProvider = (props) => {
     return response
   }, function (error) {
     const res = error.response;
+    // console.log(error)
     if (
       res.status === 401 ||
       res.data.message.indexOf("invalid token") == 0 ||
@@ -38,7 +39,7 @@ const StoreProvider = (props) => {
       return new Promise((response, reject) => {
         axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`)
           .then((data) => {
-            console.log("logout")
+            // console.log("logout")
             store.dispatch(logout({ user: null, token: "" }))
             localStorage.removeItem("user")
             router.push("/login")

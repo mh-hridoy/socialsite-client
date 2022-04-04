@@ -12,6 +12,7 @@ import {
   Button,
   MenuList,
   MenuItem,
+  Spinner
 } from "@chakra-ui/react"
 import { BsHeart, BsHeartFill } from "react-icons/bs"
 import { IoIosArrowDown } from "react-icons/io"
@@ -38,6 +39,8 @@ const FeedCard = (props) => {
   const toast = useToast({ position: "top", isClosable: true })
   const [item, setItem] = useState(props.item)
   const [showComment, setShowComment] = useState(false)
+  const [postDeleteId,setPostDeleteId] = useState(null)
+  const [isPostDeleting,setIsPostDeleting] = useState(false)
   const videoRef = useRef(null)
   const breakpointColumnsObj = {
     default: 2,
@@ -131,6 +134,41 @@ const FeedCard = (props) => {
     }
   }
 
+  const postDeleteHandler = async () => {
+    setPostDeleteId(item._id)
+    try {
+      setIsPostDeleting(true)
+      await axios(
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-post/${user._id}/${item._id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      )
+
+        props.setHomeData((prev) => {
+          const allPost = [...prev]
+          const indexOfPost = allPost.findIndex((itm) => itm._id == item._id)
+          allPost.splice(indexOfPost, 1)
+
+          return [...new Set(allPost)]
+        })
+
+    } catch (e) {
+      setIsPostDeleting(false)
+      const errorMsg = e.response && e.response.data.message
+      console.log(e)
+      toast({
+        status: "error",
+        duration: 5000,
+        title: "Something went wrong!!!",
+      })
+    }
+  }
+
   return (
     <>
       <GalleryModal
@@ -207,7 +245,6 @@ const FeedCard = (props) => {
               {timeAgo(item.createdAt)}
             </Text>
 
-            {/* problem start */}
             <div
               style={{ flex: 1 }}
               onClick={(e) => {
@@ -223,7 +260,12 @@ const FeedCard = (props) => {
                     _hover={{ bg: "transparent" }}
                     as={Button}
                   >
-                    <BsThreeDotsVertical />
+                    {isPostDeleting && postDeleteId == item._id ? (
+                      <Spinner />
+                    ) : (
+                      <BsThreeDotsVertical />
+                    )}
+
                   </MenuButton>
                   <MenuList fontSize={12}>
                     <MenuItem
@@ -242,14 +284,12 @@ const FeedCard = (props) => {
                       Share URL
                     </MenuItem>
                     {item?.user?._id == user?._id && (
-                      <MenuItem>Delete</MenuItem>
+                      <MenuItem onClick={postDeleteHandler}>Delete</MenuItem>
                     )}
                   </MenuList>
                 </Menu>
               </Flex>
             </div>
-
-            {/* problem end */}
           </Flex>
 
           <Text pl={10} pr={4} fontSize={15}>
@@ -280,6 +320,7 @@ const FeedCard = (props) => {
             alignItems="center"
             justifyContent="center"
             pr={4}
+            onClick={(e) => e.stopPropagation()}
             marginBottom={10}
           >
             {item.images && item.images.length !== 0 && (
@@ -366,6 +407,7 @@ const FeedCard = (props) => {
           {/* footer of a post */}
           {user != null && (
             <Flex
+            onClick={(e) => e.stopPropagation()}
               position={"absolute"}
               bottom={0}
               left={0}

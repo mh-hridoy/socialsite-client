@@ -53,7 +53,7 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
       transform={"translateY(-12px)"}
       rounded="md"
       px={4}
-      minHeight={200}
+      minHeight={comments?.length == 0 ? undefined : comments?.length < 2 ? 120 : 200 }
       maxHeight={400}
       overflow={"auto"}
       borderBottom="1px"
@@ -78,7 +78,10 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
           size={"sm"}
           onClick={(e) => e.stopPropagation()}
           value={commentText}
-          onChange={(e) => {e.stopPropagation(); setCommentText(e.target.value)}}
+          onChange={(e) => {
+            e.stopPropagation()
+            setCommentText(e.target.value)
+          }}
           type="text"
           placeholder="What's in your mind?"
           width={"100%"}

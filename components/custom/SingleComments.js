@@ -1,22 +1,55 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { Flex, Avatar, Text, useColorModeValue, Menu,
 MenuButton,
 Button,
 MenuList,
 useToast,
-MenuItem } from "@chakra-ui/react"
+MenuItem, Spinner } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
 import {useRouter} from "next/router"
 import { MdVerified } from "react-icons/md"
 import timeAgo from "../utils/DateConverter"
 import { BsThreeDotsVertical } from "react-icons/bs"
-
+import axios from "axios"
 
 const SingleComments = ({item}) => {
     const user = useSelector((state) => state.user.user)
+    const token = useSelector((state) => state.user.token)
     const router = useRouter()
      const toast = useToast({ position: "top", isClosable: true })
-// console.log(item)
+    const [isCommentDeleting, setIsCommentDeleting] = useState(false)
+    const [commentDeleteId, setCommentDeleteId] = useState(null)
+
+const deleteCommentHandler = async () => {
+  setCommentDeleteId(item._id)
+  try {
+    setIsCommentDeleting(true)
+    await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-comment/${user._id}/${item._id}` ,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    )
+
+  } catch (e) {
+      setIsCommentDeleting(false)
+    const errorMsg = e.response && e.response.data.message
+    console.log(e)
+    toast({
+      status: "error",
+      duration: 5000,
+      title: "Something went wrong!!!",
+    })
+  }
+
+
+
+  
+}
+
 
   return (
     <Flex
@@ -45,9 +78,13 @@ const SingleComments = ({item}) => {
             _hover={{ bg: "transparent" }}
             as={Button}
           >
-            <BsThreeDotsVertical />
+            {isCommentDeleting && commentDeleteId == item._id ? (
+              <Spinner />
+            ) : (
+              <BsThreeDotsVertical />
+            )}
           </MenuButton>
-          <MenuList fontSize={12} >
+          <MenuList fontSize={12}>
             <MenuItem
               onClick={() => {
                 navigator.clipboard.writeText(
@@ -64,7 +101,9 @@ const SingleComments = ({item}) => {
               Share URL
             </MenuItem>
 
-            {item?.user?._id == user?._id && <MenuItem>Delete</MenuItem>}
+            {item?.user?._id == user?._id && (
+              <MenuItem onClick={deleteCommentHandler}>Delete</MenuItem>
+            )}
           </MenuList>
         </Menu>
       </Flex>
