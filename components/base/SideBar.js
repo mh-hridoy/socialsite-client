@@ -26,6 +26,7 @@ import {
   MdOutlineLogout,
   MdOutlineDarkMode,
   MdOutlineAccountCircle,
+  MdPeopleOutline,
 } from "react-icons/md"
 import { BsSun } from "react-icons/bs"
 import { useDispatch, useSelector } from "react-redux"
@@ -56,6 +57,12 @@ const [isModalOpen, setIsModalOpen] = useState(false)
       Icon: MdOutlineAccountCircle,
       uri: `/account/myaccount/${user !== null && user._id}`,
       path: `/account/myaccount/[user]`,
+    },
+    {
+      name: "People",
+      Icon: MdPeopleOutline,
+      uri: `/people`,
+      path: `/people`,
     },
 
     {

@@ -1,9 +1,8 @@
-
-import React, { useState } from 'react'
+import React, { useState } from "react"
 import { Flex, Input, Button, Text, useColorModeValue } from "@chakra-ui/react"
-import SingleComments from './SingleComments'
-import { useSelector } from 'react-redux'
-import axios from 'axios'
+import SingleComments from "./SingleComments"
+import { useSelector } from "react-redux"
+import axios from "axios"
 import _ from "underscore"
 
 const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
@@ -27,24 +26,26 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
           withCredentials: true,
         }
       )
-      setHomeData((prev) => {
-        const allPost = [...prev]
-        const indexOfPost = allPost.findIndex((item) => item._id == postId)
-        const currentPost = _.clone(allPost[indexOfPost])
-        const postComment = _.clone(currentPost.comments)
-        postComment.unshift(data)
-        
-        currentPost.comments = [...new Set(postComment)]
-        allPost[indexOfPost] = currentPost
-       return [...new Set(allPost)]
-
-      })
       setCommentText("")
+      if (setHomeData != undefined) {
+        setHomeData((prev) => {
+          const allPost = [...prev]
+          const indexOfPost = allPost.findIndex((item) => item._id == postId)
+          const currentPost = _.clone(allPost[indexOfPost])
+          const postComment = _.clone(currentPost.comments)
+          postComment.unshift(data)
+
+          currentPost.comments = [...new Set(postComment)]
+          allPost[indexOfPost] = currentPost
+          return [...new Set(allPost)]
+        })
+      }
+
       setLoading(false)
     } catch (e) {
       setLoading(false)
       const errorMsg = e.response && e.response.data.message
-      console.log(errorMsg)
+      console.log(e)
     }
   }
 
@@ -53,7 +54,7 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
       transform={"translateY(-12px)"}
       rounded="md"
       px={4}
-      minHeight={comments?.length == 0 ? undefined :  200 }
+      minHeight={comments?.length == 0 ? undefined : 200}
       maxHeight={400}
       overflow={"auto"}
       borderBottom="1px"

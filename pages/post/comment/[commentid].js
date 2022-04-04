@@ -49,7 +49,7 @@ const CommentShow = () => {
     }
   }, [fetchData == true])
 
-  console.log(item)
+  // console.log(item)
 
   return (
     <>
@@ -70,13 +70,14 @@ const CommentShow = () => {
               <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
             </Flex>
           ) : (
-            <WithHeader headerName="Feed">
+            <WithHeader headerName="Feed/Comment">
               <Flex
                 borderRight={"1px"}
                 borderLeft={"1px"}
                 borderColor={useColorModeValue("gray.200", "#333")}
                 minHeight={"90vh"}
                 widht="100%"
+                overflowX="hidden"
                 mt={2}
                 p={2}
               >

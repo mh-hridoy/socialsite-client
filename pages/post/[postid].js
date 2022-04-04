@@ -24,7 +24,7 @@ const PostId = () => {
   useEffect(() => {
     if (fetchData == false && user != null) {
       const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
-        query: { token: token, postId: router.query.postid },
+        query: { token: token, postId: router.query.postid, userId: user._id },
       })
       socket.on("onePost", (data) => {
         setItem(data)
