@@ -53,7 +53,7 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
       transform={"translateY(-12px)"}
       rounded="md"
       px={4}
-      minHeight={comments?.length == 0 ? undefined : comments?.length < 2 ? 120 : 200 }
+      minHeight={comments?.length == 0 ? undefined :  200 }
       maxHeight={400}
       overflow={"auto"}
       borderBottom="1px"

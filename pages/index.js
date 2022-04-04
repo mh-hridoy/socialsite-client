@@ -13,6 +13,7 @@ export default function Home(props) {
   const token = useSelector((state) => state.user.token)
   const [homeData, setHomeData] = useState([])
   const [loading, setLoading] = useState(true)
+  const user = useSelector((state) => state.user.user)
   const router = useRouter()
   const dispatch = useDispatch()
   const [fetchData, setFetchData] = useState(false)
@@ -22,7 +23,7 @@ export default function Home(props) {
   useEffect(() => {
     if (!loading) {
       const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
-        query: { token: token },
+        query: { token: token, userId: user?._id },
       })
       socket.on("posts", (data) => {
         // console.log(data)
@@ -89,7 +90,7 @@ export default function Home(props) {
         setFetchingHomeData(true)
         try {
           const { data } = await axios(
-            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-posts?page=${page}`,
+            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-posts/${user?._id}?page=${page}`,
             {
               headers: {
                 "Content-Type": "application/json",

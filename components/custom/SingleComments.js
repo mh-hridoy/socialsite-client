@@ -57,6 +57,8 @@ const deleteCommentHandler = async () => {
         e.stopPropagation()
         router.push(`/post/comment/${item._id}`)
       }}
+      width={"100%"}
+      cursor="pointer"
       marginBottom={3}
       paddingBottom={2}
       borderBottom="1px"
@@ -88,7 +90,7 @@ const deleteCommentHandler = async () => {
             <MenuItem
               onClick={() => {
                 navigator.clipboard.writeText(
-                  `${window.location.protocol}//${window.location.host}/comment/${item._id}`
+                  `${window.location.protocol}//${window.location.host}/post/comment/${item._id}`
                 )
 
                 toast({

@@ -126,7 +126,7 @@ const [isModalOpen, setIsModalOpen] = useState(false)
       {user !== null ? (
         <Flex
           height={"100vh"}
-          width={["10%", "10%", "20%", "20%", "35%"]}
+          width={["15%", "15%", "20%", "20%", "35%"]}
           position={"sticky"}
           direction={"column"}
           top={0}
