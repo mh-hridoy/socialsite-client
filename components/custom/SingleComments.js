@@ -45,9 +45,6 @@ const deleteCommentHandler = async () => {
     })
   }
 
-
-
-  
 }
 
 
@@ -137,6 +134,7 @@ const deleteCommentHandler = async () => {
             gap={2}
             fontWeight={600}
             fontSize={15}
+           color= {item.user?._id == user?._id ? "rgb(29, 155, 240)" : undefined}
           >
             {item.user.fullName}{" "}
             {item.user.isUserVerified && item.user.isUserVerified == true && (

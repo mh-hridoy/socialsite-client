@@ -82,12 +82,12 @@ const [isModalOpen, setIsModalOpen] = useState(false)
         },
         withCredentials: true,
       })
-
-      dispatch(logout({ user: null, token: "" }))
       localStorage.removeItem("user")
+      router.push("/login")
+      dispatch(logout({ user: null, token: "" }))
       setIsLoading(false)
 
-      router.push("/login")
+      
       toast({
         status: "success",
         duration: 3000,

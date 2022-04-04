@@ -228,6 +228,7 @@ const FeedCard = (props) => {
                   // gap={2}
                   fontWeight={600}
                   fontSize={16}
+                  color={item.user?._id == user?._id ? "rgb(29, 155, 240)" : undefined}
                 >
                   {item.user ? item.user.fullName : "Not A User"}{" "}
                   {item.user && item.user.isVerified == true && (
