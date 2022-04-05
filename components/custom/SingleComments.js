@@ -24,7 +24,7 @@ const deleteCommentHandler = async () => {
   setCommentDeleteId(item._id)
   try {
     setIsCommentDeleting(true)
-    await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-comment/${user._id}/${item._id}` ,
+    await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-comment/${user?._id}/${item._id}` ,
       {
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +124,7 @@ const deleteCommentHandler = async () => {
           _hover={{ border: "2px solid rgb(29, 155, 240)" }}
           cursor="pointer"
           size={"sm"}
-          name={item.user.fullName}
+          name={item.user?.fullName}
           src={item.user?.profilePicture?.img}
         ></Avatar>
         <Flex marginBottom={2} direction="column">
@@ -136,8 +136,8 @@ const deleteCommentHandler = async () => {
             fontSize={15}
            color= {item.user?._id == user?._id ? "rgb(29, 155, 240)" : undefined}
           >
-            {item.user.fullName}{" "}
-            {item.user.isUserVerified && item.user.isUserVerified == true && (
+            {item.user?.fullName}{" "}
+            {item.user?.isUserVerified && item.user?.isUserVerified == true && (
               <MdVerified color="rgb(29, 155, 240)" />
             )}
           </Text>

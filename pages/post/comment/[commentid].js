@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react"
 import { Flex, Spinner, useColorModeValue } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
-import { useRouter } from "next/router"
 import WithHeader from "../../../components/custom/WithHeader"
-import axios from "axios"
 import SingleComments from "../../../components/custom/SingleComments"
+import useHttp from "../../../components/utils/useHttp"
+import { useRouter } from "next/router"
 
 const CommentShow = () => {
   const [loading, setLoading] = useState(true)
   const user = useSelector((state) => state.user.user)
-  const token = useSelector((state) => state.user.token)
   const [fetchData, setFetchData] = useState(false)
   const [item, setItem] = useState({})
   const router = useRouter()
@@ -18,38 +17,20 @@ const CommentShow = () => {
     setFetchData(true)
   }, [])
 
- 
 
-  useEffect(() => {
-    const commentId = window.location.pathname.split("/")[3]
-    if (fetchData == true) {
-      const fetchPostData = async () => {
-        try {
-          const { data } = await axios(
-            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-comment/${commentId}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              withCredentials: true,
-            }
-          )
-          setItem(data)
-          setLoading(!loading)
-          setFetchData(!fetchData)
-        } catch (e) {
-          setLoading(!loading)
-          setFetchData(!fetchData)
-          const errorMsg = e.response && e.response.data.message
-          console.log(errorMsg)
-        }
-      }
-      fetchPostData()
-    }
-  }, [fetchData == true])
 
-  // console.log(item)
+  const { _ } = useHttp({
+    fetchNow: fetchData,
+    setFetchNow: setFetchData,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-comment/${router.query.commentid}`,
+    isAuth: true,
+    isSetData: true,
+    setData: setItem,
+    isEToast: true,
+    cb: () => setLoading(false),
+    ecb: () => setLoading(false),
+  }) 
+
 
   return (
     <>

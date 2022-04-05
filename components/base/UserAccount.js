@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react"
+import React, { useState } from "react"
 import {
   Flex,
   Avatar,
@@ -19,11 +19,11 @@ import dateFormat from "dateformat"
 import AllPost from "../custom/AllPost"
 import { useSelector } from "react-redux"
 import { useRouter } from "next/router"
-import axios from "axios"
 import { MdOutlineFlipCameraIos } from "react-icons/md"
 import Resizer from "react-image-file-resizer"
 import ReactCrop from "react-image-crop"
 import countReaction from '../utils/countReaction'
+import useHttp from "../utils/useHttp"
 
 const UserAccount = ({
   post,
@@ -36,18 +36,20 @@ const UserAccount = ({
 }) => {
   const userAccount = useSelector((state) => state.user.user)
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const token = useSelector((state) => state.user.token)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [profileImage, setProfileImage] = useState(null)
   const [coverImage, setCoverImage] = useState(null)
   const [nameValue, setNameValue] = useState("")
   const [bioValue, setBioValue] = useState("")
-  const [manageLoading, setManageLoading] = useState(false)
   const [profileModalOpen, setProfileModalOpen] = useState(false)
   const [profileBeforeProcess, setProfileBeforeProcess] = useState(null)
   const [ImageCrop, setImageCrop] = useState(null)
   const [profileRawFile, setProfileRawFile] = useState(null)
+  const [unfollowRequest, setUnfollowRequest] = useState(false)
+  const [followRequest,setFollowRequest] = useState(false)
+  const [userUploadedData, setUserUploadedData] = useState({})
+  const [userDataRequest,setUserDataRequest] = useState(false)
+
   const [crop, setCrop] = useState({
     unit: "%",
     x: 25,
@@ -57,56 +59,37 @@ const UserAccount = ({
   })
 
   // console.log(cropProfileImage)
+
+  const { isLoading } = useHttp({
+    fetchNow: unfollowRequest,
+    setFetchNow: setUnfollowRequest,
+    method: "post",
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unfollow-user/${userAccount?._id}`,
+    body: { followId: user?._id },
+    isAuth: true,
+    isSetData: true,
+    setData: setUserData,
+  
+  })
+
   const unFollowHandler = async () => {
-    try {
-      setIsLoading(true)
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unfollow-user/${userAccount._id}`,
-        { followId: user._id },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-
-      setUserData(data)
-      setIsLoading(false)
-    } catch (e) {
-      setIsLoading(false)
-
-      const errorMsg = e.response && e.response.data.message
-      console.log(errorMsg)
-    }
+    setUnfollowRequest(true)
+    
   }
 
 
-  // console.log(user)
+  const { isLoading: isFollowLoading } = useHttp({
+    fetchNow: followRequest,
+    setFetchNow: setFollowRequest,
+    method: "post",
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/follow-user/${userAccount?._id}`,
+    body: { followId: user?._id },
+    isAuth: true,
+    isSetData: true,
+    setData: setUserData,
+  })
   const followHandler = async () => {
-    try {
-      setIsLoading(true)
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/follow-user/${userAccount._id}`,
-        { followId: user._id },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-
-      setUserData(data)
-      setIsLoading(false)
-    } catch (e) {
-      setIsLoading(false)
-
-      const errorMsg = e.response && e.response.data.message
-      console.log(errorMsg)
-    }
+    setFollowRequest(true)
   }
 
   const coverImageHandler = (e) => {
@@ -176,41 +159,36 @@ setProfileRawFile(file)
 
     setProfileModalOpen(false)
 
-
   }
 
+
+ const { isLoading: manageLoading } = useHttp({
+   fetchNow: userDataRequest,
+   setFetchNow: setUserDataRequest,
+   method: "post",
+   url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/manage-account/${userAccount._id}`,
+   body: userUploadedData,
+   isAuth: true,
+   isSetData: true,
+   setData: setUserData,
+   isEToast: true,
+   cb: (() => {
+      setNameValue("")
+       setCoverImage(null)
+       setProfileImage(null)
+       setBioValue("")
+       setIsModalOpen(!isModalOpen)
+   }),
+
+   ecb: (() => setIsModalOpen(!isModalOpen))
+ }) 
 
   const userDataHandler = async () => {
     const userData = { profileImage, coverImage, nameValue, bioValue }
-    try {
-      setManageLoading(true)
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/manage-account/${userAccount._id}`,
-        userData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-
-      setUserData(data)
-      setManageLoading(false)
-      setNameValue("")
-      setCoverImage(null)
-      setProfileImage(null)
-      setBioValue("")
-      setIsModalOpen(!isModalOpen)
-    } catch (e) {
-      setManageLoading(false)
-      setIsModalOpen(!isModalOpen)
-      const errorMsg = e.response && e.response.data.message
-      console.log(errorMsg)
-    }
+    setUserUploadedData(userData)
+    setUserDataRequest(true)
+    
   }
-  // console.log(crop)
   return (
     <>
       <Modal
@@ -420,7 +398,11 @@ setProfileRawFile(file)
                   : followHandler
               }
               size="sm"
-              isLoading={isLoading}
+              isLoading={
+                user.follower.includes(userAccount?._id) == true
+                  ? isLoading
+                  : isFollowLoading
+              }
               fontSize={12}
               variant="outline"
             >

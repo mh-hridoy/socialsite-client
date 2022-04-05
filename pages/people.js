@@ -1,52 +1,31 @@
 import React, { useState, useEffect } from "react"
 import { Flex, Spinner, useColorModeValue } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
-import { useRouter } from "next/router"
 import WithHeader from "../components/custom/WithHeader"
-import axios from "axios"
 import SingleUserCard from "../components/custom/SingleUserCard"
+import useHttp from "../components/utils/useHttp"
 
 const PeoplePage = () => {
   const [loading, setLoading] = useState(true)
   const user = useSelector((state) => state.user.user)
-  const token = useSelector((state) => state.user.token)
   const [fetchData, setFetchData] = useState(false)
   const [users, setUsers] = useState([])
-  const router = useRouter()
 
   useEffect(() => {
     setFetchData(true)
   }, [])
 
-  useEffect(() => {
-    if (fetchData == true) {
-      const fetchPeople = async () => {
-        try {
-          const { data } = await axios(
-            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-users/${user?._id}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              withCredentials: true,
-            }
-          )
-          setUsers([...data])
-        //   console.log(data)
-          setLoading(!loading)
-          setFetchData(!fetchData)
-        } catch (e) {
-          setLoading(!loading)
-          router.push("/login")
-          setFetchData(!fetchData)
-          const errorMsg = e.response && e.response.data.message
-          console.log(errorMsg)
-        }
-      }
-      fetchPeople()
-    }
-  }, [fetchData == true])
+    const { _ } = useHttp({
+      fetchNow: fetchData,
+      setFetchNow: setFetchData,
+      url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-users/${user?._id}`,
+      isAuth: true,
+      isSetData: true,
+      setData: setUsers,
+      epushTo: "/login",
+      cb: () => setLoading(false),
+      ecb: () => setLoading(false),
+    })
 
 
   return (

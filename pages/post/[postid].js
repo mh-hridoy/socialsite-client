@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Flex, Spinner, Text } from "@chakra-ui/react"
+import { Flex, Spinner } from "@chakra-ui/react"
 import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/router"
 import WithHeader from "../../components/custom/WithHeader"
@@ -7,6 +7,8 @@ import SingleFeed from "../../components/base/SingleFeed"
 import axios from "axios"
 import io from "socket.io-client"
 import {logout} from '../../store/userInfoSlice'
+import useHttp from "../../components/utils/useHttp"
+
 
 const PostId = () => {
   const [loading, setLoading] = useState(true)
@@ -49,38 +51,19 @@ const PostId = () => {
     }
   }, [fetchData == false && user != null])
 
-  
+    const { _ } = useHttp({
+      fetchNow: fetchData && router.query.postid,
+      setFetchNow: setFetchData,
+      url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-post/${router.query.postid}`,
+      isAuth: true,
+      isSetData: true,
+      setData: setItem,
+      isEToast: true,
+      cb: () => setLoading(false),
+      ecb: () => setLoading(false),
+    })   
 
-  useEffect(() => {
-    const postId = window.location.pathname.split("/")[2]
-    if (fetchData == true) {
-      // if (user == null) router.push("/login")
-      const fetchPostData = async () => {
-        try {
-          const { data } = await axios(
-            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-post/${postId}`,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              withCredentials: true,
-            }
-          )
-          setItem(data)
-          setLoading(!loading)
-          setFetchData(!fetchData)
-        } catch (e) {
-          setLoading(!loading)
-          setFetchData(!fetchData)
-          // router.push("/login")
-          const errorMsg = e.response && e.response.data.message
-          console.log(errorMsg)
-        }
-      }
-      fetchPostData()
-    }
-  }, [fetchData == true])
+
 
 
   return (

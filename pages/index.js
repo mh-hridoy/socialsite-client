@@ -20,6 +20,7 @@ export default function Home(props) {
   const [totalPage, setTotalPage] = useState(null)
   const [page, setPage] = useState(1)
   const [fetchingHomeData, setFetchingHomeData] = useState(false)
+
   useEffect(() => {
     if (!loading) {
       const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
@@ -67,7 +68,7 @@ export default function Home(props) {
           (item) => item._id == post._id
         )
         // console.log(indexOfNewPost)
-        //if exist replace it with the existingone
+        //if exist replace it with the existing-one
         if (indexOfNewPost != -1) {
           newArray[indexOfNewPost] = post
         } else {
@@ -85,7 +86,6 @@ export default function Home(props) {
 
   useEffect(() => {
     if (fetchData == true || page > 1) {
-      // console.log("i'm running")
       const fetchInitData = async () => {
         setFetchingHomeData(true)
         try {
@@ -113,7 +113,6 @@ export default function Home(props) {
           setFetchingHomeData(false)
 
           const errorMsg = e.response && e.response.data.message
-          // console.log(errorMsg)
         }
       }
 

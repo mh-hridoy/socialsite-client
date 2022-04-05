@@ -29,7 +29,9 @@ const useHttp = (
   removeStore = false,
   epushTo = null,
   outDispatch = false,
-  cb = null}
+  cb = null,
+  ecb = null
+}
 ) => {
   const [isLoading, setIsLoading] = useState(false)
   const token = useSelector((state) => state.user.token)
@@ -113,11 +115,17 @@ const useHttp = (
           if (setFetchNow !== null) {
             setFetchNow(!fetchNow)
           }
+
+
           let errorMsg = err.response
             ? err.response.data.message
             : "Something went wrong!!!"
 
           setIsLoading(false)
+
+          if (ecb != null) {
+            ecb()
+          }
 
           if (
             errorMsg.indexOf("Your email is not verified") == 0 &&
