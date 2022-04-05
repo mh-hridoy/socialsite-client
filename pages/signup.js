@@ -14,7 +14,6 @@ import {
   Alert,
   AlertIcon,
   AlertTitle,
-  useToast,
 } from "@chakra-ui/react"
 import PhoneInput from "react-phone-input-2"
 
@@ -22,7 +21,9 @@ import * as Yup from "yup"
 
 import { useRouter } from "next/router"
 import UnAuth from "../components/base/UnAuth"
-import axios from "axios"
+import useHttp from "../components/utils/useHttp"
+
+
 const signupSchema = Yup.object().shape({
   password: Yup.string()
     .min(8, "Password must be 8 character long.")
@@ -38,51 +39,31 @@ const signupSchema = Yup.object().shape({
 })
 
 const Signup = () => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [sendRequest, setSendRequest] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState("")
   const router = useRouter()
-  const toast = useToast({ position: "top", isClosable: true })
+  const [body, setBody] = useState({})
+
+  // Signup request using custom hook
+  const { isLoading } = useHttp(
+    {fetchNow : sendRequest,
+    setFetchNow : setSendRequest,
+    url : `${process.env.NEXT_PUBLIC_MAIN_PROXY}/signup`,
+    method : "post",
+    body : body,
+    isToast : true,
+    toastMessage : "data.message",
+    isPush : true,
+    pushTo: "/login"}
+  )
 
   const phoneNumberHandler = (e) => {
     setPhoneNumber(e)
   }
 
-  const signupHandler = async (values) => {
-    // if (!setPhoneNumber) return
-
-    
-    setIsLoading(true)
-
-    try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/signup`,
-        { ...values, phoneNumber },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
-      setIsLoading(false)
-      toast({
-        status: "success",
-        duration: 3000,
-        title: data.message,
-      })
-      router.push("/login")
-    } catch (e) {
-      setIsLoading(false)
-      const errorMsg = e.response
-        ? e.response.data.message
-        : "Something went wrong!!!"
-
-      toast({
-        status: "error",
-        duration: 5000,
-        title: errorMsg,
-      })
-    }
+  const signupHandler = (values) => {
+    setBody({ ...values, phoneNumber })
+    setSendRequest(true)
   }
 
   return (

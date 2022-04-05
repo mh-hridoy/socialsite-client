@@ -20,10 +20,10 @@ import {
 } from "@chakra-ui/react"
 import * as Yup from "yup"
 import { useRouter } from "next/router"
-import { useDispatch } from "react-redux"
 import axios from "axios"
 import { login } from "../store/userInfoSlice"
 import UnAuth from "../components/base/UnAuth"
+import useHttp from "../components/utils/useHttp"
 
 const loginSchema = Yup.object().shape({
   password: Yup.string()
@@ -44,123 +44,75 @@ const resetSchema = Yup.object().shape({
 
 const Login = () => {
   const [isForget, setIsForget] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [sendRequest, setSendRequest] = useState(false)
   const router = useRouter()
-  const toast = useToast({ position: "top", isClosable: true })
-  const dispatch = useDispatch()
   const [verifyMessage, setVerifyMessage] = useState(null)
   const [userID, setUserId] = useState(null)
-  const [verifyLoading, setVerifyLoading] = useState(false)
-  
-  const loginHandler = async (values) => {
-    setIsLoading(true)
+  const [verifyRequest, setVerifyRequest] = useState(false)
+  const [body, setBody] = useState({})
+  const [resetBody,setResetBody] = useState({})
+  const [resetRequestStart, setResetRequestStart] = useState(false)
 
-    try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/login`,
-        values,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
-      dispatch(login(data))
-      localStorage.setItem("user", JSON.stringify(data))
-      setIsLoading(false)
-      router.push("/")
-      toast({
-        status: "success",
-        duration: 3000,
-        title: "Succesfully logged in!",
-      })
-    } catch (e) {
-      setIsLoading(false)
 
-      const errorMsg = e.response && e.response.data.message
-      // console.log(errorMsg)
-      if (errorMsg.indexOf("Your email is not verified") == 0) {
-        setVerifyMessage("Please verify your email to continue...")
-        setUserId(errorMsg.split(".")[1])
-      } else {
-        toast({
-          status: "error",
-          duration: 5000,
-          title: errorMsg || "Something went wrong!!!",
-        })
-      }
+ 
+  //login request
+     const loginHandler = (values) => {
+       setBody(values)
+       setSendRequest(true)
+     }
+  const { isLoading } = useHttp(
+    {fetchNow : sendRequest,
+    setFetchNow : setSendRequest,
+    isLocalStorage : true,
+    url : `${process.env.NEXT_PUBLIC_MAIN_PROXY}/login`,
+    method : "post",
+    body: body,
+    isMessage : true,
+    setMessage : setVerifyMessage,
+    setUserId : setUserId,
+    isDispatch : true,
+    dispatchFunc : login,
+    isEToast : true,
+    isPush : true,
+    pushTo : "/",
     }
+  )
+
+
+  //verify email request
+  const requestVerify = () => {
+    setVerifyRequest(true)
   }
+   const { isLoading: verifyLoading } = useHttp({
+     fetchNow: verifyRequest,
+     setFetchNow: setVerifyRequest,
+     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/request-verify-email`,
+     method: "post",
+     body: { id: userID },
+     isMessage: true,
+     setMessage: setVerifyMessage,
+     setUserId: setUserId,
+     isToast: true,
+     isEToast: true,
+     
+   })
 
-  const requestVerify = async () => {
-    setVerifyLoading(!verifyLoading)
-
-    try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/request-verify-email`,
-        { id: userID },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
-    setVerifyLoading(!verifyLoading)
-    setVerifyMessage(null)
-    setUserId(null)
-      toast({
-        status: "success",
-        duration: 3000,
-        title: data,
-      })
-    } catch (e) {
-    setVerifyLoading(!verifyLoading)
-
-      const errorMsg = e.response && e.response.data.message
-      toast({
-        status: "error",
-        duration: 5000,
-        title: errorMsg || "Something went wrong!!!",
-      })
+   //reset request
+    const requestReset = (values) => {
+      setResetBody(values)
+      setResetRequestStart(true)
     }
+   const { isLoading: resetLoading } = useHttp({
+     fetchNow: resetRequestStart,
+     setFetchNow: setResetRequestStart,
+     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/reset-request`,
+     method: "post",
+     body: resetBody,
+     isToast: true,
+     isEToast: true,
+     cb: () => setIsForget(!isForget),
+   })
 
-
-  }
-
-  const requestReset = async (values) => {
-    setIsLoading(true)
-
-    try {
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/reset-request`,
-        values,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      )
-      setIsLoading(false)
-      setIsForget(!isForget)
-      toast({
-        status: "success",
-        duration: 3000,
-        title: data,
-      })
-    } catch (e) {
-      setIsLoading(false)
-
-      const errorMsg = e.response && e.response.data.message
-      toast({
-        status: "error",
-        duration: 5000,
-        title: errorMsg || "Something went wrong!!!",
-      })
-    }
-  }
 
   return (
     <UnAuth>
@@ -207,7 +159,12 @@ const Login = () => {
                           {verifyLoading ? (
                             <Spinner size="sm" color="buttonColor" ml={2} />
                           ) : (
-                            <a style={{marginLeft: 2}} onClick={requestVerify}>verify now</a>
+                            <a
+                              style={{ marginLeft: 2 }}
+                              onClick={requestVerify}
+                            >
+                              verify now
+                            </a>
                           )}
                         </Alert>
                       )}
@@ -315,7 +272,7 @@ const Login = () => {
                       </a>
 
                       <Button
-                        isLoading={isLoading}
+                        isLoading={resetLoading}
                         type="submit"
                         bg="buttonColor"
                         isFullWidth

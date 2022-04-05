@@ -21,6 +21,7 @@ import * as Yup from "yup"
 import { useRouter } from "next/router"
 import axios from "axios"
 import UnAuth from "../../components/base/UnAuth"
+import useHttp from "../../components/utils/useHttp"
 
 const resetSchema = Yup.object().shape({
   password: Yup.string()
@@ -37,53 +38,32 @@ const resetSchema = Yup.object().shape({
   ),
 })
 
-
-
 const ResetRequest = () => {
-  const [isLoading, setIsLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const toast = useToast({ position: "top", isClosable: true })
+  const [body, setBody] = useState({})
+  const [resetRequest, setResetRequest] = useState(false)
   let veriCode;
 
+  const { isLoading } = useHttp({
+    fetchNow: resetRequest,
+    setFetchNow: setResetRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/reset-password`,
+    method: "post",
+    body: { resetCode: router.query.forgetpass, ...body },
+    isToast: true,
+    isEToast: true,
+    isPush: true,
+    pushTo: "/login",
+  })
+
+
   const resetHandler = async (values) => {
-    const verifyCode = router.query.forgetpass
-    const {password} = values
-    setIsLoading(true)
-
-    try {
-     const { data } = await axios.post(
-       `${process.env.NEXT_PUBLIC_MAIN_PROXY}/reset-password`,
-       { resetCode: verifyCode, password }
-     )
-
-      setIsLoading(false)
-      toast({
-        status: "success",
-        duration: 5000,
-        title: data,
-      })
-      router.push("/login")
-
-    } catch (e) {
-
-            setIsLoading(false)
-
-      const errorMsg = e.response
-        ? e.response.data.message
-        : "Something went wrong!!!"
-
-      toast({
-        status: "error",
-        duration: 5000,
-        title: errorMsg,
-      })
-    }
-
+  setBody({ ...values })
+setResetRequest(true)
    
   }
-
-  
 
   useEffect(() => {
     const code = window.location.pathname.split("/")

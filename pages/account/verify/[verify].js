@@ -1,88 +1,78 @@
-import { Button, Flex, Heading, Stack, Spinner, useToast } from '@chakra-ui/react'
-import React, {useState, useEffect} from 'react'
-import axios from 'axios'
+import {
+  Button,
+  Flex,
+  Heading,
+  Stack,
+  Spinner,
+  useToast,
+} from "@chakra-ui/react"
+import React, { useState, useEffect } from "react"
+import axios from "axios"
+import useHttp from "../../../components/utils/useHttp"
 
-import {useRouter} from 'next/router'
+import { useRouter } from "next/router"
 
 const VerifyPage = () => {
   const [loading, setLoading] = useState(true)
-  const [isLoading, setIsLoading] = useState(false)
   const toast = useToast({ position: "top", isClosable: true })
   const router = useRouter()
-  let veriCode;
+  const [verifyCheck, setVerifyCheck] = useState(false)
+  let veriCode
 
-const verifyEmailHandler = async()=> {
-  const verifyCode = router.query.verify
-  
-  setIsLoading(true)
-  try {
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_MAIN_PROXY}/verify-email`,
-      { verifyCode: verifyCode },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    )
-      setIsLoading(false)
+ 
+
+  const verifyEmailHandler = async () => {
+    setVerifyCheck(true)
+    
+  }
+//verify email request
+   const { isLoading } = useHttp({
+     fetchNow: verifyCheck,
+     setFetchNow: setVerifyCheck,
+     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/verify-email`,
+     method: "post",
+     body: { verifyCode: router.query.verify },
+     isToast: true,
+     isEToast: true,
+     isPush: true,
+     isEPush: true,
+     pushTo: "/",
+     epushTo: "/login",
+   })
+
+  useEffect(() => {
+    const code = window.location.pathname.split("/")
+    veriCode = code[code.length - 1]
+    checkCode()
+  }, [])
+
+  const checkCode = async () => {
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/check-verify-email`,
+        { verifyCode: veriCode },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      )
+
+      setLoading(false)
+    } catch (e) {
+      router.push("/login")
+      const errorMsg = e.response
+        ? e.response.data.message
+        : "Something went wrong!!!"
+
       toast({
-        status: "success",
+        status: "error",
         duration: 5000,
-        title: "Email verified successfully.",
+        title: errorMsg,
       })
-      router.push("/")
-  } catch (e) {
-    router.push("/login")
-    const errorMsg = e.response
-      ? e.response.data.message
-      : "Something went wrong!!!"
-
-    toast({
-      status: "error",
-      duration: 5000,
-      title: errorMsg,
-    })
+    }
   }
-
-}
-
-useEffect(() => {
-  const code = window.location.pathname.split("/")
-  veriCode = code[code.length - 1]
-  checkCode()
-}, [])
-
-const checkCode = async () => {
-  try {
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_MAIN_PROXY}/check-verify-email`,
-      { verifyCode: veriCode },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      }
-    )
-
-    setLoading(false)
-  } catch (e) {
-    router.push("/login")
-    const errorMsg = e.response
-      ? e.response.data.message
-      : "Something went wrong!!!"
-
-    toast({
-      status: "error",
-      duration: 5000,
-      title: errorMsg,
-    })
-  }
-}
-
-
 
   return (
     <>

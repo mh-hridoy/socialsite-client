@@ -3,7 +3,6 @@ import {
   WrapItem,
   useColorModeValue,
   Spinner,
-  useToast,
   useColorMode,
   Avatar,
   Flex,
@@ -16,7 +15,6 @@ ModalContent,
 ModalCloseButton
 } from "@chakra-ui/react"
 
-import axios from "axios"
 import { useRouter } from "next/router"
 import React, { useState } from "react"
 import {
@@ -30,7 +28,7 @@ import {
 } from "react-icons/md"
 import { BsSun } from "react-icons/bs"
 import { useDispatch, useSelector } from "react-redux"
-
+import useHttp from "../utils/useHttp"
 import { logout } from "../../store/userInfoSlice"
 import CreateNewFeed from "../custom/CreateNewFeed"
 
@@ -38,11 +36,9 @@ const SideBar = () => {
   const { colorMode, toggleColorMode } = useColorMode()
   const router = useRouter()
   const user = useSelector((state) => state.user.user)
-  const dispatch = useDispatch()
-  const toast = useToast({ position: "top", isClosable: true })
-  const [isLoading, setIsLoading] = useState(false)
   const pathName = router.pathname
 const [isModalOpen, setIsModalOpen] = useState(false)
+const [logoutRequest, setLogoutRequest] = useState(false)
 
 
   const item = [
@@ -73,41 +69,26 @@ const [isModalOpen, setIsModalOpen] = useState(false)
     },
   ]
 
-  const logoutHandler = async () => {
-    try {
-      setIsLoading(true)
-      await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
-      })
-      localStorage.removeItem("user")
-      router.push("/login")
-      dispatch(logout({ user: null, token: "" }))
-      setIsLoading(false)
 
-      
-      toast({
-        status: "success",
-        duration: 3000,
-        title: "Succesfully logged out!",
-      })
-    } catch (e) {
-      setIsLoading(false)
-      const errorMsg = e.response
-        ? e.response.data.message
-        : "Something went wrong!!!"
+const { isLoading } = useHttp({
+  fetchNow: logoutRequest,
+  setFetchNow: setLogoutRequest,
+  url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`,
+  isLocalStorage: true,
+  removeStore: true,
+  isDispatch: true,
+  dispatchFunc: logout,
+  outDispatch: true,
+  isEToast: true,
+  isPush: true,
+  pushTo: "/login",
+})
 
-      toast({
-        status: "error",
-        duration: 5000,
-        title: errorMsg,
-      })
-    }
+
+  const logoutHandler =  () => {
+    setLogoutRequest(true)
   }
 
-  // console.log(isModalOpen)
 
   return (
     <>
