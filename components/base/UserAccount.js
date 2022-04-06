@@ -88,6 +88,7 @@ const UserAccount = ({
     isSetData: true,
     setData: setUserData,
   })
+  
   const followHandler = async () => {
     setFollowRequest(true)
   }

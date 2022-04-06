@@ -20,7 +20,7 @@ const Admin = () => {
         setIsCheckNow(true)
     }, [])
 
-    const { _ } = useHttp({
+    const { requestedData } = useHttp({
       fetchNow: checkNow,
       setFetchNow: setIsCheckNow,
       url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-all-user/${user?._id}`,
@@ -30,7 +30,7 @@ const Admin = () => {
      isEToast: true,
       isEPush: true,
       epushTo: "/login",
-      cb: (() => {setIsCheckNow(false); setLoading(false)})
+      cb: (() => {setIsCheckNow(false); setLoading(false); console.log(requestedData) })
     })
 
 

@@ -21,167 +21,108 @@ import {
   MdOutlineModeEditOutline,
 } from "react-icons/md"
 import axios from "axios"
+import useHttp from "../utils/useHttp"
 
 const UserModel = ({ user }) => {
   const userInfo = useSelector((state) => state.user.user)
   const token = useSelector((state) => state.user.token)
   const router = useRouter()
-  const [isVloading, setIsVloading] = useState(false)
-  const [isDloading, setIsDloading] = useState(false)
   const toast = useToast({ position: "top", isClosable: true })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [emailValue, setEmailValue] = useState("")
   const [nameValue, setNameValue] = useState("")
   const [passwordValue, setPasswordValue] = useState("")
   const [phoneValue, setPhoneValue] = useState("")
-  const [isChangeLoading, setIsChangeLoading] = useState(false)
+  const [sendVRequest, setSendVRequest] = useState(false)
+  const [verifyUserId, setVerifyUserId] = useState(null)
+  const [sendDRequest, setSendDRequest] = useState(false)
+  const [dUserId, setDUserId] = useState(null)
+  const [adminChangeRequest,setAdminChangeRequest] = useState(false)
 
-  const verifyHandler = async (id) => {
-    try {
-      setIsVloading(!isVloading)
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/verify-account/${userInfo._id}`,
-        { userId: id },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-      setIsVloading(!isVloading)
-      toast({
-        status: "success",
-        duration: 5000,
-        title: data,
-      })
-      router.reload()
-    } catch (e) {
-      router.push("/")
-      setIsVloading(!isVloading)
+  //verifyAccount request
+  const { isLoading: isVloading } = useHttp({
+    fetchNow: sendVRequest,
+    method: "post",
+    body: { userId: verifyUserId },
+    setFetchNow: setSendVRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/verify-account/${userInfo?._id}`,
+    isAuth: true,
+    isEToast: true,
+    eToastMessage: "Something went wrong!",
+    isToast: true,
+    cb: () => router.reload(),
+    ecb: () => router.push("/"),
+  })
 
-      const errorMsg = e.response && e.response.data.message
-      toast({
-        status: "error",
-        duration: 5000,
-        title: errorMsg || "Something went wrong!!!",
-      })
-      // console.log(errorMsg)
-    }
+  const verifyHandler = (id) => {
+    setVerifyUserId(id)
+    setSendVRequest(true)
   }
 
-  const unVerifyHandler = async (id) => {
-     try {
-       setIsVloading(!isVloading)
-       const { data } = await axios.post(
-         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unverify-account/${userInfo._id}`,
-         { userId: id },
-         {
-           headers: {
-             "Content-Type": "application/json",
-             Authorization: `Bearer ${token}`,
-           },
-           withCredentials: true,
-         }
-       )
-       setIsVloading(!isVloading)
-       toast({
-         status: "success",
-         duration: 5000,
-         title: data,
-       })
-       router.reload()
-     } catch (e) {
-       router.push("/")
-       setIsVloading(!isVloading)
+  //un-verifyAccount request
+  const { isLoading: isUVloading } = useHttp({
+    fetchNow: sendVRequest,
+    method: "post",
+    body: { userId: verifyUserId },
+    setFetchNow: setSendVRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unverify-account/${userInfo?._id}`,
+    isAuth: true,
+    isEToast: true,
+    eToastMessage: "Something went wrong!",
+    isToast: true,
+    cb: () => router.reload(),
+    ecb: () => router.push("/"),
+  })
 
-       const errorMsg = e.response && e.response.data.message
-       toast({
-         status: "error",
-         duration: 5000,
-         title: errorMsg || "Something went wrong!!!",
-       })
-       // console.log(errorMsg)
-     }
+  const unVerifyHandler = (id) => {
+    setVerifyUserId(id)
+    setSendVRequest(true)
   }
 
-  const deleteHandler = async (id) => {
-    try {
-      setIsDloading(!isDloading)
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-account/${userInfo._id}`,
-        { userId: id },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-      setIsDloading(!isDloading)
-      toast({
-        status: "success",
-        duration: 5000,
-        title: data,
-      })
-      router.reload()
-    } catch (e) {
-      router.push("/")
-      setIsDloading(!isDloading)
+  //Delete account request
+  const { isLoading: isDloading } = useHttp({
+    fetchNow: sendDRequest,
+    method: "post",
+    body: { userId: dUserId },
+    setFetchNow: setSendDRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-account/${userInfo?._id}`,
+    isAuth: true,
+    isToast: true,
+    isEToast: true,
+    eToastMessage: "Something went wrong!",
+    isToast: true,
+    cb: () => router.reload(),
+    ecb: () => router.push("/"),
+  })
 
-      const errorMsg = e.response && e.response.data.message
-      toast({
-        status: "error",
-        duration: 5000,
-        title: errorMsg || "Something went wrong!!!",
-      })
-      // console.log(errorMsg)
-    }
-
+  const deleteHandler = (id) => {
+    setDUserId(id)
+    setSendDRequest(true)
   }
 
-  const adminManageHandler = async () => {
-    try {
-      setIsChangeLoading(!isDloading)
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/admin-manage-account/${userInfo._id}`,
-        {
-          fullName: nameValue,
+  //admin manage request
+  const { isLoading: isChangeLoading } = useHttp({
+    fetchNow: adminChangeRequest,
+    method: "post",
+    body: {  fullName: nameValue,
           email: emailValue,
           phoneNumber: phoneValue,
           password: passwordValue,
-          userId : user._id,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-      setIsChangeLoading(!isDloading)
-      toast({
-        status: "success",
-        duration: 5000,
-        title: data,
-      })
-      router.reload()
-    } catch (e) {
-      router.push("/")
-      setIsChangeLoading(!isDloading)
+          userId: user._id,
+   },
+    setFetchNow: setAdminChangeRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/admin-manage-account/${userInfo?._id}`,
+    isAuth: true,
+    isToast: true,
+    isEToast: true,
+    isToast: true,
+    cb: () => router.reload(),
+    ecb: () => router.push("/"),
+  })
 
-      const errorMsg = e.response && e.response.data.message
-      toast({
-        status: "error",
-        duration: 5000,
-        title: errorMsg || "Something went wrong!!!",
-      })
-      console.log(errorMsg)
-    }
-
+  const adminManageHandler = async () => {
+    setAdminChangeRequest(true)
+  
   }
 
   return (
@@ -227,8 +168,8 @@ const UserModel = ({ user }) => {
             />
 
             <Button
-            bg={"buttonColor"}
-            isLoading={isChangeLoading}
+              bg={"buttonColor"}
+              isLoading={isChangeLoading}
               onClick={adminManageHandler}
             >
               Save
@@ -250,7 +191,7 @@ const UserModel = ({ user }) => {
         <Flex
           onClick={() =>
             router.push(
-              user._id == userInfo._id
+              user._id == userInfo?._id
                 ? `/account/myaccount/${user._id}`
                 : `/account/${user._id}`
             )
@@ -288,18 +229,18 @@ const UserModel = ({ user }) => {
           justifyContent="center"
           cursor="pointer"
         >
-            <Button
-              isLoading={isVloading}
-              fontSize={12}
-              size={"sm"}
-              bg="buttonColor"
-              onClick={() => setIsModalOpen(!isModalOpen)}
-            >
-              <MdOutlineModeEditOutline size={16} />
-            </Button>
-          
           <Button
-            isLoading={isVloading}
+            // isLoading={isVloading}
+            fontSize={12}
+            size={"sm"}
+            bg="buttonColor"
+            onClick={() => setIsModalOpen(!isModalOpen)}
+          >
+            <MdOutlineModeEditOutline size={16} />
+          </Button>
+
+          <Button
+            isLoading={isVloading || isUVloading}
             onClick={
               user.isVerified
                 ? () => unVerifyHandler(user._id)

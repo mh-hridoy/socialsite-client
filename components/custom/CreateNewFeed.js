@@ -3,7 +3,6 @@ import {
   Flex,
   Textarea,
   Button,
-  Text,
   FormLabel,
   Input,
   useColorMode,
@@ -153,57 +152,7 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
     })
   }
 
-  // const postHandler = async () => {
-  //   setIsLoading(true)
-  //   const tags = []
-  //   if (selectedTag.length !== 0) {
-  //     selectedTag.map((item) => tags.push(item.value))
-  //   }
 
-  //   if (feedText || images.length !== 0) {
-  //     try {
-  //       const { data } = await axios.post(
-  //         `${process.env.NEXT_PUBLIC_MAIN_PROXY}/new-post`,
-  //         { text: feedText, images, user: user._id, tags },
-  //         {
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //           withCredentials: true,
-  //         }
-  //       )
-  //       setFeedText("")
-  //       setImages([])
-  //       // const oldData = [...homeData]
-  //       // const newData = [data, ...oldData]
-  //       // setHomeData([...new Set(newData)])
-  //       toast({
-  //         status: "success",
-  //         duration: 3000,
-  //         title: "Post created!",
-  //       })
-  //       setIsLoading(false)
-  //     } catch (e) {
-  //       setIsLoading(false)
-
-  //       const errorMsg = e.response && e.response.data.message
-  //       // console.log(errorMsg)
-  //       // toast({
-  //       //   status: "error",
-  //       //   duration: 5000,
-  //       //   title: errorMsg || "Something went wrong!!!",
-  //       // })
-  //     }
-  //   } else {
-  //     setIsLoading(false)
-  //     toast({
-  //       status: "info",
-  //       duration: 3000,
-  //       title: "Status or Image is required.",
-  //     })
-  //   }
-  // }
 
   const postHandler = async () => {
     setIsLoading(true)
@@ -248,12 +197,7 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
         setIsLoading(false)
 
         const errorMsg = e.response && e.response.data.message
-        // console.log(errorMsg)
-        // toast({
-        //   status: "error",
-        //   duration: 5000,
-        //   title: errorMsg || "Something went wrong!!!",
-        // })
+      
       }
     } else {
       setIsLoading(false)
@@ -270,8 +214,6 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
     allImages.splice(inx, 1)
     setImages([...allImages])
   }
-
-  // console.log(images)
 
   const customStyles = {
     option: (provided) => ({

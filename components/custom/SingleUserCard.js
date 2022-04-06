@@ -4,7 +4,6 @@ import {
   Text,
   Button,
   Avatar,
-  useToast,
   useColorModeValue,
 } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
@@ -13,80 +12,49 @@ import {
   MdVerified,
   
 } from "react-icons/md"
-import axios from "axios"
+import useHttp from "../utils/useHttp"
 
 const SingleUserCard = ({ user }) => {
   const userInfo = useSelector((state) => state.user.user)
-  const token = useSelector((state) => state.user.token)
   const router = useRouter()
-  const toast = useToast({ position: "top", isClosable: true })
-  const [isLoading, setIsLoading] = useState(false)
-const [buttonText, setButtonText] = useState("Follow")
+  const [buttonText, setButtonText] = useState("Follow")
+  const [unFollowRequest, setUnfollowRequest] = useState(false)
+  const [followRequest, setFollowRequest] = useState(false)
 
+  // unfollow request
+  const { isLoading } = useHttp({
+    fetchNow: unFollowRequest,
+    method: "post",
+    body: { followId: user._id },
+    setFetchNow: setUnfollowRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unfollow-user/${userInfo._id}`,
+    isAuth: true,
+    isEToast: true,
+    eToastMessage: "Something went wrong!",
+    cb: () => setButtonText("Follow"),
+  })
 
-const unFollowHandler = async () => {
-  try {
-    setIsLoading(true)
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unfollow-user/${userInfo._id}`,
-      { followId: user._id },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      }
-    )
-
-    setIsLoading(false)
-    setButtonText("Follow")
-  } catch (e) {
-    setIsLoading(false)
-    const errorMsg = e.response && e.response.data.message
-    toast({
-      status: "error",
-      duration: 5000,
-      title: "Something went wrong!",
-    })
-    // console.log(errorMsg)
+  const unFollowHandler = () => {
+    setUnfollowRequest(true)
   }
-}
 
-// console.log(user)
-const followHandler = async () => {
-  try {
-    setIsLoading(true)
-    const { data } = await axios.post(
-      `${process.env.NEXT_PUBLIC_MAIN_PROXY}/follow-user/${userInfo._id}`,
-      { followId: user._id },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      }
-    )
+  // follow request
+  const { isLoading: followLoading } = useHttp({
+    fetchNow: followRequest,
+    method: "post",
+    body: { followId: user._id },
+    setFetchNow: setFollowRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/follow-user/${userInfo._id}`,
+    isAuth: true,
+    isEToast: true,
+    eToastMessage: "Something went wrong!",
+    cb: () => setButtonText("Unfollow"),
+  })
 
-    
-    setIsLoading(false)
-        setButtonText("Unfollow")
-
-  } catch (e) {
-
-    setIsLoading(false)
-toast({
-  status: "error",
-  duration: 5000,
-  title: "Something went wrong!",
-})
-    const errorMsg = e.response && e.response.data.message
-    console.log(errorMsg)
+  // console.log(user)
+  const followHandler = () => {
+    setFollowRequest(true)
   }
-}
-
-
   return (
     <>
       <Flex
@@ -145,7 +113,7 @@ toast({
             bg="buttonColor"
             size={"sm"}
             fontSize={14}
-            isLoading={isLoading}
+            isLoading={buttonText == "Follow" ? followLoading : isLoading}
           >
             {buttonText}
           </Button>

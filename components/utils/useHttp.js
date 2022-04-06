@@ -4,8 +4,8 @@ import { useSelector, useDispatch } from "react-redux"
 import { useToast } from "@chakra-ui/react"
 import { useRouter } from "next/router"
 
-const useHttp = (
-  {fetchNow = false,
+const useHttp = ({
+  fetchNow = false,
   setFetchNow = null,
   isLocalStorage = false,
   url = null,
@@ -16,7 +16,7 @@ const useHttp = (
   setData = null,
   isMessage = false,
   setMessage = null,
-  setUserId= null,
+  setUserId = null,
   isDispatch = false,
   dispatchFunc = null,
   isToast = false,
@@ -30,13 +30,15 @@ const useHttp = (
   epushTo = null,
   outDispatch = false,
   cb = null,
-  ecb = null
-}
-) => {
+  ecb = null,
+  rcb = null,
+  isSetDefault = true,
+}) => {
   const [isLoading, setIsLoading] = useState(false)
   const token = useSelector((state) => state.user.token)
   const dispatch = useDispatch()
   const toast = useToast({ position: "top", isClosable: true })
+  const [requestedData, setRequestedData] = useState(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -63,6 +65,9 @@ const useHttp = (
               withCredentials: true,
             }
           )
+
+          setRequestedData(data)
+
           if (isLocalStorage && !removeStore) {
             localStorage.setItem("user", JSON.stringify(data))
           }
@@ -71,11 +76,12 @@ const useHttp = (
             localStorage.removeItem("user")
           }
 
-            if (cb != null) {
-              cb()
-            }
           if (isSetData && setData !== null) {
             setData(data)
+          }
+
+          if (cb != null) {
+            cb()
           }
 
           if (setFetchNow !== null) {
@@ -86,7 +92,7 @@ const useHttp = (
           }
 
           if (isDispatch && dispatchFunc !== null && outDispatch) {
-            dispatch(dispatchFunc({user: null, toke: ""}))
+            dispatch(dispatchFunc({ user: null, toke: "" }))
           }
 
           if (isToast) {
@@ -109,13 +115,14 @@ const useHttp = (
             router.push(pushTo)
           }
 
-          setIsLoading(false)
+          if (isSetDefault) {
+            setIsLoading(false)
+          }
         } catch (err) {
           console.log(err)
           if (setFetchNow !== null) {
             setFetchNow(!fetchNow)
           }
-
 
           let errorMsg = err.response
             ? err.response.data.message
@@ -150,9 +157,15 @@ const useHttp = (
       }
       fetchData()
     }
+
+    return () => {
+      if (rcb != null) {
+        rcb()
+      }
+    }
   }, [fetchNow])
 
-  return { isLoading }
+  return { isLoading, requestedData }
 }
 
 export default useHttp

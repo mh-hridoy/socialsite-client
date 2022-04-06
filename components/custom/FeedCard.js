@@ -20,7 +20,6 @@ import { AiOutlineComment } from "react-icons/ai"
 import Masonry from "react-masonry-css"
 import GalleryModal from "./GalleryModal"
 import { useRouter } from "next/router"
-import axios from "axios"
 import { useSelector } from "react-redux"
 import CommentsOfFeed from "./CommentsOfFeed"
 import { MdVerified } from "react-icons/md"
@@ -28,19 +27,23 @@ import _ from "underscore"
 import timeAgo from "../utils/DateConverter"
 import { BsThreeDotsVertical } from "react-icons/bs"
 import countReaction from '../utils/countReaction'
+import useHttp from '../utils/useHttp'
+
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(0)
-  const token = useSelector((state) => state.user.token)
   const user = useSelector((state) => state.user.user)
   const router = useRouter()
   const toast = useToast({ position: "top", isClosable: true })
   const [item, setItem] = useState(props.item)
   const [showComment, setShowComment] = useState(false)
-  const [postDeleteId,setPostDeleteId] = useState(null)
-  const [isPostDeleting,setIsPostDeleting] = useState(false)
+  const [postDeleteId, setPostDeleteId] = useState(null)
+  const [postDelRequest,setPostDelRequest] = useState(false)
+
+  const [reactRequest, setReactRequest] = useState(false)
+  const [unlikeRequest, setUnlikeRequest] = useState(false)
   const videoRef = useRef(null)
   const breakpointColumnsObj = {
     default: 2,
@@ -69,29 +72,18 @@ const FeedCard = (props) => {
     modItem.reactedByUser = [...new Set(reactedByUser)]
 
     setItem(modItem)
-
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-like`,
-        { userId: user._id, postId: item._id },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-    } catch (e) {
-      const errorMsg = e.response && e.response.data.message
-      // console.log(errorMsg)
-      // toast({
-      //   status: "error",
-      //   duration: 5000,
-      //   title: "Something went wrong!!!",
-      // })
-    }
+    setReactRequest(true)
   }
+
+  //like request
+  const { isLoading: _likeLoading } = useHttp({
+    fetchNow: reactRequest,
+    setFetchNow: setReactRequest,
+    method: "post",
+    body: { userId: user._id, postId: item._id },
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-like`,
+    isAuth: true,
+  })
 
   const unLikeHandler = async (e) => {
     e.stopPropagation()
@@ -104,69 +96,39 @@ const FeedCard = (props) => {
     modItem.reactedByUser = [...new Set(reactedByUser)]
 
     setItem(modItem)
-
-    // const newItem = { ...item }
-    // newItem.totalReact = newItem.totalReact - 1
-    // const indexOfUser = newItem.reactedByUser.indexOf((item) => item == user._id )
-    // newItem.reactedByUser.splice(indexOfUser, 1)
-
-    // setItem(newItem)
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-unlike`,
-        { userId: user._id, postId: item._id },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-    } catch (e) {
-      const errorMsg = e.response && e.response.data.message
-      // console.log(errorMsg)
-      // toast({
-      //   status: "error",
-      //   duration: 5000,
-      //   title: "Something went wrong!!!",
-      // })
-    }
+    setUnlikeRequest(true)
   }
 
-  const postDeleteHandler = async () => {
-    setPostDeleteId(item._id)
-    try {
-      setIsPostDeleting(true)
-      await axios(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-post/${user._id}/${item._id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
+  //unLike request
+  const { isLoading: _unlikeLoading } = useHttp({
+    fetchNow: unlikeRequest,
+    setFetchNow: setUnlikeRequest,
+    method: "post",
+    body: { userId: user._id, postId: item._id },
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-unlike`,
+    isAuth: true,
+  })
 
+  //post delete request
+  const { isLoading: isPostDeleting } = useHttp({
+    fetchNow: postDelRequest,
+    setFetchNow: setPostDelRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-post/${user._id}/${item._id}`,
+    isAuth: true,
+    isEToast: true,
+    cb: (() => {
         props.setHomeData((prev) => {
           const allPost = [...prev]
           const indexOfPost = allPost.findIndex((itm) => itm._id == item._id)
           allPost.splice(indexOfPost, 1)
-
           return [...new Set(allPost)]
         })
+    })
+  })
 
-    } catch (e) {
-      setIsPostDeleting(false)
-      const errorMsg = e.response && e.response.data.message
-      console.log(e)
-      toast({
-        status: "error",
-        duration: 5000,
-        title: "Something went wrong!!!",
-      })
-    }
+  const postDeleteHandler = async () => {
+    setPostDeleteId(item._id)
+    setPostDelRequest(true)
   }
 
   return (
@@ -228,7 +190,11 @@ const FeedCard = (props) => {
                   // gap={2}
                   fontWeight={600}
                   fontSize={16}
-                  color={item.user?._id == user?._id ? "rgb(29, 155, 240)" : undefined}
+                  color={
+                    item.user?._id == user?._id
+                      ? "rgb(29, 155, 240)"
+                      : undefined
+                  }
                 >
                   {item.user ? item.user.fullName : "Not A User"}{" "}
                   {item.user && item.user.isVerified == true && (
@@ -266,7 +232,6 @@ const FeedCard = (props) => {
                     ) : (
                       <BsThreeDotsVertical />
                     )}
-
                   </MenuButton>
                   <MenuList fontSize={12}>
                     <MenuItem
@@ -408,7 +373,7 @@ const FeedCard = (props) => {
           {/* footer of a post */}
           {user != null && (
             <Flex
-            onClick={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
               position={"absolute"}
               bottom={0}
               left={0}

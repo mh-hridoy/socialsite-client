@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import { Flex, Avatar, Text, useColorModeValue, Menu,
 MenuButton,
 Button,
@@ -10,44 +10,33 @@ import {useRouter} from "next/router"
 import { MdVerified } from "react-icons/md"
 import timeAgo from "../utils/DateConverter"
 import { BsThreeDotsVertical } from "react-icons/bs"
-import axios from "axios"
+import useHttp from '../utils/useHttp'
 
 const SingleComments = ({item}) => {
-    const user = useSelector((state) => state.user.user)
-    const token = useSelector((state) => state.user.token)
-    const router = useRouter()
-     const toast = useToast({ position: "top", isClosable: true })
-    const [isCommentDeleting, setIsCommentDeleting] = useState(false)
-    const [commentDeleteId, setCommentDeleteId] = useState(null)
+  const user = useSelector((state) => state.user.user)
+  const router = useRouter()
+  const toast = useToast({ position: "top", isClosable: true })
+  const [commentDeleteId, setCommentDeleteId] = useState(null)
+  const [commentDeleteRequest, setCommentDeleteRequest] = useState(false)
 
-const deleteCommentHandler = async () => {
-  setCommentDeleteId(item._id)
-  try {
-    setIsCommentDeleting(true)
-    await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-comment/${user?._id}/${item._id}` ,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      }
-    )
+  const { isLoading: isCommentDeleting } = useHttp({
+    fetchNow: commentDeleteRequest,
+    setFetchNow: setCommentDeleteRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-comment/${user?._id}/${item._id}`,
+    isAuth: true,
+    isEToast: true,
+    eToastMessage: "Something went wrong!",
+    isSetDefault: false,
+  })
 
-  } catch (e) {
-      setIsCommentDeleting(false)
-    const errorMsg = e.response && e.response.data.message
-    console.log(e)
-    toast({
-      status: "error",
-      duration: 5000,
-      title: "Something went wrong!!!",
-    })
+  const deleteCommentHandler = async () => {
+    setCommentDeleteId(item._id)
+    setCommentDeleteRequest(true)
   }
 
-}
+  
 
-
+  
   return (
     <Flex
       onClick={(e) => {
@@ -124,8 +113,8 @@ const deleteCommentHandler = async () => {
           _hover={{ border: "2px solid rgb(29, 155, 240)" }}
           cursor="pointer"
           size={"sm"}
-          name={item.user?.fullName}
-          src={item.user?.profilePicture?.img}
+          name={item?.user?.fullName}
+          src={item?.user?.profilePicture?.img}
         ></Avatar>
         <Flex marginBottom={2} direction="column">
           <Text
@@ -134,21 +123,24 @@ const deleteCommentHandler = async () => {
             gap={2}
             fontWeight={600}
             fontSize={15}
-           color= {item.user?._id == user?._id ? "rgb(29, 155, 240)" : undefined}
+            color={
+              item?.user?._id == user?._id ? "rgb(29, 155, 240)" : undefined
+            }
           >
-            {item.user?.fullName}{" "}
-            {item.user?.isUserVerified && item.user?.isUserVerified == true && (
-              <MdVerified color="rgb(29, 155, 240)" />
-            )}
+            {item?.user?.fullName}{" "}
+            {item?.user?.isUserVerified &&
+              item?.user?.isUserVerified == true && (
+                <MdVerified color="rgb(29, 155, 240)" />
+              )}
           </Text>
 
           <Text fontSize={12} opacity={"0.7"}>
-            {timeAgo(item.createdAt)}
+            {timeAgo(item?.createdAt)}
           </Text>
         </Flex>
       </Flex>
       <Text paddingLeft={10} fontSize={14}>
-        {item.text}
+        {item?.text}
       </Text>
     </Flex>
   )
