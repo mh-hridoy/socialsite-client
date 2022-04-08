@@ -74,6 +74,9 @@ const theme = extendTheme(
 
 function MyApp({ Component, pageProps }) {
   const [headerName, setHeaderName] = useState("Home")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [quoteData, setQuoteData] = useState(null)
+  const [homeData, setHomeData] = useState([])
 
 
   Router.events.on("routeChangeStart", progress.start)
@@ -88,9 +91,22 @@ function MyApp({ Component, pageProps }) {
         {/* <Header /> */}
 
         <Flex>
-          <SideBar />
+          <SideBar
+            homeData={homeData}
+            setHomeData={setHomeData}
+            quoteData={quoteData}
+            setQuoteData={setQuoteData}
+            isModalOpen={isModalOpen}
+            setIsModalOpen={setIsModalOpen}
+          />
           <Flex width="100%" direction="column">
             <Component
+              homeData={homeData}
+              setHomeData={setHomeData}
+              quoteData={quoteData}
+              setQuoteData={setQuoteData}
+              isCreateModalOpen={isModalOpen}
+              setIsCreateModalOpen={setIsModalOpen}
               headerName={headerName}
               setHeaderName={setHeaderName}
               {...pageProps}

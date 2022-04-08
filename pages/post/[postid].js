@@ -6,9 +6,8 @@ import WithHeader from "../../components/custom/WithHeader"
 import SingleFeed from "../../components/base/SingleFeed"
 import axios from "axios"
 import io from "socket.io-client"
-import {logout} from '../../store/userInfoSlice'
+import { logout } from "../../store/userInfoSlice"
 import useHttp from "../../components/utils/useHttp"
-
 
 const PostId = () => {
   const [loading, setLoading] = useState(true)
@@ -17,8 +16,8 @@ const PostId = () => {
   const [fetchData, setFetchData] = useState(false)
   const [item, setItem] = useState({})
   const router = useRouter()
-    const dispatch = useDispatch()
-    
+  const dispatch = useDispatch()
+
   useEffect(() => {
     setFetchData(true)
   }, [])
@@ -51,27 +50,32 @@ const PostId = () => {
     }
   }, [fetchData == false && user != null])
 
-    const { _ } = useHttp({
-      fetchNow: fetchData && router.query.postid,
-      setFetchNow: setFetchData,
-      url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-post/${router.query.postid}`,
-      isAuth: true,
-      isSetData: true,
-      setData: setItem,
-      isEToast: true,
-      cb: () => setLoading(false),
-      ecb: () => setLoading(false),
-    })   
-
-
-
+  const { _ } = useHttp({
+    fetchNow: fetchData && router.query.postid,
+    setFetchNow: setFetchData,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-post/${router.query.postid}`,
+    isAuth: true,
+    isSetData: true,
+    setData: setItem,
+    isEToast: true,
+    cb: () => setLoading(false),
+    ecb: () => setLoading(false),
+  })
 
   return (
     <>
+      <head>
+        <meta
+          name="description"
+          content="An example of a meta description. These show up in search engine results."
+        />
+      </head>
       <Flex w={"100%"} alignItems={"center"} justifyContent="center">
         <Flex
           direction="column"
-          minWidth={user != null ? "100%" : ["100%", "100%", "60%", "50%", "50%"]}
+          minWidth={
+            user != null ? "100%" : ["100%", "100%", "60%", "50%", "50%"]
+          }
         >
           {loading ? (
             <Flex

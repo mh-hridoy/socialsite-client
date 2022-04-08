@@ -11,7 +11,6 @@ import WithHeader from "../components/custom/WithHeader"
 
 export default function Home(props) {
   const token = useSelector((state) => state.user.token)
-  const [homeData, setHomeData] = useState([])
   const [loading, setLoading] = useState(true)
   const user = useSelector((state) => state.user.user)
   const router = useRouter()
@@ -61,7 +60,7 @@ export default function Home(props) {
   const setupAllData = (post) => {
     setTimeout(() => {
       // console.log("socket running")
-      setHomeData((prev) => {
+      props.setHomeData((prev) => {
         const newArray = [...prev]
         // find if the post already exist
         const indexOfNewPost = newArray.findIndex(
@@ -99,9 +98,9 @@ export default function Home(props) {
               withCredentials: true,
             }
           )
-          const newArray = [...homeData, ...data.post]
+          const newArray = [...props.homeData, ...data.post]
           const withoutDup = [...new Set(newArray)]
-          setHomeData(withoutDup)
+          props.setHomeData(withoutDup)
           dispatch(storeFeed({ data: newArray }))
 
           setTotalPage(data.totalPage)
@@ -143,12 +142,16 @@ export default function Home(props) {
             >
               <WithHeader headerName={props.headerName}>
                 <HomeComponent
+                  quoteData={props.quoteData}
+                  setQuoteData={props.setQuoteData}
+                  isCreateModalOpen={props.isCreateModalOpen}
+                  setIsCreateModalOpen={props.setIsCreateModalOpen}
                   fetchingHomeData={fetchingHomeData}
                   totalPage={totalPage}
                   page={page}
                   setPage={setPage}
-                  homeData={homeData}
-                  setHomeData={setHomeData}
+                  homeData={props.homeData}
+                  setHomeData={props.setHomeData}
                 />
               </WithHeader>
             </Flex>

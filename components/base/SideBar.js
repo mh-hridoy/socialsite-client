@@ -27,19 +27,17 @@ import {
   MdPeopleOutline,
 } from "react-icons/md"
 import { BsSun } from "react-icons/bs"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import useHttp from "../utils/useHttp"
 import { logout } from "../../store/userInfoSlice"
 import CreateNewFeed from "../custom/CreateNewFeed"
 
-const SideBar = () => {
+const SideBar = ({ isModalOpen, setIsModalOpen, quoteData, setQuoteData, homeData, setHomeData }) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const router = useRouter()
   const user = useSelector((state) => state.user.user)
   const pathName = router.pathname
-const [isModalOpen, setIsModalOpen] = useState(false)
-const [logoutRequest, setLogoutRequest] = useState(false)
-
+  const [logoutRequest, setLogoutRequest] = useState(false)
 
   const item = [
     {
@@ -51,7 +49,7 @@ const [logoutRequest, setLogoutRequest] = useState(false)
     {
       name: "Profile",
       Icon: MdOutlineAccountCircle,
-      uri: `/account/myaccount/${user !== null && user._id}`,
+      uri: `/account/myaccount/${user?._id}`,
       path: `/account/myaccount/[user]`,
     },
     {
@@ -69,26 +67,23 @@ const [logoutRequest, setLogoutRequest] = useState(false)
     },
   ]
 
+  const { isLoading } = useHttp({
+    fetchNow: logoutRequest,
+    setFetchNow: setLogoutRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`,
+    isLocalStorage: true,
+    removeStore: true,
+    isDispatch: true,
+    dispatchFunc: logout,
+    outDispatch: true,
+    isEToast: true,
+    isPush: true,
+    pushTo: "/login",
+  })
 
-const { isLoading } = useHttp({
-  fetchNow: logoutRequest,
-  setFetchNow: setLogoutRequest,
-  url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`,
-  isLocalStorage: true,
-  removeStore: true,
-  isDispatch: true,
-  dispatchFunc: logout,
-  outDispatch: true,
-  isEToast: true,
-  isPush: true,
-  pushTo: "/login",
-})
-
-
-  const logoutHandler =  () => {
+  const logoutHandler = () => {
     setLogoutRequest(true)
   }
-
 
   return (
     <>
@@ -96,17 +91,22 @@ const { isLoading } = useHttp({
         size={"xl"}
         isOpen={isModalOpen}
         onClose={() => {
+          setQuoteData(null);
           setIsModalOpen(!isModalOpen)
         }}
       >
         <ModalOverlay />
-        <ModalContent maxHeight={"90%"} padding={10}>
+        <ModalContent padding={10}>
           <ModalCloseButton _focus={{ boxShadow: "none" }} />
           <CreateNewFeed
+          homeData={homeData}
+          setHomeData={setHomeData}
+          quoteData={quoteData} 
+          setQuoteData = {setQuoteData}
             name="file2"
             isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}
-            
+
           />
         </ModalContent>
       </Modal>
@@ -230,7 +230,7 @@ const { isLoading } = useHttp({
                 _hover={{ border: "2px solid rgb(29, 155, 240)" }}
                 cursor="pointer"
                 size={"sm"}
-                name={user && user.fullName ? user.fullName : "Not A User"}
+                name={user && user.fullName ? user?.fullName : "Not A User"}
                 src={user?.profilePicture?.img}
               ></Avatar>
             </Show>
@@ -248,7 +248,7 @@ const { isLoading } = useHttp({
                 fontWeight={600}
                 fontSize={15}
               >
-                {user.fullName}
+                {user?.fullName}
                 {isLoading ? (
                   <Spinner size={"sm"} />
                 ) : (

@@ -173,12 +173,13 @@ const UserId = (props) => {
               <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
             </Flex>
           ) : (
-            <Flex
-             direction={"column"}
-              width={"100%"}
-            >
+            <Flex direction={"column"} width={"100%"}>
               <WithHeader totalPost={totalPost} headerName={"User Account"}>
                 <UserAccount
+                  quoteData={props.quoteData}
+                  setQuoteData={props.setQuoteData}
+                  isCreateModalOpen={props.isCreateModalOpen}
+                  setIsCreateModalOpen={props.setIsCreateModalOpen}
                   post={homeData}
                   setUserData={setUserData}
                   user={userData}

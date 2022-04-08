@@ -158,11 +158,6 @@ const useHttp = ({
       fetchData()
     }
 
-    return () => {
-      if (rcb != null) {
-        rcb()
-      }
-    }
   }, [fetchNow])
 
   return { isLoading, requestedData }

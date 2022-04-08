@@ -14,8 +14,8 @@ import {
   MenuItem,
   Spinner
 } from "@chakra-ui/react"
-import { BsHeart, BsHeartFill } from "react-icons/bs"
-import { IoIosArrowDown } from "react-icons/io"
+import { BsHeart, BsHeartFill, BsChatQuote, BsShare } from "react-icons/bs"
+import { FiShare } from "react-icons/fi"
 import { AiOutlineComment } from "react-icons/ai"
 import Masonry from "react-masonry-css"
 import GalleryModal from "./GalleryModal"
@@ -28,6 +28,7 @@ import timeAgo from "../utils/DateConverter"
 import { BsThreeDotsVertical } from "react-icons/bs"
 import countReaction from '../utils/countReaction'
 import useHttp from '../utils/useHttp'
+import SingleFeed from "./SingleFeed"
 
 
 const FeedCard = (props) => {
@@ -40,8 +41,8 @@ const FeedCard = (props) => {
   const [item, setItem] = useState(props.item)
   const [showComment, setShowComment] = useState(false)
   const [postDeleteId, setPostDeleteId] = useState(null)
-  const [postDelRequest,setPostDelRequest] = useState(false)
-
+  const [postDelRequest, setPostDelRequest] = useState(false)
+  const [sendShareRequest, setSendShareRequest] = useState(false)
   const [reactRequest, setReactRequest] = useState(false)
   const [unlikeRequest, setUnlikeRequest] = useState(false)
   const videoRef = useRef(null)
@@ -49,6 +50,14 @@ const FeedCard = (props) => {
     default: 2,
     700: 1,
   }
+
+  // console.log(props.hasQuote)
+
+  const quoteHandler = () => { 
+    props.setQuoteData(item)
+    props.setIsCreateModalOpen(true)
+  }
+
 
   // console.log(item)
   useEffect(() => {
@@ -80,10 +89,38 @@ const FeedCard = (props) => {
     fetchNow: reactRequest,
     setFetchNow: setReactRequest,
     method: "post",
-    body: { userId: user._id, postId: item._id },
+    body: { userId: user?._id, postId: item?._id },
     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-like`,
     isAuth: true,
   })
+
+  //share feed request
+  const { isLoading: _isShareLoading } = useHttp({
+    fetchNow: sendShareRequest,
+    setFetchNow: setSendShareRequest,
+    method: "post",
+    body: { userId: user?._id, postId: item._id },
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-share`,
+    isAuth: true,
+    
+  })
+
+  const shareHandler = () => {
+    const modItem = _.clone(item)
+
+    const sharedByUser = [...modItem.sharedBy]
+
+    sharedByUser.push(user?._id)
+    modItem.sharedBy = [...new Set(sharedByUser)]
+
+    setItem(modItem)
+
+    setSendShareRequest(true)
+  }
+
+  const unSharehandler = () => {
+    console.log("unshare handler")
+  }
 
   const unLikeHandler = async (e) => {
     e.stopPropagation()
@@ -104,7 +141,7 @@ const FeedCard = (props) => {
     fetchNow: unlikeRequest,
     setFetchNow: setUnlikeRequest,
     method: "post",
-    body: { userId: user._id, postId: item._id },
+    body: { userId: user?._id, postId: item._id },
     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-unlike`,
     isAuth: true,
   })
@@ -113,24 +150,24 @@ const FeedCard = (props) => {
   const { isLoading: isPostDeleting } = useHttp({
     fetchNow: postDelRequest,
     setFetchNow: setPostDelRequest,
-    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-post/${user._id}/${item._id}`,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-post/${user?._id}/${item._id}`,
     isAuth: true,
     isEToast: true,
-    cb: (() => {
-        props.setHomeData((prev) => {
-          const allPost = [...prev]
-          const indexOfPost = allPost.findIndex((itm) => itm._id == item._id)
-          allPost.splice(indexOfPost, 1)
-          return [...new Set(allPost)]
-        })
-    })
+    cb: () => {
+      props.setHomeData((prev) => {
+        const allPost = [...prev]
+        const indexOfPost = allPost.findIndex((itm) => itm._id == item._id)
+        allPost.splice(indexOfPost, 1)
+        return [...new Set(allPost)]
+      })
+    },
   })
 
   const postDeleteHandler = async () => {
     setPostDeleteId(item._id)
     setPostDelRequest(true)
   }
-
+  // console.log(router.pathname)
   return (
     <>
       <GalleryModal
@@ -144,7 +181,7 @@ const FeedCard = (props) => {
       <Flex
         width={"100%"}
         cursor={"pointer"}
-        onClick={() => router.push(`/post/${item._id}`)}
+        onClick={() => {if(router.pathname != "/post/[postid]") {router.push(`/post/${item._id}`)}else{return} }}
         ref={props.lastFeedRef ? props.lastFeedRef : null}
         direction={"column"}
         gap={4}
@@ -279,17 +316,16 @@ const FeedCard = (props) => {
               })}
             </Flex>
           )}
-
-          <Flex
-            py={3}
-            pl={10}
-            alignItems="center"
-            justifyContent="center"
-            pr={4}
-            onClick={(e) => e.stopPropagation()}
-            marginBottom={10}
-          >
-            {item.images && item.images.length !== 0 && (
+          {item.images && item.images.length !== 0 && (
+            <Flex
+              py={3}
+              pl={10}
+              alignItems="center"
+              justifyContent="center"
+              pr={4}
+              onClick={(e) => e.stopPropagation()}
+              marginBottom={10}
+            >
               <>
                 {item.images.length == 1 ? (
                   item.images[0].type.includes("image") ? (
@@ -367,10 +403,30 @@ const FeedCard = (props) => {
                   </Masonry>
                 )}
               </>
-            )}
-          </Flex>
+            </Flex>
+          )}
+
+          {/* this is for extras */}
+          {props.hasQuote == true && (
+            <Flex
+              mt={2}
+              mb={8}
+              width={"90%"}
+              border="1px"
+              borderColor="gray.200"
+              bg="gray.200"
+              borderRadius={"lg"}
+              boxShadow="sm"
+              alignSelf="center"
+              direction="column"
+              onClick={(e) => {e.stopPropagation(); router.push(`/post/${item.referPost._id}`) }}
+            >
+              <SingleFeed item={item.referPost} />
+            </Flex>
+          )}
 
           {/* footer of a post */}
+
           {user != null && (
             <Flex
               onClick={(e) => e.stopPropagation()}
@@ -381,6 +437,73 @@ const FeedCard = (props) => {
               justifyContent={"center"}
               width={"100%"}
             >
+              <Flex
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowComment(!showComment)
+                }}
+                // width={"100%"}
+                cursor="pointer"
+                px={10}
+                py={2}
+                gap={4}
+                alignItems="center"
+                justifyContent="center"
+              >
+                <AiOutlineComment size={20} />
+                {item.comments?.length != 0 && (
+                  <Text fontSize={14}>
+                    {countReaction(item.comments?.length)}
+                  </Text>
+                )}
+              </Flex>
+              <Menu>
+                <MenuButton
+                  variant="fill"
+                  bg="transparent"
+                  _active={{ bg: "transparent" }}
+                  _hover={{ bg: "transparent" }}
+                  as={Button}
+                >
+                  <Flex gap={2}>
+                    <BsShare
+                      color={
+                        item?.sharedBy.includes(user._id)
+                          ? "rgb(29, 155, 240)"
+                          : undefined
+                      }
+                      size={18}
+                    />
+                    {item?.sharedBy?.length != 0 && (
+                      <Text fontWeight={200} fontSize={14}>
+                        {countReaction(
+                          item?.sharedBy?.length + item?.quoteBy?.length || 0
+                        )}
+                      </Text>
+                    )}
+                  </Flex>
+                </MenuButton>{" "}
+                <MenuList fontSize={16}>
+                  <MenuItem
+                    onClick={
+                      item?.sharedBy.includes(user._id)
+                        ? unSharehandler
+                        : shareHandler
+                    }
+                    gap={2}
+                  >
+                    <BsShare size={16} />
+                    <Text>
+                      {item?.sharedBy.includes(user._id) ? "Unshare" : "Share"}
+                    </Text>
+                  </MenuItem>
+
+                  <MenuItem onClick={quoteHandler} gap={2}>
+                    <BsChatQuote size={18} />
+                    <Text>Quote Feed</Text>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
               <Flex
                 gap={4}
                 alignItems="center"
@@ -401,28 +524,33 @@ const FeedCard = (props) => {
                 ) : (
                   <BsHeart size={18} />
                 )}
-                <Text fontSize={14}>
-                  {countReaction(item.reactedByUser?.length)}
-                </Text>
+                {item?.reactedByUser?.length != 0 && (
+                  <Text fontSize={14}>
+                    {countReaction(item.reactedByUser?.length)}
+                  </Text>
+                )}
               </Flex>
+
               <Flex
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowComment(!showComment)
-                }}
-                // width={"100%"}
-                cursor="pointer"
-                px={10}
-                py={2}
                 gap={4}
                 alignItems="center"
                 justifyContent="center"
+                cursor="pointer"
+                px={10}
+                py={2}
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${window.location.protocol}//${window.location.host}/post/${item._id}`
+                  )
+
+                  toast({
+                    status: "success",
+                    duration: 5000,
+                    title: "Link copied to the clipboard.",
+                  })
+                }}
               >
-                <AiOutlineComment size={20} />
-                <Text fontSize={14}>
-                  {countReaction(item.comments?.length)}
-                </Text>
-                <IoIosArrowDown />
+                <FiShare size={18} />
               </Flex>
             </Flex>
           )}

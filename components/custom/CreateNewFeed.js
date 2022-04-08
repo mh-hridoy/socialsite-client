@@ -10,6 +10,7 @@ import {
   PopoverTrigger,
   PopoverContent,
   useColorModeValue,
+  Text,
   PopoverArrow,
   useToast,
 } from "@chakra-ui/react"
@@ -20,8 +21,17 @@ import { AiOutlineDelete } from "react-icons/ai"
 import axios from "axios"
 import { useSelector } from "react-redux"
 import Select from "react-select"
+import SingleFeed from "./SingleFeed"
 
-const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
+const CreateNewFeed = ({
+  name,
+  setHomeData,
+  homeData,
+  setIsModalOpen,
+  isModalOpen,
+  quoteData,
+  setQuoteData
+}) => {
   const [showEmoji, setShowEmoji] = useState(false)
   const { colorMode } = useColorMode()
   const [feedText, setFeedText] = useState("")
@@ -51,6 +61,7 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
     ].join("")
     setFeedText(emoWithText)
   }
+
 
   const textHandler = (e) => {
     setFeedText(e.target.value)
@@ -152,8 +163,6 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
     })
   }
 
-
-
   const postHandler = async () => {
     setIsLoading(true)
     const tags = []
@@ -165,7 +174,12 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
       try {
         const { data } = await axios.post(
           `${process.env.NEXT_PUBLIC_MAIN_PROXY}/new-post`,
-          { text: feedText, images, user: user._id, tags },
+          {
+            text: feedText,
+            images,
+            user: user._id,
+            tags,
+            quoteData: quoteData?._id },
           {
             headers: {
               "Content-Type": "application/json",
@@ -174,19 +188,21 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
             withCredentials: true,
           }
         )
-        setFeedText("")
+           if (setIsModalOpen != undefined) {
+             setIsModalOpen(false)
+             const oldData = [...homeData]
+             const newData = [data, ...oldData]
+             setHomeData([...new Set(newData)])
+           } else {
+             const oldData = [...homeData]
+             const newData = [data, ...oldData]
+             setHomeData([...new Set(newData)])
+           }
+
         setImages([])
+        setFeedText("")
+        setQuoteData(null)
         setSelectedTag([])
-
-        if (setIsModalOpen != undefined) {
-          
-          setIsModalOpen(false)
-        } else {
-          const oldData = [...homeData]
-          const newData = [data, ...oldData]
-          setHomeData([...new Set(newData)])
-        }
-
         setIsLoading(false)
         toast({
           status: "success",
@@ -197,7 +213,6 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
         setIsLoading(false)
 
         const errorMsg = e.response && e.response.data.message
-      
       }
     } else {
       setIsLoading(false)
@@ -282,8 +297,21 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
             isMulti={true}
             options={selectOption}
           />
-        </Flex>
 
+          {isModalOpen && quoteData && (
+            <Flex
+              boxShadow={"sm"}
+              rounded="lg"
+              border="1px"
+              borderColor="gray.200"
+              m={5}
+              wrap={"wrap"}
+              bg="gray.200"
+            >
+              <SingleFeed item={quoteData} />
+            </Flex>
+          )}
+        </Flex>
         {/* show images */}
         {images.length !== 0 && (
           <Flex
@@ -351,6 +379,7 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
             {/* images with delete icon */}
           </Flex>
         )}
+
         <Flex
           position="absolute"
           bottom={0}
@@ -408,6 +437,9 @@ const CreateNewFeed = ({ name, setHomeData, homeData, setIsModalOpen }) => {
           </Button>
         </Flex>
       </Flex>
+      {/* //quote data */}
+
+      {/* quote data ends here */}
     </Flex>
   )
 }

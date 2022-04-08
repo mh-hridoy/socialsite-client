@@ -183,6 +183,10 @@ const setupAllData = (post) => {
             <Flex direction="column" minWidth={"100%"}>
               <WithHeader totalPost={totalPost} headerName={props.headerName}>
                 <UserAccount
+                  quoteData={props.quoteData}
+                  setQuoteData={props.setQuoteData}
+                  isCreateModalOpen={props.isCreateModalOpen}
+                  setIsCreateModalOpen={props.setIsCreateModalOpen}
                   post={homeData}
                   user={userData}
                   setUserData={setUserData}

@@ -14,7 +14,11 @@ const SingleFeed = ({item}) => {
         mt={2}
         p={2}
       >
-        <FeedCard item={item} />
+        {item.postType == "quote" ? (
+          <FeedCard hasQuote={true} item={item} />
+        ) : (
+          <FeedCard item={item} />
+        )}
       </Flex>
     </>
   )

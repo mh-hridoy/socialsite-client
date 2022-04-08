@@ -27,7 +27,7 @@ const SingleUserCard = ({ user }) => {
     method: "post",
     body: { followId: user._id },
     setFetchNow: setUnfollowRequest,
-    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unfollow-user/${userInfo._id}`,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unfollow-user/${userInfo?._id}`,
     isAuth: true,
     isEToast: true,
     eToastMessage: "Something went wrong!",
@@ -44,7 +44,7 @@ const SingleUserCard = ({ user }) => {
     method: "post",
     body: { followId: user._id },
     setFetchNow: setFollowRequest,
-    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/follow-user/${userInfo._id}`,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/follow-user/${userInfo?._id}`,
     isAuth: true,
     isEToast: true,
     eToastMessage: "Something went wrong!",
@@ -70,7 +70,7 @@ const SingleUserCard = ({ user }) => {
         <Flex
           onClick={() =>
             router.push(
-              user._id == userInfo._id
+              user._id == userInfo?._id
                 ? `/account/myaccount/${user._id}`
                 : `/account/${user._id}`
             )

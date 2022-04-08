@@ -2,7 +2,7 @@ import React from "react"
 import { Flex, Text, Spinner, useColorModeValue } from "@chakra-ui/react"
 import CreateNewFeed from "../custom/CreateNewFeed"
 import AllPost from "../custom/AllPost"
-import {useRouter} from "next/router"
+import { useRouter } from "next/router"
 const HomeComponent = ({
   homeData,
   setPage,
@@ -10,6 +10,10 @@ const HomeComponent = ({
   totalPage,
   fetchingHomeData,
   setHomeData,
+  quoteData,
+  setQuoteData,
+  isCreateModalOpen,
+  setIsCreateModalOpen,
 }) => {
   const router = useRouter()
   return (
@@ -24,12 +28,20 @@ const HomeComponent = ({
       borderColor={useColorModeValue("gray.200", "#333")}
     >
       <Flex w={"100%"} direction={"column"} gap={4}>
-        <CreateNewFeed homeData={homeData} setHomeData={setHomeData} name="file" />
+        <CreateNewFeed
+          homeData={homeData}
+          setHomeData={setHomeData}
+          name="file"
+        />
         <Text fontWeight={600} mb={2}>
           Recent posts:
         </Text>
         <AllPost
           // setFetchData={setFetchData}
+          quoteData={quoteData}
+          setQuoteData={setQuoteData}
+          isCreateModalOpen={isCreateModalOpen}
+          setIsCreateModalOpen={setIsCreateModalOpen}
           setPage={setPage}
           totalPage={totalPage}
           page={page}

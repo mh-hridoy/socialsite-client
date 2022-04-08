@@ -1,9 +1,23 @@
 import React, { useState, useCallback, useRef } from "react"
 import FeedCard from "./FeedCard"
 import { Text, Flex } from "@chakra-ui/react"
-
-const AllPost = ({ post, setPage, page, totalPage, setHomeData }) => {
+import { useSelector } from "react-redux"
+import { RiShareForwardBoxFill } from "react-icons/ri"
+const AllPost = ({
+  post,
+  setPage,
+  page,
+  totalPage,
+  setHomeData,
+  user,
+  quoteData,
+  setQuoteData,
+  isCreateModalOpen,
+  setIsCreateModalOpen,
+}) => {
   const feedRef = useRef(null)
+  const userData = useSelector((state) => state.user.user)
+
 
   const lastFeedRef = useCallback(
     (node) => {
@@ -23,16 +37,98 @@ const AllPost = ({ post, setPage, page, totalPage, setHomeData }) => {
     },
     [page]
   )
-
+    // console.log(post)
   // console.log(post)
   return (
     <>
-        <Flex minWidth={"100%"} direction="column">
-          {post && post.length !== 0 ? (
-            post.map((item, inx) => {
-              if (post.length == inx + 1) {
+      <Flex minWidth={"100%"} direction="column">
+        {post && post.length !== 0 ? (
+          post.map((item, inx) => {
+              if (
+                item?.sharedBy?.includes(user?._id) &&
+                item.postType != "quote" &&
+                post.length != inx + 1
+              ) {
+                return (
+                  <Flex key={inx} direction="column">
+                    <Text
+                      pl={4}
+                      transform="translateY(10px)"
+                      display={"flex"}
+                      // border="1px solid red"
+                      gap={2}
+                      alignItems="center"
+                      fontSize={14}
+                      fontWeight={600}
+                    >
+                      <RiShareForwardBoxFill size={18} />
+                      Shared by{" "}
+                      {userData?._id == user?._id ? "YOU" : user?.fullName}
+                    </Text>
+                    <FeedCard
+                      quoteData={quoteData}
+                      setQuoteData={setQuoteData}
+                      isCreateModalOpen={isCreateModalOpen}
+                      setIsCreateModalOpen={setIsCreateModalOpen}
+                      setHomeData={setHomeData}
+                      item={item}
+                    />
+                  </Flex>
+                )
+              } else if (
+                item?.sharedBy?.includes(user?._id) &&
+                item.postType != "quote" &&
+                post?.length == inx + 1
+              ) {
+                return (
+                  <Flex key={inx} direction="column">
+                    <Text
+                      pl={4}
+                      transform="translateY(10px)"
+                      display={"flex"}
+                      // border="1px solid red"
+                      gap={2}
+                      alignItems="center"
+                      fontSize={14}
+                      fontWeight={600}
+                    >
+                      <RiShareForwardBoxFill />
+                      Shared by{" "}
+                      {userData?._id == user?._id ? "YOU" : user?.fullName}
+                    </Text>
+                    <FeedCard
+                      quoteData={quoteData}
+                      setQuoteData={setQuoteData}
+                      isCreateModalOpen={isCreateModalOpen}
+                      setIsCreateModalOpen={setIsCreateModalOpen}
+                      setHomeData={setHomeData}
+                      lastFeedRef={lastFeedRef}
+                      key={inx}
+                      item={item}
+                    />
+                  </Flex>
+                )
+              } else if (item.postType == "quote" && post?.length != inx + 1) {
                 return (
                   <FeedCard
+                    hasQuote={true}
+                    quoteData={quoteData}
+                    setQuoteData={setQuoteData}
+                    isCreateModalOpen={isCreateModalOpen}
+                    setIsCreateModalOpen={setIsCreateModalOpen}
+                    setHomeData={setHomeData}
+                    key={inx}
+                    item={item}
+                  />
+                )
+              } else if (item.postType == "quote" && post?.length == inx + 1) {
+                return (
+                  <FeedCard
+                    hasQuote={true}
+                    quoteData={quoteData}
+                    setQuoteData={setQuoteData}
+                    isCreateModalOpen={isCreateModalOpen}
+                    setIsCreateModalOpen={setIsCreateModalOpen}
                     setHomeData={setHomeData}
                     lastFeedRef={lastFeedRef}
                     key={inx}
@@ -41,14 +137,22 @@ const AllPost = ({ post, setPage, page, totalPage, setHomeData }) => {
                 )
               } else {
                 return (
-                  <FeedCard setHomeData={setHomeData} key={inx} item={item} />
+                  <FeedCard
+                    quoteData={quoteData}
+                    setQuoteData={setQuoteData}
+                    isCreateModalOpen={isCreateModalOpen}
+                    setIsCreateModalOpen={setIsCreateModalOpen}
+                    setHomeData={setHomeData}
+                    key={inx}
+                    item={item}
+                  />
                 )
               }
-            })
-          ) : (
-            <Text>There's no activity.</Text>
-          )}
-        </Flex>
+          })
+        ) : (
+          <Text>There's no activity.</Text>
+        )}
+      </Flex>
     </>
   )
 }

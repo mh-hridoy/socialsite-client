@@ -33,6 +33,10 @@ const UserAccount = ({
   setPage,
   setHomeData,
   setUserData,
+  quoteData,
+setQuoteData,
+isCreateModalOpen,
+setIsCreateModalOpen
 }) => {
   const userAccount = useSelector((state) => state.user.user)
   const router = useRouter()
@@ -462,11 +466,16 @@ setProfileRawFile(file)
           Feeds:
         </Text>
         <AllPost
+          quoteData={quoteData}
+          setQuoteData={setQuoteData}
+          isCreateModalOpen={isCreateModalOpen}
+          setIsCreateModalOpen={setIsCreateModalOpen}
           setPage={setPage}
           totalPage={totalPage}
           page={page}
           post={post}
           setHomeData={setHomeData}
+          user={user}
         />
       </Flex>
     </>
