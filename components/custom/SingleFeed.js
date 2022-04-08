@@ -24,6 +24,11 @@ const SingleFeed = ({ item }) => {
        700: 1,
      }
 
+     if(item == null) {
+         return (
+             <Text p={4} >Post deleted</Text>
+         )
+     }
 
 
   return (
@@ -92,7 +97,7 @@ const SingleFeed = ({ item }) => {
             })}
           </Flex>
         )}
-        {item.images && item.images.length !== 0 && (
+        {item?.images && item?.images.length !== 0 && (
           <Flex
           pt={2}
           >

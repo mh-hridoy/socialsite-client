@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Flex, Spinner } from "@chakra-ui/react"
+import { Flex, Spinner, useColorModeValue } from "@chakra-ui/react"
 import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/router"
 import WithHeader from "../../components/custom/WithHeader"
@@ -8,8 +8,8 @@ import axios from "axios"
 import io from "socket.io-client"
 import { logout } from "../../store/userInfoSlice"
 import useHttp from "../../components/utils/useHttp"
-
-const PostId = () => {
+import CommentsOfFeed from "../../components/custom/CommentsOfFeed"
+const PostId = (props) => {
   const [loading, setLoading] = useState(true)
   const user = useSelector((state) => state.user.user)
   const token = useSelector((state) => state.user.token)
@@ -62,15 +62,16 @@ const PostId = () => {
     ecb: () => setLoading(false),
   })
 
+
   return (
     <>
-      <head>
-        <meta
-          name="description"
-          content="An example of a meta description. These show up in search engine results."
-        />
-      </head>
-      <Flex w={"100%"} alignItems={"center"} justifyContent="center">
+      <Flex
+        borderRight={"1px"}
+        borderLeft={"1px"}
+        borderColor={useColorModeValue("gray.200", "#333")}
+        w={"100%"}
+        minHeight="95vh"
+      >
         <Flex
           direction="column"
           minWidth={
@@ -88,7 +89,18 @@ const PostId = () => {
             </Flex>
           ) : (
             <WithHeader headerName="Feed">
-              <SingleFeed item={item} />
+              <SingleFeed item={item.post} />
+              <CommentsOfFeed
+                quoteData={props.quoteData}
+                setQuoteData={props.setQuoteData}
+                isCreateModalOpen={props.isCreateModalOpen}
+                setIsCreateModalOpen={props.setIsCreateModalOpen}
+                setHomeData={props.setHomeData}
+                comments={item.postComment}
+                setPost={setItem}
+                postId={item.post?._id}
+                item={item}
+              />
             </WithHeader>
           )}
         </Flex>

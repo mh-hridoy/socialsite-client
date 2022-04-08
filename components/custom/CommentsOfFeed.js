@@ -4,8 +4,20 @@ import SingleComments from "./SingleComments"
 import { useSelector } from "react-redux"
 import axios from "axios"
 import _ from "underscore"
+import CreateReply from "../custom/CreateReply"
+import FeedCard from "../custom/FeedCard"
 
-const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
+const CommentsOfFeed = ({
+  postId,
+  setPost,
+  comments,
+  setHomeData,
+  quoteData,
+  setQuoteData,
+  isCreateModalOpen,
+  setIsCreateModalOpen,
+  item
+}) => {
   const [commentText, setCommentText] = useState("")
   const user = useSelector((state) => state.user.user)
   const token = useSelector((state) => state.user.token)
@@ -51,22 +63,16 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
 
   return (
     <Flex
-      transform={"translateY(-12px)"}
       rounded="md"
+      onClick={(e) => e.stopPropagation()}
       px={4}
-      minHeight={comments?.length == 0 ? undefined : 200}
-      maxHeight={400}
-      overflow={"auto"}
-      borderBottom="1px"
-      borderColor={useColorModeValue("gray.200", "#333")}
       direction="column"
       position="relative"
       widht="100%"
-      overflowX="hidden"
+      // border="1px solid red"
     >
       <Flex
-        paddingTop={4}
-        position="sticky"
+        onClick={(e) => e.stopPropagation()}
         zIndex={10}
         top={0}
         backgroundColor={useColorModeValue("#fff", "#1A202C")}
@@ -74,7 +80,18 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
         justifyContent="center"
         gap={2}
       >
-        <Input
+        <CreateReply
+          hasQuote={true}
+          setItem={setPost}
+          quoteData={quoteData}
+          setQuoteData={setQuoteData}
+          isModalOpen={isCreateModalOpen}
+          setIsModalOpen={setIsCreateModalOpen}
+          name={postId + 1}
+          postId={postId}
+          item={item}
+        />
+        {/* <Input
           _focus={{ boxShadow: "none" }}
           size={"sm"}
           onClick={(e) => e.stopPropagation()}
@@ -95,19 +112,32 @@ const CommentsOfFeed = ({ postId, comments, setHomeData }) => {
           size="sm"
         >
           Comment
-        </Button>
+        </Button> */}
       </Flex>
 
       {comments && comments.length == 0 && (
-        <Text marginTop={4} textAlign={"center"} fontSize={14} opacity={0.7}>
-          No comments yet!
-        </Text>
+        <>
+          <Text marginTop={4} textAlign={"center"} fontSize={14} opacity={0.7}>
+            No comments yet!
+          </Text>
+        </>
       )}
 
       <Flex mt={4} direction="column">
         {comments &&
           comments.map((item, inx) => {
-            return <SingleComments key={inx} item={item} />
+            return (
+              <FeedCard
+              
+                quoteData={quoteData}
+                setQuoteData={setQuoteData}
+                isCreateModalOpen={isCreateModalOpen}
+                setIsCreateModalOpen={setIsCreateModalOpen}
+                setHomeData={setHomeData}
+                key={inx}
+                item={item}
+              />
+            )
           })}
       </Flex>
     </Flex>

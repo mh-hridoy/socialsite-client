@@ -14,7 +14,8 @@ import {
   MenuItem,
   Spinner
 } from "@chakra-ui/react"
-import { BsHeart, BsHeartFill, BsChatQuote, BsShare } from "react-icons/bs"
+import { BsHeart, BsHeartFill, BsChatQuote } from "react-icons/bs"
+import { RiStackshareLine } from "react-icons/ri"
 import { FiShare } from "react-icons/fi"
 import { AiOutlineComment } from "react-icons/ai"
 import Masonry from "react-masonry-css"
@@ -70,6 +71,8 @@ const FeedCard = (props) => {
     setCurrentImageArray([...item.images])
   }
 
+  // console.log(item)
+
   const likeHandler = async (e) => {
     e.stopPropagation()
     const modItem = _.clone(item)
@@ -99,7 +102,7 @@ const FeedCard = (props) => {
     fetchNow: sendShareRequest,
     setFetchNow: setSendShareRequest,
     method: "post",
-    body: { userId: user?._id, postId: item._id },
+    body: { userId: user?._id, postId: item?._id },
     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-share`,
     isAuth: true,
     
@@ -141,7 +144,7 @@ const FeedCard = (props) => {
     fetchNow: unlikeRequest,
     setFetchNow: setUnlikeRequest,
     method: "post",
-    body: { userId: user?._id, postId: item._id },
+    body: { userId: user?._id, postId: item?._id },
     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-unlike`,
     isAuth: true,
   })
@@ -150,18 +153,19 @@ const FeedCard = (props) => {
   const { isLoading: isPostDeleting } = useHttp({
     fetchNow: postDelRequest,
     setFetchNow: setPostDelRequest,
-    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-post/${user?._id}/${item._id}`,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/delete-post/${user?._id}/${item?._id}`,
     isAuth: true,
     isEToast: true,
     cb: () => {
       props.setHomeData((prev) => {
         const allPost = [...prev]
-        const indexOfPost = allPost.findIndex((itm) => itm._id == item._id)
+        const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
         allPost.splice(indexOfPost, 1)
         return [...new Set(allPost)]
       })
     },
   })
+
 
   const postDeleteHandler = async () => {
     setPostDeleteId(item._id)
@@ -179,16 +183,19 @@ const FeedCard = (props) => {
         setSelectedItem={setSelectedItem}
       />
       <Flex
+        position={"relative"}
         width={"100%"}
         cursor={"pointer"}
-        onClick={() => {if(router.pathname != "/post/[postid]") {router.push(`/post/${item._id}`)}else{return} }}
+        onClick={() => {
+            router.push(`/post/${item?._id}`)
+         
+        }}
         ref={props.lastFeedRef ? props.lastFeedRef : null}
         direction={"column"}
         gap={4}
         // borderTop="1px"
-        borderBottom="1px"
+        borderTop="1px"
         borderColor={useColorModeValue("gray.200", "#333")}
-        position="relative"
       >
         <Flex
           direction={"column"}
@@ -204,8 +211,8 @@ const FeedCard = (props) => {
                 e.stopPropagation()
                 router.push(
                   item.user._id == user._id
-                    ? `/account/myaccount/${item.user._id}`
-                    : `/account/${item && item.user._id}`
+                    ? `/account/myaccount/${item?.user._id}`
+                    : `/account/${item && item?.user._id}`
                 )
               }}
             >
@@ -214,11 +221,11 @@ const FeedCard = (props) => {
                 cursor="pointer"
                 size={"sm"}
                 name={
-                  item.user && item.user.fullName
-                    ? item.user.fullName
+                  item?.user && item?.user.fullName
+                    ? item?.user.fullName
                     : "Not A User"
                 }
-                src={item.user?.profilePicture?.img}
+                src={item?.user?.profilePicture?.img}
               ></Avatar>
               <Flex alignItems="center" gap={4}>
                 <Text
@@ -228,13 +235,13 @@ const FeedCard = (props) => {
                   fontWeight={600}
                   fontSize={16}
                   color={
-                    item.user?._id == user?._id
+                    item?.user?._id == user?._id
                       ? "rgb(29, 155, 240)"
                       : undefined
                   }
                 >
-                  {item.user ? item.user.fullName : "Not A User"}{" "}
-                  {item.user && item.user.isVerified == true && (
+                  {item?.user ? item?.user.fullName : "Not A User"}{" "}
+                  {item?.user && item?.user.isVerified == true && (
                     <MdVerified color="rgb(29, 155, 240)" />
                   )}
                 </Text>
@@ -246,7 +253,7 @@ const FeedCard = (props) => {
               fontWeight={500}
               opacity={"0.7"}
             >
-              {timeAgo(item.createdAt)}
+              {timeAgo(item?.createdAt)}
             </Text>
 
             <div
@@ -264,7 +271,7 @@ const FeedCard = (props) => {
                     _hover={{ bg: "transparent" }}
                     as={Button}
                   >
-                    {isPostDeleting && postDeleteId == item._id ? (
+                    {isPostDeleting && postDeleteId == item?._id ? (
                       <Spinner />
                     ) : (
                       <BsThreeDotsVertical />
@@ -274,7 +281,7 @@ const FeedCard = (props) => {
                     <MenuItem
                       onClick={() => {
                         navigator.clipboard.writeText(
-                          `${window.location.protocol}//${window.location.host}/post/${item._id}`
+                          `${window.location.protocol}//${window.location.host}/post/${item?._id}`
                         )
 
                         toast({
@@ -295,13 +302,13 @@ const FeedCard = (props) => {
             </div>
           </Flex>
 
-          <Text pl={10} pr={4} fontSize={15}>
-            {item.text}
+          <Text pl={10} mb={5} pr={4} fontSize={15}>
+            {item?.text}
           </Text>
 
-          {item.tags && (
+          {item?.tags && (
             <Flex marginLeft={10} gap={5}>
-              {item.tags.map((item, inx) => {
+              {item?.tags.map((item, inx) => {
                 return (
                   <Tag
                     cursor={"pointer"}
@@ -316,7 +323,7 @@ const FeedCard = (props) => {
               })}
             </Flex>
           )}
-          {item.images && item.images.length !== 0 && (
+          {item?.images && item?.images.length !== 0 && (
             <Flex
               py={3}
               pl={10}
@@ -327,8 +334,8 @@ const FeedCard = (props) => {
               marginBottom={10}
             >
               <>
-                {item.images.length == 1 ? (
-                  item.images[0].type.includes("image") ? (
+                {item?.images.length == 1 ? (
+                  item?.images[0].type?.includes("image") ? (
                     <img
                       onClick={(e) => {
                         e.stopPropagation()
@@ -336,11 +343,11 @@ const FeedCard = (props) => {
                         setIsModalOpen(!isModalOpen)
                       }}
                       style={{ cursor: "pointer", borderRadius: "20px" }}
-                      alt={item.images[0].name}
-                      src={item.images[0].img}
+                      alt={item?.images[0].name}
+                      src={item?.images[0].img}
                     />
                   ) : (
-                    item.images[0].type.includes("video") && (
+                    item?.images[0].type?.includes("video") && (
                       <video
                         ref={videoRef}
                         onClick={(e) => e.stopPropagation()}
@@ -350,7 +357,7 @@ const FeedCard = (props) => {
                           height: "300px",
                           widht: "100%",
                         }}
-                        src={item.images[0].img}
+                        src={item?.images[0].img}
                         controls={true}
                         autoPlay={false}
                       ></video>
@@ -362,8 +369,8 @@ const FeedCard = (props) => {
                     className="my-masonry-grid"
                     columnClassName="my-masonry-grid_column"
                   >
-                    {item.images.map((image, inx) =>
-                      image.type.includes("image") ? (
+                    {item?.images.map((image, inx) =>
+                      image.type?.includes("image") ? (
                         <img
                           onClick={(e) => {
                             e.stopPropagation()
@@ -382,7 +389,7 @@ const FeedCard = (props) => {
                           src={image.img}
                         />
                       ) : (
-                        image.type.includes("video") && (
+                        image.type?.includes("video") && (
                           <video
                             onClick={(e) => e.stopPropagation()}
                             style={{
@@ -414,12 +421,15 @@ const FeedCard = (props) => {
               width={"90%"}
               border="1px"
               borderColor="gray.200"
-              bg="gray.200"
+              bg={useColorModeValue("gray.200", "#333")}
               borderRadius={"lg"}
               boxShadow="sm"
               alignSelf="center"
               direction="column"
-              onClick={(e) => {e.stopPropagation(); router.push(`/post/${item.referPost._id}`) }}
+              onClick={(e) => {
+                e.stopPropagation()
+                router.push(`/post/${item.referPost._id}`)
+              }}
             >
               <SingleFeed item={item.referPost} />
             </Flex>
@@ -440,7 +450,8 @@ const FeedCard = (props) => {
               <Flex
                 onClick={(e) => {
                   e.stopPropagation()
-                  setShowComment(!showComment)
+                    router.push(`/post/${item._id}`)
+                
                 }}
                 // width={"100%"}
                 cursor="pointer"
@@ -451,9 +462,9 @@ const FeedCard = (props) => {
                 justifyContent="center"
               >
                 <AiOutlineComment size={20} />
-                {item.comments?.length != 0 && (
+                {item?.refComment?.length != 0 && (
                   <Text fontSize={14}>
-                    {countReaction(item.comments?.length)}
+                    {countReaction(item?.refComment?.length)}
                   </Text>
                 )}
               </Flex>
@@ -466,9 +477,9 @@ const FeedCard = (props) => {
                   as={Button}
                 >
                   <Flex gap={2}>
-                    <BsShare
+                    <RiStackshareLine
                       color={
-                        item?.sharedBy.includes(user._id)
+                        item?.sharedBy?.includes(user._id)
                           ? "rgb(29, 155, 240)"
                           : undefined
                       }
@@ -486,15 +497,15 @@ const FeedCard = (props) => {
                 <MenuList fontSize={16}>
                   <MenuItem
                     onClick={
-                      item?.sharedBy.includes(user._id)
+                      item?.sharedBy?.includes(user._id)
                         ? unSharehandler
                         : shareHandler
                     }
                     gap={2}
                   >
-                    <BsShare size={16} />
+                    <RiStackshareLine size={16} />
                     <Text>
-                      {item?.sharedBy.includes(user._id) ? "Unshare" : "Share"}
+                      {item?.sharedBy?.includes(user._id) ? "Unshare" : "Share"}
                     </Text>
                   </MenuItem>
 
@@ -512,21 +523,21 @@ const FeedCard = (props) => {
                 px={10}
                 py={2}
                 onClick={
-                  item.reactedByUser &&
-                  item.reactedByUser.includes(user && user._id)
+                  item?.reactedByUser &&
+                  item?.reactedByUser?.includes(user && user._id)
                     ? unLikeHandler
                     : likeHandler
                 }
               >
-                {item.reactedByUser &&
-                item.reactedByUser.includes(user && user._id) ? (
+                {item?.reactedByUser &&
+                item?.reactedByUser?.includes(user && user._id) ? (
                   <BsHeartFill color="rgb(29, 155, 240)" />
                 ) : (
                   <BsHeart size={18} />
                 )}
                 {item?.reactedByUser?.length != 0 && (
                   <Text fontSize={14}>
-                    {countReaction(item.reactedByUser?.length)}
+                    {countReaction(item?.reactedByUser?.length)}
                   </Text>
                 )}
               </Flex>
@@ -540,7 +551,7 @@ const FeedCard = (props) => {
                 py={2}
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    `${window.location.protocol}//${window.location.host}/post/${item._id}`
+                    `${window.location.protocol}//${window.location.host}/post/${item?._id}`
                   )
 
                   toast({
@@ -555,15 +566,19 @@ const FeedCard = (props) => {
             </Flex>
           )}
         </Flex>
-        {showComment && user != null && (
+        {/* {user != null && (
           <CommentsOfFeed
             // item={item}
             // setItem={setItem}
+            quoteData={props.quoteData}
+            setQuoteData={props.setQuoteData}
+            isCreateModalOpen={props.isCreateModalOpen}
+            setIsCreateModalOpen={props.setIsCreateModalOpen}
             setHomeData={props.setHomeData}
             comments={item.comments}
             postId={item._id}
           />
-        )}
+        )} */}
       </Flex>
     </>
   )

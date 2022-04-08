@@ -68,14 +68,7 @@ const useHttp = ({
 
           setRequestedData(data)
 
-          if (isLocalStorage && !removeStore) {
-            localStorage.setItem("user", JSON.stringify(data))
-          }
-
-          if (isLocalStorage && removeStore) {
-            localStorage.removeItem("user")
-          }
-
+             
           if (isSetData && setData !== null) {
             setData(data)
           }
@@ -87,14 +80,8 @@ const useHttp = ({
           if (setFetchNow !== null) {
             setFetchNow(!fetchNow)
           }
-          if (isDispatch && dispatchFunc !== null && !outDispatch) {
-            dispatch(dispatchFunc(data))
-          }
 
-          if (isDispatch && dispatchFunc !== null && outDispatch) {
-            dispatch(dispatchFunc({ user: null, toke: "" }))
-          }
-
+          
           if (isToast) {
             toast({
               status: "success",
@@ -111,9 +98,28 @@ const useHttp = ({
             setMessage(null)
             setUserId(null)
           }
+
           if (isPush && pushTo !== null) {
             router.push(pushTo)
           }
+
+          if (isLocalStorage && !removeStore) {
+            localStorage.setItem("user", JSON.stringify(data))
+          }
+
+          if (isLocalStorage && removeStore) {
+            localStorage.removeItem("user")
+          }
+
+          if (isDispatch && dispatchFunc !== null && !outDispatch) {
+            dispatch(dispatchFunc(data))
+          }
+
+          if (isDispatch && dispatchFunc !== null && outDispatch) {
+            dispatch(dispatchFunc({ user: null, toke: "" }))
+          }
+
+       
 
           if (isSetDefault) {
             setIsLoading(false)

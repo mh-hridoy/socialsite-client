@@ -9,12 +9,11 @@ const SingleFeed = ({item}) => {
         borderRight={"1px"}
         borderLeft={"1px"}
         borderColor={useColorModeValue("gray.200", "#333")}
-        minHeight={"90vh"}
         widht="100%"
         mt={2}
         p={2}
       >
-        {item.postType == "quote" ? (
+        {item?.postType == "quote" ? (
           <FeedCard hasQuote={true} item={item} />
         ) : (
           <FeedCard item={item} />

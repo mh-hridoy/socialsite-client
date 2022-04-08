@@ -19,10 +19,10 @@ import Resizer from "react-image-file-resizer"
 import { AiOutlineDelete } from "react-icons/ai"
 import axios from "axios"
 import { useSelector } from "react-redux"
-import Select from "react-select"
 import SingleFeed from "./SingleFeed"
+import { isDataView } from "underscore"
 
-const CreateNewFeed = ({
+const CreateReply = ({
   name,
   setHomeData,
   homeData,
@@ -30,6 +30,9 @@ const CreateNewFeed = ({
   isModalOpen,
   quoteData,
   setQuoteData,
+  setItem,
+  item,
+  postId,
 }) => {
   const [showEmoji, setShowEmoji] = useState(false)
   const { colorMode } = useColorMode()
@@ -41,16 +44,6 @@ const CreateNewFeed = ({
   const token = useSelector((state) => state.user.token)
   const user = useSelector((state) => state.user.user)
   const [selectedTag, setSelectedTag] = useState([])
-
-  const selectOption = [
-    { value: "general", label: "General" },
-    { value: "technology", label: "Technology" },
-    { value: "development", label: "Development" },
-    { value: "programming", label: "Programming" },
-    { value: "places", label: "Places" },
-    { value: "universe", label: "Universe" },
-    { value: "nature", label: "Nature" },
-  ]
 
   const emojiHandler = (emoji) => {
     const emoWithText = [
@@ -75,7 +68,7 @@ const CreateNewFeed = ({
       field.scrollHeight +
       parseInt(computed.getPropertyValue("padding-bottom"), 10) +
       parseInt(computed.getPropertyValue("border-bottom-width"), 10) -
-      40
+      30
 
     field.style.height = height + "px"
   }
@@ -161,68 +154,6 @@ const CreateNewFeed = ({
     })
   }
 
-  const postHandler = async () => {
-    setIsLoading(true)
-    const tags = []
-    if (selectedTag.length !== 0) {
-      selectedTag.map((item) => tags.push(item.value))
-    }
-
-    if (feedText || images.length !== 0) {
-      try {
-        const { data } = await axios.post(
-          `${process.env.NEXT_PUBLIC_MAIN_PROXY}/new-post`,
-          {
-            text: feedText,
-            images,
-            user: user._id,
-            tags,
-            quoteData: quoteData?._id,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            withCredentials: true,
-          }
-        )
-        if (setIsModalOpen != undefined) {
-          setIsModalOpen(false)
-          const oldData = [...homeData]
-          const newData = [data, ...oldData]
-          setHomeData([...new Set(newData)])
-        } else {
-          const oldData = [...homeData]
-          const newData = [data, ...oldData]
-          setHomeData([...new Set(newData)])
-        }
-
-        setImages([])
-        setFeedText("")
-        setQuoteData(null)
-        setSelectedTag([])
-        setIsLoading(false)
-        toast({
-          status: "success",
-          duration: 3000,
-          title: "Post has been created!",
-        })
-      } catch (e) {
-        setIsLoading(false)
-
-        const errorMsg = e.response && e.response.data.message
-      }
-    } else {
-      setIsLoading(false)
-      toast({
-        status: "info",
-        duration: 3000,
-        title: "Status or Image is required.",
-      })
-    }
-  }
-
   const removeImage = (inx) => {
     const allImages = [...images]
     allImages.splice(inx, 1)
@@ -257,11 +188,70 @@ const CreateNewFeed = ({
     },
   }
 
+  const postHandler = async () => {
+    setIsLoading(true)
+
+    if (feedText || images.length !== 0) {
+      try {
+        const { data } = await axios.post(
+          `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-reply`,
+          {
+            text: feedText,
+            images,
+            user: user._id,
+            postId,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+          }
+        )
+        setImages([])
+        setFeedText("")
+        setQuoteData(null)
+        setIsLoading(false)
+
+        // const oldComments = [...item.postComment]
+         
+        //  const indexOfNewComment = oldComments.findIndex(
+        //    (item) => item._id == data._id
+        //  )
+       
+        //  if (indexOfNewComment != -1) {
+        //    oldComments[indexOfNewComment] = data
+        //  } else {
+        //    oldComments.unshift(data)
+        //  }
+
+        //  const modifiedComments = [...new Set(oldComments)]        
+
+
+        // setItem({ postComment: modifiedComments, ...item })
+
+
+      } catch (e) {
+        setIsLoading(false)
+
+        const errorMsg = e.response && e.response.data.message
+      }
+    } else {
+      setIsLoading(false)
+      toast({
+        status: "info",
+        duration: 3000,
+        title: "Status or Image is required.",
+      })
+    }
+  }
+
   return (
     <Flex direction="column" gap={5} width="100%">
       <Flex
         borderBottom="1px"
-        borderColor={useColorModeValue("gray.200", "#333")}
+        borderColor={useColorModeValue("gray.100", "#333")}
         position="relative"
         direction="column"
         width="100%"
@@ -269,52 +259,25 @@ const CreateNewFeed = ({
         <Flex direction="column" marginBottom={images.length == 0 ? 10 : 0}>
           <Textarea
             onInput={areaHandler}
-            border="none"
             variant={"unstyled"}
-            fontSize={16}
-            height="auto"
+            fontSize={14}
             value={feedText}
             onChange={textHandler}
-            maxH="50vh"
+            rows={2}
             onSelectCapture={(e) =>
               setCurrentSelection(e.target.selectionStart)
             }
-            borderBottom={"1px"}
-            borderColor={useColorModeValue("gray.200", "#333")}
-            px={5}
-            pt={2}
-            placeholder="What's happening?"
+            mb={2}
+            p={2}
+            placeholder="Leave your reply!"
             width={"100%"}
             resize="none"
           />
-
-          <Select
-            styles={customStyles}
-            input={{ backgroundColor: "rgb(29, 155, 240)" }}
-            placeholder="Select tags..."
-            onChange={(e) => setSelectedTag(e)}
-            isMulti={true}
-            options={selectOption}
-          />
-
-          {isModalOpen && quoteData && (
-            <Flex
-              boxShadow={"sm"}
-              rounded="lg"
-              border="1px"
-              borderColor="gray.200"
-              m={5}
-              wrap={"wrap"}
-              bg={useColorModeValue("gray.200", "#333")}
-            >
-              <SingleFeed item={quoteData} />
-            </Flex>
-          )}
         </Flex>
         {/* show images */}
+
         {images.length !== 0 && (
           <Flex
-            marginTop={4}
             height={"70px"}
             width={"100%"}
             wrap={"wrap"}
@@ -443,4 +406,4 @@ const CreateNewFeed = ({
   )
 }
 
-export default CreateNewFeed
+export default CreateReply
