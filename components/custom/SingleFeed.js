@@ -36,8 +36,6 @@ const SingleFeed = ({ item }) => {
       width={"100%"}
       direction={"column"}
       gap={4}
-      borderBottom="1px"
-      borderColor={useColorModeValue("gray.200", "#333")}
       position="relative"
     >
       <Flex

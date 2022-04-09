@@ -1,11 +1,10 @@
-import React, { useState } from "react"
-import { Flex, Input, Button, Text, useColorModeValue } from "@chakra-ui/react"
-import SingleComments from "./SingleComments"
+import React from "react"
+import { Flex, Text, useColorModeValue } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
-import axios from "axios"
 import _ from "underscore"
 import CreateReply from "../custom/CreateReply"
 import FeedCard from "../custom/FeedCard"
+import {useRouter} from "next/router"
 
 const CommentsOfFeed = ({
   postId,
@@ -13,53 +12,14 @@ const CommentsOfFeed = ({
   comments,
   setHomeData,
   quoteData,
+  setComments,
   setQuoteData,
   isCreateModalOpen,
   setIsCreateModalOpen,
-  item
+  item,
 }) => {
-  const [commentText, setCommentText] = useState("")
   const user = useSelector((state) => state.user.user)
-  const token = useSelector((state) => state.user.token)
-  const [loading, setLoading] = useState(false)
-
-  const commentHandler = async (e) => {
-    e.stopPropagation()
-    try {
-      setLoading(true)
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/create-comment`,
-        { userId: user._id, text: commentText, postId: postId },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        }
-      )
-      setCommentText("")
-      if (setHomeData != undefined) {
-        setHomeData((prev) => {
-          const allPost = [...prev]
-          const indexOfPost = allPost.findIndex((item) => item._id == postId)
-          const currentPost = _.clone(allPost[indexOfPost])
-          const postComment = _.clone(currentPost.comments)
-          postComment.unshift(data)
-
-          currentPost.comments = [...new Set(postComment)]
-          allPost[indexOfPost] = currentPost
-          return [...new Set(allPost)]
-        })
-      }
-
-      setLoading(false)
-    } catch (e) {
-      setLoading(false)
-      const errorMsg = e.response && e.response.data.message
-      console.log(e)
-    }
-  }
+  const router = useRouter()
 
   return (
     <Flex
@@ -69,20 +29,39 @@ const CommentsOfFeed = ({
       direction="column"
       position="relative"
       widht="100%"
-      // border="1px solid red"
     >
       <Flex
         onClick={(e) => e.stopPropagation()}
         zIndex={10}
         top={0}
         backgroundColor={useColorModeValue("#fff", "#1A202C")}
-        alignItems="center"
-        justifyContent="center"
+        mt={5}
         gap={2}
+        direction="column"
       >
+        <Text display={"flex"} gap={1} fontSize={14} opacity={"0.7"}>
+          Reply to{" "}
+          <Text
+            opacity={"1"}
+            fontWeight={600}
+            cursor="pointer"
+            onClick={(e) => {
+              e.stopPropagation()
+              router.push(
+                item?.user?._id == user?._id
+                  ? `/account/myaccount/${item?.user?._id}`
+                  : `/account/${item?.user?._id}`
+              )
+            }}
+          >
+            {item?.user.fullName}
+          </Text>{" "}
+        </Text>
         <CreateReply
           hasQuote={true}
           setItem={setPost}
+          comments={comments}
+          setComments={setComments}
           quoteData={quoteData}
           setQuoteData={setQuoteData}
           isModalOpen={isCreateModalOpen}
@@ -91,28 +70,6 @@ const CommentsOfFeed = ({
           postId={postId}
           item={item}
         />
-        {/* <Input
-          _focus={{ boxShadow: "none" }}
-          size={"sm"}
-          onClick={(e) => e.stopPropagation()}
-          value={commentText}
-          onChange={(e) => {
-            e.stopPropagation()
-            setCommentText(e.target.value)
-          }}
-          type="text"
-          placeholder="What's in your mind?"
-          width={"100%"}
-        />
-        <Button
-          disabled={!commentText}
-          isLoading={loading}
-          onClick={commentHandler}
-          bg={"buttonColor"}
-          size="sm"
-        >
-          Comment
-        </Button> */}
       </Flex>
 
       {comments && comments.length == 0 && (
@@ -125,17 +82,16 @@ const CommentsOfFeed = ({
 
       <Flex mt={4} direction="column">
         {comments &&
-          comments.map((item, inx) => {
+          comments.map((iteM, inx) => {
             return (
               <FeedCard
-              
                 quoteData={quoteData}
                 setQuoteData={setQuoteData}
                 isCreateModalOpen={isCreateModalOpen}
                 setIsCreateModalOpen={setIsCreateModalOpen}
                 setHomeData={setHomeData}
                 key={inx}
-                item={item}
+                item={iteM}
               />
             )
           })}

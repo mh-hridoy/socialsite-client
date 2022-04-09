@@ -29,6 +29,8 @@ const CreateReply = ({
   setIsModalOpen,
   isModalOpen,
   quoteData,
+  setComments,
+  comments,
   setQuoteData,
   setItem,
   item,
@@ -214,22 +216,21 @@ const CreateReply = ({
         setQuoteData(null)
         setIsLoading(false)
 
-        // const oldComments = [...item.postComment]
-         
-        //  const indexOfNewComment = oldComments.findIndex(
-        //    (item) => item._id == data._id
-        //  )
+        const oldComments = [...comments]
+         const indexOfNewComment = oldComments.findIndex(
+           (item) => item._id == data._id
+         )
        
-        //  if (indexOfNewComment != -1) {
-        //    oldComments[indexOfNewComment] = data
-        //  } else {
-        //    oldComments.unshift(data)
-        //  }
+         if (indexOfNewComment != -1) {
+           oldComments[indexOfNewComment] = data
+         } else {
+           oldComments.unshift(data)
+         }
 
-        //  const modifiedComments = [...new Set(oldComments)]        
+         const modifiedComments = [...new Set(oldComments)]        
 
 
-        // setItem({ postComment: modifiedComments, ...item })
+        setComments(modifiedComments)
 
 
       } catch (e) {
@@ -375,7 +376,7 @@ const CreateReply = ({
                   size={23}
                 />
               </PopoverTrigger>
-              <PopoverContent mt={10} _focus={{ boxShadow: "none" }}>
+              <PopoverContent overflow = "hidden" height={300} minWidth={"fit-content"} mt={10} _focus={{ boxShadow: "none" }}>
                 <PopoverArrow />
                 <Picker
                   onSelect={(e) => emojiHandler(e.native)}

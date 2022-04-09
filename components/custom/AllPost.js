@@ -3,6 +3,7 @@ import FeedCard from "./FeedCard"
 import { Text, Flex } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
 import { RiShareForwardBoxFill } from "react-icons/ri"
+import { AiOutlineConsoleSql } from "react-icons/ai"
 const AllPost = ({
   post,
   setPage,
@@ -37,8 +38,8 @@ const AllPost = ({
     },
     [page]
   )
-    // console.log(post)
-  // console.log(post)
+
+
   return (
     <>
       <Flex minWidth={"100%"} direction="column">
@@ -125,6 +126,19 @@ const AllPost = ({
                 return (
                   <FeedCard
                     hasQuote={true}
+                    quoteData={quoteData}
+                    setQuoteData={setQuoteData}
+                    isCreateModalOpen={isCreateModalOpen}
+                    setIsCreateModalOpen={setIsCreateModalOpen}
+                    setHomeData={setHomeData}
+                    lastFeedRef={lastFeedRef}
+                    key={inx}
+                    item={item}
+                  />
+                )
+              } else if (post?.length == inx + 1) {
+                return (
+                  <FeedCard
                     quoteData={quoteData}
                     setQuoteData={setQuoteData}
                     isCreateModalOpen={isCreateModalOpen}

@@ -33,6 +33,7 @@ const useHttp = ({
   ecb = null,
   rcb = null,
   isSetDefault = true,
+  extraLoad = null
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const token = useSelector((state) => state.user.token)
@@ -68,7 +69,6 @@ const useHttp = ({
 
           setRequestedData(data)
 
-             
           if (isSetData && setData !== null) {
             setData(data)
           }
@@ -81,7 +81,6 @@ const useHttp = ({
             setFetchNow(!fetchNow)
           }
 
-          
           if (isToast) {
             toast({
               status: "success",
@@ -118,8 +117,6 @@ const useHttp = ({
           if (isDispatch && dispatchFunc !== null && outDispatch) {
             dispatch(dispatchFunc({ user: null, toke: "" }))
           }
-
-       
 
           if (isSetDefault) {
             setIsLoading(false)
@@ -163,8 +160,7 @@ const useHttp = ({
       }
       fetchData()
     }
-
-  }, [fetchNow])
+  }, [fetchNow, extraLoad != null && extraLoad])
 
   return { isLoading, requestedData }
 }

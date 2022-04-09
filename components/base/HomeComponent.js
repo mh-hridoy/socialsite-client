@@ -18,10 +18,10 @@ const HomeComponent = ({
   const router = useRouter()
   return (
     <Flex
-      alignItems={"center"}
       justifyContent="center"
       marginBottom={5}
       w={"100%"}
+      minHeight="100vh"
       pt={5}
       borderRight={"1px"}
       borderLeft={"1px"}

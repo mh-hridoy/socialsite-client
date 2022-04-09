@@ -123,7 +123,7 @@ export default function Home(props) {
 
   return (
     <>
-      <Flex w={"100%"} alignItems={"center"} justifyContent="center">
+      <Flex w={"100%"}  alignItems={"center"} justifyContent="center">
         <Flex minWidth={"100%"}>
           {loading ? (
             <Flex

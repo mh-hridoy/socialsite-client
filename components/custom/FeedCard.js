@@ -12,7 +12,7 @@ import {
   Button,
   MenuList,
   MenuItem,
-  Spinner
+  Spinner,
 } from "@chakra-ui/react"
 import { BsHeart, BsHeartFill, BsChatQuote } from "react-icons/bs"
 import { RiStackshareLine } from "react-icons/ri"
@@ -27,10 +27,9 @@ import { MdVerified } from "react-icons/md"
 import _ from "underscore"
 import timeAgo from "../utils/DateConverter"
 import { BsThreeDotsVertical } from "react-icons/bs"
-import countReaction from '../utils/countReaction'
-import useHttp from '../utils/useHttp'
-import SingleFeed from "./SingleFeed"
-
+import countReaction from "../utils/countReaction"
+import useHttp from "../utils/useHttp"
+import SingleFeed from "../custom/SingleFeed"
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -54,16 +53,17 @@ const FeedCard = (props) => {
 
   // console.log(props.hasQuote)
 
-  const quoteHandler = () => { 
+  const quoteHandler = () => {
     props.setQuoteData(item)
     props.setIsCreateModalOpen(true)
   }
-
 
   // console.log(item)
   useEffect(() => {
     setItem(props.item)
   }, [props.item])
+
+  
 
   const galleryHandler = (inx) => {
     setIsModalOpen(!isModalOpen)
@@ -105,7 +105,6 @@ const FeedCard = (props) => {
     body: { userId: user?._id, postId: item?._id },
     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-share`,
     isAuth: true,
-    
   })
 
   const shareHandler = () => {
@@ -166,7 +165,6 @@ const FeedCard = (props) => {
     },
   })
 
-
   const postDeleteHandler = async () => {
     setPostDeleteId(item._id)
     setPostDelRequest(true)
@@ -187,8 +185,11 @@ const FeedCard = (props) => {
         width={"100%"}
         cursor={"pointer"}
         onClick={() => {
-            router.push(`/post/${item?._id}`)
-         
+          if (item.postType == "comment") {
+            router.push(`/post/comment/${item._id}`)
+          } else {
+            router.push(`/post/${item._id}`)
+          }
         }}
         ref={props.lastFeedRef ? props.lastFeedRef : null}
         direction={"column"}
@@ -211,8 +212,8 @@ const FeedCard = (props) => {
                 e.stopPropagation()
                 router.push(
                   item.user._id == user._id
-                    ? `/account/myaccount/${item?.user._id}`
-                    : `/account/${item && item?.user._id}`
+                    ? `/account/myaccount/${item?.user?._id}`
+                    : `/account/${item && item?.user?._id}`
                 )
               }}
             >
@@ -302,7 +303,60 @@ const FeedCard = (props) => {
             </div>
           </Flex>
 
-          <Text pl={10} mb={5} pr={4} fontSize={15}>
+          {item?.postType == "comment" && (
+            <Text
+              pl={10}
+              display={"flex"}
+              gap={1}
+              fontSize={14}
+              opacity={"0.7"}
+            >
+              Replying to{" "}
+              <Text
+                opacity={"1"}
+                fontWeight={600}
+                cursor="pointer"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  router.push(
+                    item?.referPost?.user?._id == user?._id
+                      ? `/account/myaccount/${item?.referPost?.user?._id}`
+                      : `/account/${item?.referPost?.user._id}`
+                  )
+                }}
+              >
+                {item?.referPost?.user.fullName}
+              </Text>{" "}
+            </Text>
+          )}
+
+          {item?.referPost && router.pathname != "/post/[postid]" && (
+            <Flex
+              onClick={() => {
+                if (item?.referPost.postType == "comment") {
+                  router.push(`/post/comment/${item?.referPost._id}`)
+                } else {
+                  router.push(`/post/${item?.referPost._id}`)
+                }
+              }}
+              boxShadow={"sm"}
+              rounded="lg"
+              border="1px"
+              borderColor="gray.200"
+              m={5}
+              wrap={"wrap"}
+              bg={useColorModeValue("gray.200", "#333")}
+            >
+              <SingleFeed item={item.referPost} />
+            </Flex>
+          )}
+
+          <Text
+            pl={10}
+            mb={item?.images?.length == 0 ? 5 : 1}
+            pr={4}
+            fontSize={15}
+          >
             {item?.text}
           </Text>
 
@@ -450,8 +504,11 @@ const FeedCard = (props) => {
               <Flex
                 onClick={(e) => {
                   e.stopPropagation()
+                  if (item.postType == "comment") {
+                    router.push(`/post/comment/${item._id}`)
+                  } else {
                     router.push(`/post/${item._id}`)
-                
+                  }
                 }}
                 // width={"100%"}
                 cursor="pointer"
@@ -464,7 +521,7 @@ const FeedCard = (props) => {
                 <AiOutlineComment size={20} />
                 {item?.refComment?.length != 0 && (
                   <Text fontSize={14}>
-                    {countReaction(item?.refComment?.length)}
+                    {countReaction(props.totalComment || item?.refComment?.length)}
                   </Text>
                 )}
               </Flex>
@@ -572,7 +629,7 @@ const FeedCard = (props) => {
             // setItem={setItem}
             quoteData={props.quoteData}
             setQuoteData={props.setQuoteData}
-            isCreateModalOpen={props.isCreateModalOpen}
+            isCreateModalOpen=sCreateModalOpen}
             setIsCreateModalOpen={props.setIsCreateModalOpen}
             setHomeData={props.setHomeData}
             comments={item.comments}

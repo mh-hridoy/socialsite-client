@@ -1,40 +1,118 @@
 import React, { useState, useEffect } from "react"
 import { Flex, Spinner, useColorModeValue } from "@chakra-ui/react"
-import { useSelector } from "react-redux"
-import WithHeader from "../../../components/custom/WithHeader"
-import SingleComments from "../../../components/custom/SingleComments"
-import useHttp from "../../../components/utils/useHttp"
+import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/router"
-
-const CommentShow = () => {
+import WithHeader from "../../components/custom/WithHeader"
+import SingleFeed from "../../components/base/SingleFeed"
+import axios from "axios"
+import io from "socket.io-client"
+import { logout } from "../../store/userInfoSlice"
+import CommentsOfFeed from "../../components/custom/CommentsOfFeed"
+const CommentId = (props) => {
   const [loading, setLoading] = useState(true)
   const user = useSelector((state) => state.user.user)
+  const token = useSelector((state) => state.user.token)
   const [fetchData, setFetchData] = useState(false)
   const [item, setItem] = useState({})
+  const [allComments, setAllComments] = useState([])
   const router = useRouter()
+  const dispatch = useDispatch()
 
   useEffect(() => {
+    setLoading(true)
     setFetchData(true)
   }, [])
 
+  useEffect(() => {
+    if (loading == false) {
+      console.log("working on it ")
+      const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
+        query: { token: token, postId: router.query.postid, userId: user._id },
+      })
+      socket.on("onePost", (data) => {
+        manageData(data)
+      })
 
+      socket.on("connect_error", async (err) => {
+        if (loading == false && err.message == "Authentication error") {
+          try {
+            await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`)
 
-  const { _ } = useHttp({
-    fetchNow: fetchData,
-    setFetchNow: setFetchData,
-    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-comment/${router.query.commentid}`,
-    isAuth: true,
-    isSetData: true,
-    setData: setItem,
-    isEToast: true,
-    cb: () => setLoading(false),
-    ecb: () => setLoading(false),
-  }) 
+            dispatch(logout({ user: null, token: "" }))
+            localStorage.removeItem("user")
 
+            router.push("/login")
+          } catch (e) {
+            console.log(e)
+          }
+        } else {
+          socket.connect()
+        }
+      })
+    }
+  }, [loading == false])
 
+  const manageData = (data) => {
+    setTimeout(() => {
+      const oldComments = [...allComments]
+      const indexOfNewComment = oldComments.findIndex(
+        (item) => item._id == data._id
+      )
+
+      if (indexOfNewComment != -1) {
+        oldComments[indexOfNewComment] = data
+      } else {
+        oldComments.unshift(data)
+      }
+
+      const modifiedComments = [...new Set(oldComments)]
+
+      setAllComments(modifiedComments)
+    }, 2000)
+  }
+
+  useEffect(() => {
+    const postId = window.location.pathname.split("/")[3]
+    if (fetchData == true) {
+      // if (user == null) router.push("/login")
+      const fetchPostData = async () => {
+        try {
+          const { data } = await axios(
+            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-post/${postId}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              withCredentials: true,
+            }
+          )
+          setItem(data?.post)
+          setAllComments([...data?.postComment])
+          setLoading(!loading)
+          setFetchData(!fetchData)
+        } catch (e) {
+          setLoading(!loading)
+          setFetchData(!fetchData)
+          // router.push("/login")
+          const errorMsg = e.response && e.response.data.message
+          console.log(errorMsg)
+        }
+      }
+      fetchPostData()
+    }
+  }, [fetchData == true])
+
+  // console.log(item)
   return (
     <>
-      <Flex w={"100%"} alignItems={"center"} justifyContent="center">
+      <Flex
+        borderRight={"1px"}
+        borderLeft={"1px"}
+        borderColor={useColorModeValue("gray.200", "#333")}
+        w={"100%"}
+        minHeight="100vh"
+      >
         <Flex
           direction="column"
           minWidth={
@@ -51,19 +129,21 @@ const CommentShow = () => {
               <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
             </Flex>
           ) : (
-            <WithHeader headerName="Feed/Comment">
-              <Flex
-                borderRight={"1px"}
-                borderLeft={"1px"}
-                borderColor={useColorModeValue("gray.200", "#333")}
-                minHeight={"90vh"}
-                widht="100%"
-                overflowX="hidden"
-                mt={2}
-                p={2}
-              >
-                <SingleComments item={item} />
-              </Flex>
+            <WithHeader headerName="Feed">
+              <SingleFeed totalComment={allComments.length} item={item} />
+              <CommentsOfFeed
+                quoteData={props.quoteData}
+                totalComment={allComments?.length}
+                setQuoteData={props.setQuoteData}
+                isCreateModalOpen={props.isCreateModalOpen}
+                setIsCreateModalOpen={props.setIsCreateModalOpen}
+                setHomeData={props.setHomeData}
+                comments={allComments}
+                setComments={setAllComments}
+                setPost={setItem}
+                postId={item?._id}
+                item={item}
+              />
             </WithHeader>
           )}
         </Flex>
@@ -72,4 +152,4 @@ const CommentShow = () => {
   )
 }
 
-export default CommentShow
+export default CommentId
