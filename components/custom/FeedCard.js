@@ -45,6 +45,7 @@ const FeedCard = (props) => {
   const [sendShareRequest, setSendShareRequest] = useState(false)
   const [reactRequest, setReactRequest] = useState(false)
   const [unlikeRequest, setUnlikeRequest] = useState(false)
+  const [sendUnshareRequest, setSendUnshareRequest] = useState(false)
   const videoRef = useRef(null)
   const breakpointColumnsObj = {
     default: 2,
@@ -62,8 +63,6 @@ const FeedCard = (props) => {
   useEffect(() => {
     setItem(props.item)
   }, [props.item])
-
-  
 
   const galleryHandler = (inx) => {
     setIsModalOpen(!isModalOpen)
@@ -120,8 +119,26 @@ const FeedCard = (props) => {
     setSendShareRequest(true)
   }
 
+  //unshare feed request
+  const { isLoading: _isunShareLoading } = useHttp({
+    fetchNow: sendUnshareRequest,
+    setFetchNow: setSendUnshareRequest,
+    method: "post",
+    body: { userId: user?._id, postId: item?._id },
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/post-unshare`,
+    isAuth: true,
+  })
+
   const unSharehandler = () => {
-    console.log("unshare handler")
+    const modItem = _.clone(item)
+
+    const sharedByUser = [...modItem.sharedBy]
+
+    const newArr = sharedByUser.filter((item) => item != user?._id)
+    modItem.sharedBy = [...new Set(newArr)]
+
+    setItem(modItem)
+    setSendUnshareRequest(true)
   }
 
   const unLikeHandler = async (e) => {
@@ -282,7 +299,9 @@ const FeedCard = (props) => {
                     <MenuItem
                       onClick={() => {
                         navigator.clipboard.writeText(
-                          `${window.location.protocol}//${window.location.host}/post/${item?._id}`
+                          item.postType != "comment"
+                            ? `${window.location.protocol}//${window.location.host}/post/${item?._id}`
+                            : `${window.location.protocol}//${window.location.host}/post/comment/${item?._id}`
                         )
 
                         toast({
@@ -332,12 +351,14 @@ const FeedCard = (props) => {
 
           {item?.referPost && router.pathname != "/post/[postid]" && (
             <Flex
-              onClick={() => {
-                if (item?.referPost.postType == "comment") {
-                  router.push(`/post/comment/${item?.referPost._id}`)
-                } else {
-                  router.push(`/post/${item?.referPost._id}`)
-                }
+              onClick={(e) => {
+                e.stopPropagation()
+                 if (item?.referPost?.postType == "comment") {
+                   router.push(`/post/comment/${item?.referPost?._id}`)
+                 } else {
+                   router.push(`/post/${item?.referPost?._id}`)
+                 }
+               
               }}
               boxShadow={"sm"}
               rounded="lg"
@@ -468,7 +489,7 @@ const FeedCard = (props) => {
           )}
 
           {/* this is for extras */}
-          {props.hasQuote == true && (
+          {/* {props.hasQuote == true && (
             <Flex
               mt={2}
               mb={8}
@@ -487,7 +508,7 @@ const FeedCard = (props) => {
             >
               <SingleFeed item={item.referPost} />
             </Flex>
-          )}
+          )} */}
 
           {/* footer of a post */}
 
@@ -521,7 +542,9 @@ const FeedCard = (props) => {
                 <AiOutlineComment size={20} />
                 {item?.refComment?.length != 0 && (
                   <Text fontSize={14}>
-                    {countReaction(props.totalComment || item?.refComment?.length)}
+                    {countReaction(
+                      props.totalComment || item?.refComment?.length
+                    )}
                   </Text>
                 )}
               </Flex>
@@ -608,7 +631,9 @@ const FeedCard = (props) => {
                 py={2}
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    `${window.location.protocol}//${window.location.host}/post/${item?._id}`
+                    item.postType != "comment"
+                      ? `${window.location.protocol}//${window.location.host}/post/${item?._id}`
+                      : `${window.location.protocol}//${window.location.host}/post/comment/${item?._id}`
                   )
 
                   toast({

@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react"
 import { Flex, Spinner, useColorModeValue } from "@chakra-ui/react"
 import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/router"
-import WithHeader from "../../components/custom/WithHeader"
-import SingleFeed from "../../components/base/SingleFeed"
+import WithHeader from "../../../components/custom/WithHeader"
+import SingleFeed from "../../../components/base/SingleFeed"
 import axios from "axios"
 import io from "socket.io-client"
-import { logout } from "../../store/userInfoSlice"
-import CommentsOfFeed from "../../components/custom/CommentsOfFeed"
+import { logout } from "../../../store/userInfoSlice"
+import CommentsOfFeed from "../../../components/custom/CommentsOfFeed"
 const CommentId = (props) => {
   const [loading, setLoading] = useState(true)
   const user = useSelector((state) => state.user.user)

@@ -51,12 +51,12 @@ const AllPost = ({
                 post.length != inx + 1
               ) {
                 return (
-                  <Flex key={inx} direction="column">
+                  <Flex  key={inx} direction="column">
                     <Text
                       pl={4}
                       transform="translateY(10px)"
                       display={"flex"}
-                      // border="1px solid red"
+                      mb={5}
                       gap={2}
                       alignItems="center"
                       fontSize={14}
@@ -85,9 +85,10 @@ const AllPost = ({
                   <Flex key={inx} direction="column">
                     <Text
                       pl={4}
+                      mb={5}
                       transform="translateY(10px)"
                       display={"flex"}
-                      // border="1px solid red"
+                      pt={10}
                       gap={2}
                       alignItems="center"
                       fontSize={14}

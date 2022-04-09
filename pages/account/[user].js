@@ -21,6 +21,7 @@ const UserId = (props) => {
   const [totalPage, setTotalPage] = useState(null)
   const [page, setPage] = useState(1)
   const [fetchUserFeed, setFetchUserFeed] = useState(false)
+  const [fetchingAgain, setFetchingAgain] = useState(false)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -40,6 +41,7 @@ const UserId = (props) => {
       const userAccountId = code[code.length - 1]
       const fetchUserFeed = async () => {
         try {
+          setFetchingAgain(true)
           const { data } = await axios(
             `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-my-posts/${userAccountId}?page=${page}`,
             {
@@ -56,9 +58,13 @@ const UserId = (props) => {
           setHomeData(withoutDup)
           setTotalPage(data.totalPage)
           setTotalPost(data.postCount)
+                    setFetchingAgain(false)
+
           setLoading(false)
         } catch (e) {
           setFetchUserFeed(false)
+                              setFetchingAgain(false)
+
           // router.push("/")
           const errorMsg = e.response && e.response.data.message
           console.log(e)
@@ -159,6 +165,7 @@ const UserId = (props) => {
     props.setHeaderName("My Account")
   }, [])
 
+
   return (
     <>
       <Flex w={"100%"} alignItems={"center"} justifyContent="center">
@@ -188,7 +195,7 @@ const UserId = (props) => {
                   totalPage={totalPage}
                   setHomeData={setHomeData}
                 />
-                {!fetchUserFeed && totalPage != page && loading && (
+                {fetchingAgain && (
                   <Flex
                     mt={2}
                     mb={5}
@@ -199,7 +206,7 @@ const UserId = (props) => {
                     <Spinner color={"rgb(29, 155, 240)"} size={"sm"} />
                   </Flex>
                 )}
-                {!fetchUserFeed && totalPage == page && (
+                {!fetchingAgain && (
                   <Text
                     mb={5}
                     mt={5}

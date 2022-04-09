@@ -1,33 +1,31 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from "react"
 import { Flex, useToast, Spinner, Text } from "@chakra-ui/react"
-import UserAccount from '../../../components/base/UserAccount'
-import {useSelector, useDispatch} from 'react-redux'
-import {useRouter} from 'next/router'
-import {logout} from '../../../store/userInfoSlice'
-import axios from 'axios'
+import UserAccount from "../../../components/base/UserAccount"
+import { useSelector, useDispatch } from "react-redux"
+import { useRouter } from "next/router"
+import { logout } from "../../../store/userInfoSlice"
+import axios from "axios"
 import io from "socket.io-client"
-import WithHeader from '../../../components/custom/WithHeader'
-
+import WithHeader from "../../../components/custom/WithHeader"
 
 const UserId = (props) => {
-    const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const token = useSelector((state) => state.user.token)
   const user = useSelector((state) => state.user.user)
   const toast = useToast({ position: "top", isClosable: true })
-    const [homeData, setHomeData] = useState([])
-    const [userData, setUserData]= useState(null)
+  const [homeData, setHomeData] = useState([])
+  const [userData, setUserData] = useState(null)
   const router = useRouter()
   const [fetchUser, setFfetchUser] = useState(false)
-    const [totalPost, setTotalPost] = useState(0)
- const [totalPage, setTotalPage] = useState(null)
- const [page, setPage] = useState(1)
- const [fetchUserFeed, setFetchUserFeed] = useState(false)
+  const [totalPost, setTotalPost] = useState(0)
+  const [totalPage, setTotalPage] = useState(null)
+  const [page, setPage] = useState(1)
+  const [fetchUserFeed, setFetchUserFeed] = useState(false)
   const dispatch = useDispatch()
-
+  const [fetchingAgain, setFetchingAgain] = useState(false)
 
   useEffect(() => {
     setFfetchUser(true)
-
   }, [])
 
   useEffect(() => {
@@ -43,6 +41,7 @@ const UserId = (props) => {
       const userAccountId = code[code.length - 1]
       const fetchUserFeed = async () => {
         try {
+          setFetchingAgain(true)
           const { data } = await axios(
             `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-my-posts/${userAccountId}?page=${page}`,
             {
@@ -57,12 +56,16 @@ const UserId = (props) => {
           const newArray = [...homeData, ...data.post]
           const withoutDup = [...new Set(newArray)]
           setHomeData(withoutDup)
+          setFetchingAgain(false)
+
           setTotalPage(data.totalPage)
-                    setTotalPost(data.postCount)
+          setTotalPost(data.postCount)
 
           setLoading(false)
         } catch (e) {
           setFetchUserFeed(false)
+          setFetchingAgain(false)
+
           // router.push("/")
           const errorMsg = e.response && e.response.data.message
           console.log(e)
@@ -77,94 +80,92 @@ const UserId = (props) => {
     }
   }, [fetchUserFeed == true, page])
 
-  
-
   //setup socket
-useEffect(() => {
-  if (!loading) {
-    const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
-      query: { token: token, userId: user._id },
-    })
-    socket.on("uesrPosts", (data) => {
-      // console.log(data)
-      setupAllData(data)
-    })
+  useEffect(() => {
+    if (!loading) {
+      const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
+        query: { token: token, userId: user._id },
+      })
+      socket.on("uesrPosts", (data) => {
+        // console.log(data)
+        setupAllData(data)
+      })
 
-    socket.on("connect_error", async (err) => {
-      if (loading == false && err.message == "Authentication error") {
-        try {
-          await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`)
+      socket.on("connect_error", async (err) => {
+        if (loading == false && err.message == "Authentication error") {
+          try {
+            await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`)
 
-          dispatch(logout({ user: null, token: "" }))
-          localStorage.removeItem("user")
+            dispatch(logout({ user: null, token: "" }))
+            localStorage.removeItem("user")
 
-          router.push("/login")
-        } catch (e) {
-          console.log(e)
+            router.push("/login")
+          } catch (e) {
+            console.log(e)
+          }
+        } else {
+          socket.connect()
         }
-      } else {
-        socket.connect()
-      }
-    })
+      })
+    }
+  }, [!loading])
+
+  const setupAllData = (post) => {
+    // console.log(post)
+    setTimeout(() => {
+      setHomeData((prev) => {
+        const newArray = [...prev]
+        // find if the post already exist
+        const indexOfNewPost = newArray.findIndex(
+          (item) => item._id == post._id
+        )
+        //if exist replace it with the existingone
+        if (indexOfNewPost != -1) {
+          newArray[indexOfNewPost] = post
+        } else {
+          newArray.unshift(post)
+        }
+        //else add it to the array
+
+        return [...new Set(newArray)]
+      })
+    }, 1000)
   }
-}, [!loading])
-
-const setupAllData = (post) => {
-  // console.log(post)
-  setTimeout(() => {
-    setHomeData((prev) => {
-      const newArray = [...prev]
-      // find if the post already exist
-      const indexOfNewPost = newArray.findIndex((item) => item._id == post._id)
-      //if exist replace it with the existingone
-      if (indexOfNewPost != -1) {
-        newArray[indexOfNewPost] = post
-      } else {
-        newArray.unshift(post)
-      }
-      //else add it to the array
-
-      return [...new Set(newArray)]
-    })
-  }, 1000)
-  
-}
 
   const getUserData = async () => {
-  const code = window.location.pathname.split("/")
-  const userAccountId = code[code.length - 1]
-      try {
-        const { data } = await axios(
-          `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-user-info/${userAccountId}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            withCredentials: true,
-          }
-        )
-        setUserData(data)
-        setFetchUserFeed(!fetchUserFeed)
-        setFfetchUser(false)
-        // fetchInitData(userAccountId)
-      } catch (e) {
-        setFfetchUser(false)
-        router.push("/login")
-        const errorMsg = e.response && e.response.data.message
-        console.log(errorMsg)
-        toast({
-          status: "error",
-          duration: 5000,
-          title: "Invalid user!",
-        })
-      }
+    const code = window.location.pathname.split("/")
+    const userAccountId = code[code.length - 1]
+    try {
+      const { data } = await axios(
+        `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-user-info/${userAccountId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        }
+      )
+      setUserData(data)
+      setFetchUserFeed(!fetchUserFeed)
+      setFfetchUser(false)
+      // fetchInitData(userAccountId)
+    } catch (e) {
+      setFfetchUser(false)
+      router.push("/login")
+      const errorMsg = e.response && e.response.data.message
+      console.log(errorMsg)
+      toast({
+        status: "error",
+        duration: 5000,
+        title: "Invalid user!",
+      })
+    }
   }
 
   useEffect(() => {
     props.setHeaderName("My Account")
   }, [])
-
 
   return (
     <>
@@ -195,7 +196,7 @@ const setupAllData = (post) => {
                   totalPage={totalPage}
                   setHomeData={setHomeData}
                 />
-                {!fetchUserFeed && totalPage != page && loading && (
+                {fetchingAgain && (
                   <Flex
                     mt={2}
                     mb={5}
@@ -206,7 +207,7 @@ const setupAllData = (post) => {
                     <Spinner color={"rgb(29, 155, 240)"} size={"sm"} />
                   </Flex>
                 )}
-                {!fetchUserFeed && totalPage == page && (
+                {!fetchingAgain && (
                   <Text
                     mb={5}
                     mt={5}
@@ -228,6 +229,6 @@ const setupAllData = (post) => {
     </>
   )
 }
-// 
+//
 
 export default UserId
