@@ -99,16 +99,27 @@ export default function Home(props) {
             }
           )
           const newArray = [...props.homeData, ...data.post]
-          const withoutDup = [...new Set(newArray)]
-          props.setHomeData(withoutDup)
+
+          var result = newArray.filter(function (e) {
+            var key = Object.keys(e)
+              .map((k) => e[k])
+              .join("|")
+            if (!this[key]) {
+              this[key] = true
+              return true
+            }
+          }, {})
+
+          props.setHomeData([...new Set(result)])
           dispatch(storeFeed({ data: newArray }))
 
           setTotalPage(data.totalPage)
           setFetchingHomeData(false)
-
+          setFetchData(false)
           setLoading(false)
         } catch (e) {
           router.push("/login")
+          setFetchData(false)
           setFetchingHomeData(false)
 
           const errorMsg = e.response && e.response.data.message
@@ -118,8 +129,8 @@ export default function Home(props) {
       fetchInitData()
     }
 
-    return () => setFetchData(false)
   }, [fetchData == true, page])
+
 
   return (
     <>

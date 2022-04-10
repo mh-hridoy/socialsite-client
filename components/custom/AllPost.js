@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react"
+import React, { useState, useCallback, useRef, useEffect } from "react"
 import FeedCard from "./FeedCard"
 import { Text, Flex } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
@@ -19,7 +19,6 @@ const AllPost = ({
   const feedRef = useRef(null)
   const userData = useSelector((state) => state.user.user)
 
-
   const lastFeedRef = useCallback(
     (node) => {
       // console.log(node)
@@ -38,14 +37,14 @@ const AllPost = ({
     },
     [page]
   )
-
+  
 
   return (
     <>
       <Flex minWidth={"100%"} direction="column">
         {post && post.length !== 0 ? (
           [...new Set(post)].map((item, inx) => {
-            if (
+                        if (
               item?.sharedBy?.includes(user?._id) &&
               item.postType != "quote" &&
               post.length != inx + 1
