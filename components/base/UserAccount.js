@@ -14,7 +14,11 @@ import {
   Image,
   FormControl,
 } from "@chakra-ui/react"
-import { MdVerified, MdCalendarToday } from "react-icons/md"
+import {
+  MdVerified,
+  MdCalendarToday,
+  MdOutlineLocationOn,
+} from "react-icons/md"
 import dateFormat from "dateformat"
 import AllPost from "../custom/AllPost"
 import { useSelector } from "react-redux"
@@ -53,6 +57,9 @@ setIsCreateModalOpen
   const [followRequest,setFollowRequest] = useState(false)
   const [userUploadedData, setUserUploadedData] = useState({})
   const [userDataRequest,setUserDataRequest] = useState(false)
+  const [locationValue, setLocationValue] = useState("")
+  const [dateOfBirthValue, setDateOfBirthValue] = useState("")
+  const [webSiteLinkValue, setWebSiteLinkValue] = useState("")
 
   const [crop, setCrop] = useState({
     unit: "%",
@@ -171,7 +178,7 @@ setProfileRawFile(file)
    fetchNow: userDataRequest,
    setFetchNow: setUserDataRequest,
    method: "post",
-   url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/manage-account/${userAccount._id}`,
+   url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/manage-account/${userAccount?._id}`,
    body: userUploadedData,
    isAuth: true,
    isSetData: true,
@@ -189,7 +196,15 @@ setProfileRawFile(file)
  }) 
 
   const userDataHandler = async () => {
-    const userData = { profileImage, coverImage, nameValue, bioValue }
+    const userData = {
+      profileImage,
+      coverImage,
+      nameValue,
+      bioValue,
+      locationValue,
+      dateOfBirthValue,
+      webSiteLinkValue,
+    }
     setUserUploadedData(userData)
     setUserDataRequest(true)
     
@@ -339,6 +354,34 @@ setProfileRawFile(file)
                 onChange={(e) => setBioValue(e.target.value)}
                 id="bio"
               />
+
+              <FormControl htmlFor="location"> Location </FormControl>
+              <Input
+                value={locationValue != "" ? locationValue : user?.location}
+                onChange={(e) => setLocationValue(e.target.value)}
+                id="location"
+              />
+
+              <FormControl htmlFor="dateOfBirth"> Date Of Birth </FormControl>
+              <Input
+                type={"date"}
+                value={
+                  dateOfBirthValue != ""
+                    ? dateOfBirthValue
+                    : new Date(user?.dateOfBirth)
+                }
+                onChange={(e) => setDateOfBirthValue(e.target.value)}
+                id="dateOfBirth"
+              />
+
+              <FormControl htmlFor="websiteLink"> Website </FormControl>
+              <Input
+                value={
+                  webSiteLinkValue != "" ? webSiteLinkValue : user?.websiteLink
+                }
+                onChange={(e) => setWebSiteLinkValue(e.target.value)}
+                id="websiteLink"
+              />
             </Flex>
           </Flex>
         </ModalContent>
@@ -418,7 +461,7 @@ setProfileRawFile(file)
           )}
         </Flex>
 
-        <Flex px={2} gap={1} direction="column">
+        <Flex transform="translateY(-10px)" px={2} gap={1} direction="column">
           <Text
             display={"flex"}
             alignItems="center"
@@ -432,18 +475,47 @@ setProfileRawFile(file)
             )}
           </Text>
 
-          <Text
-            display="flex"
-            fontSize={14}
-            alignItems="center"
-            gap={2}
-            opacity={0.8}
-          >
-            <MdCalendarToday /> Joined at{" "}
-            {user && dateFormat(user.createdAt, "mmmm dS, yyyy")}
-          </Text>
+          {user?.bio && <Text>{user.bio}</Text>}
 
-          <Text>{user.bio && user.bio}</Text>
+          <Flex gap={4}>
+            <Text
+              display="flex"
+              fontSize={14}
+              alignItems="center"
+              gap={2}
+              opacity={0.8}
+            >
+              <MdCalendarToday /> Joined at{" "}
+              {user && dateFormat(user.createdAt, "mmmm dS, yyyy")}
+            </Text>
+
+            {user?.location && (
+              <Flex alignItems={"center"} gap={2}>
+                <MdOutlineLocationOn sizee={18} />{" "}
+                <Text fontSize={16} opacity={0.8}>
+                  {user?.location}
+                </Text>{" "}
+              </Flex>
+            )}
+          </Flex>
+
+          {user?.websiteLink && (
+            <Flex gap={2}>
+              <Text fontSize={14}>Website : </Text>
+              <a fontSize={14} opacity={0.8}>
+                {user?.websiteLink}
+              </a>{" "}
+            </Flex>
+          )}
+
+          {user?.dateOfBirth && (
+            <Flex gap={2}>
+              <Text fontSize={14}>Date Of Birth : </Text>
+              <Text fontSize={14} opacity={0.8}>
+                {dateFormat(user?.dateOfBirth, "mmmm dS, yyyy")}
+              </Text>{" "}
+            </Flex>
+          )}
 
           <Flex mt={5} gap={5}>
             <Text display={"flex"} gap={2} fontSize={14} fontWeight={600}>

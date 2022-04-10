@@ -44,7 +44,7 @@ const AllPost = ({
     <>
       <Flex minWidth={"100%"} direction="column">
         {post && post.length !== 0 ? (
-          post.map((item, inx) => {
+          [...new Set(post)].map((item, inx) => {
               if (
                 item?.sharedBy?.includes(user?._id) &&
                 item.postType != "quote" &&

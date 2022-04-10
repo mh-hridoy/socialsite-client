@@ -5,9 +5,6 @@ import {
   Text,
   TagLabel,
   Tag,
-
-  useColorModeValue,
-
 } from "@chakra-ui/react"
 
 import Masonry from "react-masonry-css"
@@ -15,29 +12,22 @@ import Masonry from "react-masonry-css"
 import { MdVerified } from "react-icons/md"
 import _ from "underscore"
 import timeAgo from "../utils/DateConverter"
+import LinkPreview from "./LinkPreview"
 
 
-const SingleFeed = ({ item }) => {
-     const videoRef = useRef(null)
-     const breakpointColumnsObj = {
-       default: 2,
-       700: 1,
-     }
+const SingleFeed = ({ item, linkData }) => {
+  const videoRef = useRef(null)
+  const breakpointColumnsObj = {
+    default: 2,
+    700: 1,
+  }
 
-     if(item == null) {
-         return (
-             <Text p={4} >Post deleted</Text>
-         )
-     }
-
+  if (item == null) {
+    return <Text p={4}>Post deleted</Text>
+  }
 
   return (
-    <Flex
-      width={"100%"}
-      direction={"column"}
-      gap={4}
-      position="relative"
-    >
+    <Flex width={"100%"} direction={"column"} gap={4} position="relative">
       <Flex
         direction={"column"}
         position={"relative"}
@@ -83,12 +73,7 @@ const SingleFeed = ({ item }) => {
           <Flex marginLeft={10} gap={5}>
             {item.tags.map((item, inx) => {
               return (
-                <Tag
-                  key={inx}
-                  variant="outline"
-                  size="md"
-                  colorScheme="gray"
-                >
+                <Tag key={inx} variant="outline" size="md" colorScheme="gray">
                   <TagLabel>#{item}</TagLabel>
                 </Tag>
               )
@@ -96,14 +81,12 @@ const SingleFeed = ({ item }) => {
           </Flex>
         )}
         {item?.images && item?.images.length !== 0 && (
-          <Flex
-          pt={2}
-          >
+          <Flex pt={2}>
             <>
               {item.images.length == 1 ? (
                 item.images[0].type.includes("image") ? (
                   <img
-                    style={{  borderRadius: "20px" }}
+                    style={{ borderRadius: "20px" }}
                     alt={item.images[0].name}
                     src={item.images[0].img}
                   />
@@ -164,6 +147,8 @@ const SingleFeed = ({ item }) => {
             </>
           </Flex>
         )}
+
+
       </Flex>
     </Flex>
   )

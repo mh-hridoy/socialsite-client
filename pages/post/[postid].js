@@ -96,7 +96,7 @@ const PostId = (props) => {
         } catch (e) {
           setLoading(!loading)
           setFetchData(!fetchData)
-          // router.push("/login")
+          router.push("/")
           const errorMsg = e.response && e.response.data.message
           console.log(errorMsg)
         }

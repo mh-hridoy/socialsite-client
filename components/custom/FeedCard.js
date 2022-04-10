@@ -30,6 +30,8 @@ import { BsThreeDotsVertical } from "react-icons/bs"
 import countReaction from "../utils/countReaction"
 import useHttp from "../utils/useHttp"
 import SingleFeed from "../custom/SingleFeed"
+import LinkPreview from "./LinkPreview"
+import {find as FindURL} from 'linkifyjs'
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -47,12 +49,39 @@ const FeedCard = (props) => {
   const [unlikeRequest, setUnlikeRequest] = useState(false)
   const [sendUnshareRequest, setSendUnshareRequest] = useState(false)
   const videoRef = useRef(null)
+
   const breakpointColumnsObj = {
     default: 2,
     700: 1,
   }
 
   // console.log(props.hasQuote)
+
+  const PostText = () => {
+    if (props?.item?.text) {
+      const allLinks = FindURL(props?.item?.text)
+      let text = props?.item?.text
+
+      if (allLinks.length != 0) {
+        allLinks.forEach((link) => {
+          const indexOfUrl = text.indexOf(link.value)
+          if (indexOfUrl >= 0) {
+            text =
+              text.substring(0, indexOfUrl) +
+              `<a href={${link.value}} target={"_blank"}>` +
+              text.substring(indexOfUrl, indexOfUrl + link.value.length) +
+              "</a>" +
+              text.substring(indexOfUrl + link.value.length)
+          }
+        })
+      }
+    
+      return <div dangerouslySetInnerHTML={{ __html: text }} />
+
+    }
+
+  }
+    
 
   const quoteHandler = () => {
     props.setQuoteData(item)
@@ -353,12 +382,11 @@ const FeedCard = (props) => {
             <Flex
               onClick={(e) => {
                 e.stopPropagation()
-                 if (item?.referPost?.postType == "comment") {
-                   router.push(`/post/comment/${item?.referPost?._id}`)
-                 } else {
-                   router.push(`/post/${item?.referPost?._id}`)
-                 }
-               
+                if (item?.referPost?.postType == "comment") {
+                  router.push(`/post/comment/${item?.referPost?._id}`)
+                } else {
+                  router.push(`/post/${item?.referPost?._id}`)
+                }
               }}
               boxShadow={"sm"}
               rounded="lg"
@@ -369,18 +397,24 @@ const FeedCard = (props) => {
               bg={useColorModeValue("gray.200", "#333")}
             >
               <SingleFeed item={item.referPost} />
+              {item.referPost?.linkData != undefined && (
+                <LinkPreview item={item.referPost?.linkData} />
+              )}
             </Flex>
           )}
 
-          <Text
-            pl={10}
-            mb={item?.images?.length == 0 ? 5 : 1}
-            pr={4}
-            fontSize={15}
-          >
-            {item?.text}
-          </Text>
-
+          {item?.text && item?.linkData?.link != item?.text && (
+            <Flex wordBreak={"break-word"} maxWidth={"100%"}>
+              <Text
+                pl={10}
+                mb={item?.images?.length == 0 ? 5 : 1}
+                pr={4}
+                fontSize={15}
+              >
+                <PostText/>
+              </Text>
+            </Flex>
+          )}
           {item?.tags && (
             <Flex marginLeft={10} gap={5}>
               {item?.tags.map((item, inx) => {
@@ -485,6 +519,25 @@ const FeedCard = (props) => {
                   </Masonry>
                 )}
               </>
+            </Flex>
+          )}
+
+          {item?.linkData && (
+            <Flex
+              alignSelf={"center"}
+              onClick={(e) => {
+                e.stopPropagation
+                window.open(item?.linkData?.link, "_blank")
+              }}
+              width={"90%"}
+              bg={useColorModeValue("gray.200", "#333")}
+              boxShadow="sm"
+              border="1px"
+              borderColor={useColorModeValue("gray.200", "#333")}
+              borderRadius="lg"
+              mb={10}
+            >
+              <LinkPreview item={item?.linkData} />
             </Flex>
           )}
 

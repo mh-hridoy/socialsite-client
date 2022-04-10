@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import {
   Flex,
   Textarea,
@@ -41,6 +41,7 @@ const CreateNewFeed = ({
   const token = useSelector((state) => state.user.token)
   const user = useSelector((state) => state.user.user)
   const [selectedTag, setSelectedTag] = useState([])
+  const textAreaRef = useRef(null)
 
   const selectOption = [
     { value: "general", label: "General" },
@@ -75,7 +76,7 @@ const CreateNewFeed = ({
       field.scrollHeight +
       parseInt(computed.getPropertyValue("padding-bottom"), 10) +
       parseInt(computed.getPropertyValue("border-bottom-width"), 10) -
-      40
+      20
 
     field.style.height = height + "px"
   }
@@ -187,6 +188,7 @@ const CreateNewFeed = ({
             withCredentials: true,
           }
         )
+        console.log(data)
         if (setIsModalOpen != undefined) {
           setIsModalOpen(false)
           const oldData = [...homeData]
@@ -212,6 +214,13 @@ const CreateNewFeed = ({
         setIsLoading(false)
 
         const errorMsg = e.response && e.response.data.message
+        if (errorMsg) {
+          toast({
+            status: "error",
+            duration: 3000,
+            title: errorMsg,
+          })
+        }
       }
     } else {
       setIsLoading(false)
@@ -271,6 +280,7 @@ const CreateNewFeed = ({
             onInput={areaHandler}
             border="none"
             variant={"unstyled"}
+            ref={textAreaRef}
             fontSize={16}
             height="auto"
             value={feedText}

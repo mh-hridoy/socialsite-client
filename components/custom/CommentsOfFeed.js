@@ -54,7 +54,7 @@ const CommentsOfFeed = ({
               )
             }}
           >
-            {item?.user.fullName}
+            {item?.user?.fullName}
           </Text>{" "}
         </Text>
         <CreateReply

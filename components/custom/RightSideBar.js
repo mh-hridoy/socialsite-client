@@ -10,8 +10,7 @@ const RightSideBar = () => {
     <>
       {user != null ? (
         <Flex
-          width={["5%", "10%", "20%", "50%", "70%"]}
-          
+          minWidth={["5%", "10%", "20%", "30%", "30%"]}
           position="sticky"
           top={0}
           zIndex={100}
