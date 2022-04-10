@@ -48,6 +48,7 @@ const FeedCard = (props) => {
   const [reactRequest, setReactRequest] = useState(false)
   const [unlikeRequest, setUnlikeRequest] = useState(false)
   const [sendUnshareRequest, setSendUnshareRequest] = useState(false)
+  const [adminDeleteNow,setAdminDeleteNow] = useState(false)
   const videoRef = useRef(null)
 
   const breakpointColumnsObj = {
@@ -75,13 +76,10 @@ const FeedCard = (props) => {
           }
         })
       }
-    
+
       return <div dangerouslySetInnerHTML={{ __html: text }} />
-
     }
-
   }
-    
 
   const quoteHandler = () => {
     props.setQuoteData(item)
@@ -215,7 +213,30 @@ const FeedCard = (props) => {
     setPostDeleteId(item._id)
     setPostDelRequest(true)
   }
-  // console.log(router.pathname)
+
+  //admin post delete request
+  const { isLoading: isAdminPostDeleting } = useHttp({
+    fetchNow: adminDeleteNow,
+    setFetchNow: setAdminDeleteNow,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/admin-delete-post/${user?._id}/${item?._id}`,
+    isAuth: true,
+    isEToast: true,
+    cb: () => {
+      props.setHomeData((prev) => {
+        const allPost = [...prev]
+        const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
+        allPost.splice(indexOfPost, 1)
+        return [...new Set(allPost)]
+      })
+    },
+  })
+
+  const deleteByAdmin = () => {
+    setPostDeleteId(item._id)
+    setAdminDeleteNow(true)
+    
+  }
+
   return (
     <>
       <GalleryModal
@@ -318,7 +339,7 @@ const FeedCard = (props) => {
                     _hover={{ bg: "transparent" }}
                     as={Button}
                   >
-                    {isPostDeleting && postDeleteId == item?._id ? (
+                    {isPostDeleting || isAdminPostDeleting && postDeleteId == item?._id ? (
                       <Spinner />
                     ) : (
                       <BsThreeDotsVertical />
@@ -344,6 +365,10 @@ const FeedCard = (props) => {
                     </MenuItem>
                     {item?.user?._id == user?._id && (
                       <MenuItem onClick={postDeleteHandler}>Delete</MenuItem>
+                    )}
+
+                    {user?.role == "admin" && (
+                      <MenuItem onClick={deleteByAdmin}>Force Delete</MenuItem>
                     )}
                   </MenuList>
                 </Menu>
@@ -397,13 +422,14 @@ const FeedCard = (props) => {
               bg={useColorModeValue("gray.200", "#333")}
             >
               <SingleFeed item={item.referPost} />
-              {item.referPost?.linkData != undefined && (
-                <LinkPreview item={item.referPost?.linkData} />
-              )}
+              {item.referPost?.linkData != undefined &&
+                item.referPost?.linkData.image?.img && (
+                  <LinkPreview item={item.referPost?.linkData} />
+                )}
             </Flex>
           )}
 
-          {item?.text && item?.linkData?.link != item?.text && (
+          {item?.text && (
             <Flex wordBreak={"break-word"} maxWidth={"100%"}>
               <Text
                 pl={10}
@@ -411,7 +437,7 @@ const FeedCard = (props) => {
                 pr={4}
                 fontSize={15}
               >
-                <PostText/>
+                <PostText />
               </Text>
             </Flex>
           )}
@@ -522,7 +548,7 @@ const FeedCard = (props) => {
             </Flex>
           )}
 
-          {item?.linkData && (
+          {item?.linkData && item?.linkData.image?.img && (
             <Flex
               alignSelf={"center"}
               onClick={(e) => {

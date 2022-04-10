@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Flex,
   Text,
@@ -13,26 +13,44 @@ import {
   
 } from "react-icons/md"
 import useHttp from "../utils/useHttp"
+import _ from 'underscore'
 
-const SingleUserCard = ({ user }) => {
+const SingleUserCard = ({ user, userData }) => {
   const userInfo = useSelector((state) => state.user.user)
   const router = useRouter()
-  const [buttonText, setButtonText] = useState("Follow")
   const [unFollowRequest, setUnfollowRequest] = useState(false)
   const [followRequest, setFollowRequest] = useState(false)
+  const [currentUser, setCurrentUser] = useState(user)
+  const [unblockRequst,setUnblockRequest] = useState(false)
+    const [blockRequest, setBlockRequest] = useState(false)
 
   // unfollow request
   const { isLoading } = useHttp({
     fetchNow: unFollowRequest,
     method: "post",
-    body: { followId: user._id },
+    body: { followId: currentUser?._id },
     setFetchNow: setUnfollowRequest,
     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unfollow-user/${userInfo?._id}`,
     isAuth: true,
     isEToast: true,
     eToastMessage: "Something went wrong!",
-    cb: () => setButtonText("Follow"),
+    cb: () => {
+      const useOldData = currentUser
+      const cloneData = _.clone(useOldData)
+      
+      const follwers = cloneData.follower
+
+      const newFollower = follwers.filter((item) => item != userData._id )
+      cloneData.follower = [...new Set(newFollower)]
+
+      setCurrentUser(cloneData)
+
+    },
   })
+
+  useEffect(() => {
+    setCurrentUser(user)
+  }, [])
 
   const unFollowHandler = () => {
     setUnfollowRequest(true)
@@ -42,19 +60,68 @@ const SingleUserCard = ({ user }) => {
   const { isLoading: followLoading } = useHttp({
     fetchNow: followRequest,
     method: "post",
-    body: { followId: user._id },
+    body: { followId: currentUser?._id },
     setFetchNow: setFollowRequest,
     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/follow-user/${userInfo?._id}`,
     isAuth: true,
     isEToast: true,
     eToastMessage: "Something went wrong!",
-    cb: () => setButtonText("Unfollow"),
+    cb: () => {
+      const useOldData = currentUser
+      const cloneData = _.clone(useOldData)
+
+      const follwers = cloneData.follower
+      follwers.push(userData._id)
+
+      cloneData.follower = [...new Set(follwers)]
+
+      setCurrentUser(cloneData)
+
+    },
   })
 
   // console.log(user)
   const followHandler = () => {
     setFollowRequest(true)
   }
+
+  //
+    const { isLoading: isUnblocking } = useHttp({
+      fetchNow: unblockRequst,
+      method: "post",
+      body: { blockId: currentUser?._id },
+      setFetchNow: setUnblockRequest,
+      url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/unblock-user/${userInfo?._id}`,
+      isAuth: true,
+      isEToast: true,
+      eToastMessage: "Something went wrong!",
+      isSetData: true,
+      setData: setCurrentUser,
+    })
+
+  const unblockHandler = () => {
+    setUnblockRequest(true)
+
+  }
+
+  //
+  const { isLoading: isBlocking } = useHttp({
+    fetchNow: blockRequest,
+    method: "post",
+    body: { blockId: currentUser?._id },
+    setFetchNow: setBlockRequest,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/block-user/${userInfo?._id}`,
+    isAuth: true,
+    isEToast: true,
+    eToastMessage: "Something went wrong!",
+    isSetData: true,
+    setData: setCurrentUser
+  })
+  const blockHandler = () => {
+     setBlockRequest(true)
+
+  }
+  
   return (
     <>
       <Flex
@@ -70,9 +137,9 @@ const SingleUserCard = ({ user }) => {
         <Flex
           onClick={() =>
             router.push(
-              user._id == userInfo?._id
-                ? `/account/myaccount/${user._id}`
-                : `/account/${user._id}`
+              currentUser?._id == userInfo?._id
+                ? `/account/myaccount/${currentUser?._id}`
+                : `/account/${currentUser?._id}`
             )
           }
           gap={2}
@@ -82,10 +149,10 @@ const SingleUserCard = ({ user }) => {
             _hover={{ border: "2px solid rgb(29, 155, 240)" }}
             cursor="pointer"
             size={"sm"}
-            name={user.fullName}
+            name={currentUser.fullName}
             alignItems={"center"}
             justifyContent="center"
-            src={user.profilePicture?.img}
+            src={currentUser.profilePicture?.img}
           ></Avatar>
           <Text
             display={"flex"}
@@ -95,8 +162,8 @@ const SingleUserCard = ({ user }) => {
             fontWeight={600}
             fontSize={15}
           >
-            {user.fullName}{" "}
-            {user.isVerified && user.isVerified == true && (
+            {currentUser.fullName}{" "}
+            {currentUser.isVerified && currentUser.isVerified == true && (
               <MdVerified color="rgb(29, 155, 240)" />
             )}
           </Text>
@@ -108,14 +175,38 @@ const SingleUserCard = ({ user }) => {
           justifyContent="center"
           cursor="pointer"
         >
+          {!currentUser?.blockedBy?.includes(userData?._id) && (
+            <Button
+              onClick={
+                currentUser?.follower?.includes(userData?._id)
+                  ? unFollowHandler
+                  : followHandler
+              }
+              bg="buttonColor"
+              size={"sm"}
+              fontSize={14}
+              isLoading={followLoading || isLoading}
+            >
+              {currentUser?.follower?.includes(userData?._id)
+                ? "Unfollow"
+                : "Follow"}
+            </Button>
+          )}
+
           <Button
-            onClick={buttonText == "Follow" ? followHandler : unFollowHandler}
+            onClick={
+              currentUser?.blockedBy?.includes(userData?._id)
+                ? unblockHandler
+                : blockHandler
+            }
             bg="buttonColor"
             size={"sm"}
             fontSize={14}
-            isLoading={buttonText == "Follow" ? followLoading : isLoading}
+            isLoading={isBlocking || isUnblocking}
           >
-            {buttonText}
+            {currentUser?.blockedBy?.includes(userData?._id)
+              ? "Unblocke"
+              : "Block"}
           </Button>
         </Flex>
       </Flex>

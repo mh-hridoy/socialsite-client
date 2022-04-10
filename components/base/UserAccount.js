@@ -12,6 +12,8 @@ import {
   FormLabel,
   Input,
   Image,
+  Textarea,
+  Spinner,
   FormControl,
 } from "@chakra-ui/react"
 import {
@@ -26,8 +28,9 @@ import { useRouter } from "next/router"
 import { MdOutlineFlipCameraIos } from "react-icons/md"
 import Resizer from "react-image-file-resizer"
 import ReactCrop from "react-image-crop"
-import countReaction from '../utils/countReaction'
+import countReaction from "../utils/countReaction"
 import useHttp from "../utils/useHttp"
+import SingleUserCard from "../custom/SingleUserCard"
 
 const UserAccount = ({
   post,
@@ -38,9 +41,9 @@ const UserAccount = ({
   setHomeData,
   setUserData,
   quoteData,
-setQuoteData,
-isCreateModalOpen,
-setIsCreateModalOpen
+  setQuoteData,
+  isCreateModalOpen,
+  setIsCreateModalOpen,
 }) => {
   const userAccount = useSelector((state) => state.user.user)
   const router = useRouter()
@@ -54,12 +57,19 @@ setIsCreateModalOpen
   const [ImageCrop, setImageCrop] = useState(null)
   const [profileRawFile, setProfileRawFile] = useState(null)
   const [unfollowRequest, setUnfollowRequest] = useState(false)
-  const [followRequest,setFollowRequest] = useState(false)
+  const [followRequest, setFollowRequest] = useState(false)
   const [userUploadedData, setUserUploadedData] = useState({})
-  const [userDataRequest,setUserDataRequest] = useState(false)
+  const [userDataRequest, setUserDataRequest] = useState(false)
   const [locationValue, setLocationValue] = useState("")
   const [dateOfBirthValue, setDateOfBirthValue] = useState("")
   const [webSiteLinkValue, setWebSiteLinkValue] = useState("")
+  const [followData, setFollowData] = useState([])
+  const [showFollowData, setShowFollowData] = useState(false)
+  const [showFollowingData, setShowFollowingData] = useState(false)
+  const [showFollowModal, setShowFollowModal] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportText, setReportText] = useState("")
+  const [sendReport, setSendReport] = useState(false)
 
   const [crop, setCrop] = useState({
     unit: "%",
@@ -80,14 +90,11 @@ setIsCreateModalOpen
     isAuth: true,
     isSetData: true,
     setData: setUserData,
-  
   })
 
   const unFollowHandler = async () => {
     setUnfollowRequest(true)
-    
   }
-
 
   const { isLoading: isFollowLoading } = useHttp({
     fetchNow: followRequest,
@@ -99,7 +106,7 @@ setIsCreateModalOpen
     isSetData: true,
     setData: setUserData,
   })
-  
+
   const followHandler = async () => {
     setFollowRequest(true)
   }
@@ -129,7 +136,7 @@ setIsCreateModalOpen
   const profileImageHandler = (e) => {
     setProfileModalOpen(true)
     const file = e.target.files[0]
-setProfileRawFile(file)
+    setProfileRawFile(file)
     setProfileBeforeProcess(URL.createObjectURL(file))
   }
 
@@ -146,17 +153,17 @@ setProfileRawFile(file)
     canvas.height = crop.height * pixelRatio
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
     ctx.imageSmoothingQuality = "low"
-        ctx.drawImage(
-          ImageCrop,
-          crop.x * scaleX,
-          crop.y * scaleY,
-          crop.width * scaleX,
-          crop.height * scaleY,
-          0,
-          0,
-          crop.width,
-          crop.height
-        )
+    ctx.drawImage(
+      ImageCrop,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height
+    )
 
     const base64Image = canvas.toDataURL("image/jpeg")
     setProfileImage({
@@ -168,32 +175,29 @@ setProfileRawFile(file)
       img: base64Image,
     })
 
-
     setProfileModalOpen(false)
-
   }
 
-
- const { isLoading: manageLoading } = useHttp({
-   fetchNow: userDataRequest,
-   setFetchNow: setUserDataRequest,
-   method: "post",
-   url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/manage-account/${userAccount?._id}`,
-   body: userUploadedData,
-   isAuth: true,
-   isSetData: true,
-   setData: setUserData,
-   isEToast: true,
-   cb: (() => {
+  const { isLoading: manageLoading } = useHttp({
+    fetchNow: userDataRequest,
+    setFetchNow: setUserDataRequest,
+    method: "post",
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/manage-account/${userAccount?._id}`,
+    body: userUploadedData,
+    isAuth: true,
+    isSetData: true,
+    setData: setUserData,
+    isEToast: true,
+    cb: () => {
       setNameValue("")
-       setCoverImage(null)
-       setProfileImage(null)
-       setBioValue("")
-       setIsModalOpen(!isModalOpen)
-   }),
+      setCoverImage(null)
+      setProfileImage(null)
+      setBioValue("")
+      setIsModalOpen(!isModalOpen)
+    },
 
-   ecb: (() => setIsModalOpen(!isModalOpen))
- }) 
+    ecb: () => setIsModalOpen(!isModalOpen),
+  })
 
   const userDataHandler = async () => {
     const userData = {
@@ -207,10 +211,133 @@ setProfileRawFile(file)
     }
     setUserUploadedData(userData)
     setUserDataRequest(true)
-    
   }
+
+  const { isLoading: showFollowingLoading } = useHttp({
+    fetchNow: showFollowingData,
+    setFetchNow: setShowFollowingData,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-following/${user?._id}`,
+    isAuth: true,
+    isSetData: true,
+    setData: setFollowData,
+    dataTarget: "following",
+    isEToast: true,
+  })
+
+  const showFollowing = () => {
+    setShowFollowingData(true)
+    setShowFollowModal(true)
+  }
+
+  const { isLoading: showFollowerLoading } = useHttp({
+    fetchNow: showFollowData,
+    setFetchNow: setShowFollowData,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-followers/${user?._id}`,
+    isAuth: true,
+    isSetData: true,
+    setData: setFollowData,
+    dataTarget: "follower",
+    isEToast: true,
+  })
+
+  const showFollower = () => {
+    setShowFollowData(true)
+    setShowFollowModal(true)
+  }
+
+  const { isLoading: reportLoading } = useHttp({
+    fetchNow: sendReport,
+    setFetchNow: setSendReport,
+    method: "post",
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/report/${userAccount?._id}`,
+    body: { reason: reportText, reportUser: user._id },
+    isAuth: true,
+    isToast: true,
+    isEToast: true,
+    cb: () => {
+      setReportText("")
+      setShowReportModal(false)
+    },
+  })
+
+  const reportHandler = () => {
+    setShowReportModal(true)
+  }
+
   return (
     <>
+      <Modal
+        size={"xl"}
+        isOpen={showReportModal}
+        onClose={() => {
+          setShowReportModal(false)
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent p={5} py={10}>
+          <ModalCloseButton _focus={{ boxShadow: "none" }} />
+          <Textarea
+            fontSize={14}
+            value={reportText}
+            onChange={(e) => setReportText(e.target.value)}
+            rows={6}
+            mb={2}
+            required
+            p={2}
+            placeholder="Why you're reporting?"
+            width={"100%"}
+            resize="none"
+          />
+          <Button
+            bg="buttonColor"
+            isLoading={reportLoading}
+            onClick={() => setSendReport(true)}
+          >
+            Submit
+          </Button>
+        </ModalContent>
+      </Modal>
+      {/* show follow and following modal */}
+      <Modal
+        size={"xl"}
+        isOpen={showFollowModal}
+        onClose={() => {
+          setFollowData([])
+          setShowFollowModal(false)
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent p={5} py={10}>
+          <ModalCloseButton _focus={{ boxShadow: "none" }} />
+          <Text textAlign={"center"}>List</Text>
+          {showFollowingLoading || showFollowerLoading ? (
+            <Flex
+              alignItems={"center"}
+              justifyContent="center"
+              width={"100%"}
+              mt={4}
+            >
+              <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
+            </Flex>
+          ) : (
+            <Flex direction="column" mt={4} gap={4}>
+              {followData?.length != 0 &&
+                followData.map((item, inx) => {
+                  return (
+                    <SingleUserCard userData={user} key={inx} user={item} />
+                  )
+                })}
+
+              {followData.length == 0 && (
+                <Text textarea="center" fontSize={14} opacity={0.8}>
+                  Nothing to show
+                </Text>
+              )}
+            </Flex>
+          )}
+        </ModalContent>
+      </Modal>
+      {/* show follow and following modal */}
       <Modal
         size={"xl"}
         isOpen={profileModalOpen}
@@ -392,6 +519,7 @@ setProfileRawFile(file)
         borderLeft={"1px"}
         borderColor={useColorModeValue("gray.200", "#333")}
         minWidth={"100%"}
+        minH={"100vh"}
         mb={10}
         gap={4}
         direction="column"
@@ -439,25 +567,35 @@ setProfileRawFile(file)
               Manage Account
             </Button>
           ) : (
-            <Button
-              onClick={
-                user.follower.includes(userAccount?._id) == true
-                  ? unFollowHandler
-                  : followHandler
-              }
-              size="sm"
-              isLoading={
-                user.follower.includes(userAccount?._id) == true
-                  ? isLoading
-                  : isFollowLoading
-              }
-              fontSize={12}
-              variant="outline"
-            >
-              {user.follower.includes(userAccount?._id) == true
-                ? "Unfollow"
-                : "Follow"}
-            </Button>
+            <Flex gap={4}>
+              <Button
+                onClick={
+                  user.follower.includes(userAccount?._id) == true
+                    ? unFollowHandler
+                    : followHandler
+                }
+                size="sm"
+                isLoading={
+                  user.follower.includes(userAccount?._id) == true
+                    ? isLoading
+                    : isFollowLoading
+                }
+                fontSize={12}
+                variant="outline"
+              >
+                {user.follower.includes(userAccount?._id) == true
+                  ? "Unfollow"
+                  : "Follow"}
+              </Button>
+              <Button
+                size="sm"
+                fontSize={12}
+                variant="outline"
+                onClick={reportHandler}
+              >
+                Report User
+              </Button>
+            </Flex>
           )}
         </Flex>
 
@@ -518,14 +656,28 @@ setProfileRawFile(file)
           )}
 
           <Flex mt={5} gap={5}>
-            <Text display={"flex"} gap={2} fontSize={14} fontWeight={600}>
+            <Text
+              cursor="pointer"
+              display={"flex"}
+              gap={2}
+              onClick={showFollowing}
+              fontSize={14}
+              fontWeight={600}
+            >
               {countReaction(user.following?.length)}
               <Text opacity={0.8} fontWeight={200}>
                 Followings
               </Text>
             </Text>
 
-            <Text display={"flex"} gap={2} fontSize={14} fontWeight={600}>
+            <Text
+              cursor="pointer"
+              display={"flex"}
+              gap={2}
+              onClick={showFollower}
+              fontSize={14}
+              fontWeight={600}
+            >
               {countReaction(user.follower?.length)}{" "}
               <Text opacity={0.8} fontWeight={200}>
                 Followers

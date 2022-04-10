@@ -15,6 +15,7 @@ const useHttp = ({
   isSetData = false,
   setData = null,
   isMessage = false,
+  dataTarget= null,
   setMessage = null,
   setUserId = null,
   isDispatch = false,
@@ -69,8 +70,16 @@ const useHttp = ({
 
           setRequestedData(data)
 
-          if (isSetData && setData !== null) {
+          if (isSetData && setData !== null && dataTarget == null) {
             setData(data)
+          }
+
+          if (isSetData && setData !== null && dataTarget == "follower") {
+            setData(data.follower)
+          }
+
+          if (isSetData && setData !== null && dataTarget == "following") {
+            setData(data.following)
           }
 
           if (cb != null) {

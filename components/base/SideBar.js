@@ -25,6 +25,7 @@ import {
   MdOutlineDarkMode,
   MdOutlineAccountCircle,
   MdPeopleOutline,
+  MdSearch,
 } from "react-icons/md"
 import { BsSun } from "react-icons/bs"
 import { useSelector } from "react-redux"
@@ -57,6 +58,12 @@ const SideBar = ({ isModalOpen, setIsModalOpen, quoteData, setQuoteData, homeDat
       Icon: MdPeopleOutline,
       uri: `/people`,
       path: `/people`,
+    },
+    {
+      name: "Search",
+      Icon: MdSearch,
+      uri: `/search`,
+      path: `/search`,
     },
 
     {

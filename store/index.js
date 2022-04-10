@@ -29,12 +29,14 @@ const StoreProvider = (props) => {
   }, function (error) {
     const res = error.response;
     // console.log(error)
+    // Your account is disabled
     if (
       res.status === 401 ||
       res.data.message.indexOf("invalid token") == 0 ||
-      (res.data.message.indexOf("jwt expired") == 0 &&
+      res.data.message.indexOf("Your account is disabled. please contatct support") == 0 ||
+      res.data.message.indexOf("jwt expired") == 0 &&
         res.config &&
-        !res.config.__isRetryRequest)
+        !res.config.__isRetryRequest
     ) {
       return new Promise((response, reject) => {
         axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`)
@@ -42,6 +44,7 @@ const StoreProvider = (props) => {
             // console.log("logout")
             store.dispatch(logout({ user: null, token: "" }))
             localStorage.removeItem("user")
+            
             router.push("/login")
           })
           .catch((err) => {

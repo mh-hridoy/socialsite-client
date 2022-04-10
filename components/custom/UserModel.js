@@ -19,7 +19,10 @@ import {
   MdVerified,
   MdDeleteOutline,
   MdOutlineModeEditOutline,
+  MdDisabledVisible,
+
 } from "react-icons/md"
+import {AiOutlineEye} from 'react-icons/ai'
 import axios from "axios"
 import useHttp from "../utils/useHttp"
 
@@ -37,7 +40,9 @@ const UserModel = ({ user }) => {
   const [verifyUserId, setVerifyUserId] = useState(null)
   const [sendDRequest, setSendDRequest] = useState(false)
   const [dUserId, setDUserId] = useState(null)
-  const [adminChangeRequest,setAdminChangeRequest] = useState(false)
+  const [adminChangeRequest, setAdminChangeRequest] = useState(false)
+  const [disableUser, setDisableUser] = useState(false)
+  const [visibleUser, setVisibleUser] = useState(false)
 
   //verifyAccount request
   const { isLoading: isVloading } = useHttp({
@@ -104,12 +109,13 @@ const UserModel = ({ user }) => {
   const { isLoading: isChangeLoading } = useHttp({
     fetchNow: adminChangeRequest,
     method: "post",
-    body: {  fullName: nameValue,
-          email: emailValue,
-          phoneNumber: phoneValue,
-          password: passwordValue,
-          userId: user._id,
-   },
+    body: {
+      fullName: nameValue,
+      email: emailValue,
+      phoneNumber: phoneValue,
+      password: passwordValue,
+      userId: user._id,
+    },
     setFetchNow: setAdminChangeRequest,
     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/admin-manage-account/${userInfo?._id}`,
     isAuth: true,
@@ -122,9 +128,43 @@ const UserModel = ({ user }) => {
 
   const adminManageHandler = async () => {
     setAdminChangeRequest(true)
-  
   }
 
+  //disable request
+  const { isLoading: isDisableloading } = useHttp({
+    fetchNow: disableUser,
+    setFetchNow: setDisableUser,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/disable-user/${userInfo?._id}/${user._id}`,
+    isAuth: true,
+    isToast: true,
+    isEToast: true,
+    isToast: true,
+    cb: () => router.reload(),
+    ecb: () => router.push("/"),
+  })
+
+  const disableHandler = () => {
+        setDisableUser(true)
+
+  }
+
+  //visible request
+  const { isLoading: isVisibleLoading } = useHttp({
+    fetchNow: visibleUser,
+    setFetchNow: setVisibleUser,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/visible-user/${userInfo?._id}/${user._id}`,
+    isAuth: true,
+    isToast: true,
+    isEToast: true,
+    isToast: true,
+    cb: () => router.reload(),
+    ecb: () => router.push("/"),
+  })
+
+  const visibleHandler = () => {
+        setVisibleUser(true)
+
+  }
   return (
     <>
       <Modal
@@ -230,6 +270,20 @@ const UserModel = ({ user }) => {
           cursor="pointer"
         >
           <Button
+            isLoading={isDisableloading || isVisibleLoading}
+            fontSize={12}
+            size={"sm"}
+            bg="buttonColor"
+            onClick={user.isDisabled ? visibleHandler : disableHandler}
+          >
+            {!user.isDisabled ? (
+              <MdDisabledVisible size={16} />
+            ) : (
+              <AiOutlineEye size={16} />
+            )}
+          </Button>
+
+          <Button
             // isLoading={isVloading}
             fontSize={12}
             size={"sm"}
@@ -238,7 +292,6 @@ const UserModel = ({ user }) => {
           >
             <MdOutlineModeEditOutline size={16} />
           </Button>
-
           <Button
             isLoading={isVloading || isUVloading}
             onClick={
