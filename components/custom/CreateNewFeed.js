@@ -174,7 +174,7 @@ const CreateNewFeed = ({
         const { data } = await axios.post(
           `${process.env.NEXT_PUBLIC_MAIN_PROXY}/new-post`,
           {
-            text: feedText,
+            text: feedText || " ",
             images,
             user: user._id,
             tags,
@@ -188,7 +188,7 @@ const CreateNewFeed = ({
             withCredentials: true,
           }
         )
-        console.log(data)
+        
         if (setIsModalOpen != undefined) {
           setIsModalOpen(false)
           const oldData = [...homeData]

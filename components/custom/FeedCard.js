@@ -38,6 +38,7 @@ import useHttp from "../utils/useHttp"
 import SingleFeed from "../custom/SingleFeed"
 import LinkPreview from "./LinkPreview"
 import {find as FindURL} from 'linkifyjs'
+import parse from "html-react-parser"
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -68,7 +69,6 @@ const FeedCard = (props) => {
   // console.log(props.hasQuote)
 
   const PostText = () => {
-    if (props?.item?.text) {
       const allLinks = FindURL(props?.item?.text)
       let text = props?.item?.text
 
@@ -84,12 +84,15 @@ const FeedCard = (props) => {
               text.substring(indexOfUrl + link.value.length)
           }
         })
+      }else{
+        text = `<p>${text}</p>`
       }
 
-      return <div dangerouslySetInnerHTML={{ __html: text }} />
-    }
+      return <div> {parse(text)} </div>
+    
   }
 
+  // console.log(PostText)
   const quoteHandler = () => {
     props.setQuoteData(item)
     props.setIsCreateModalOpen(true)
@@ -503,7 +506,7 @@ const FeedCard = (props) => {
                 pr={4}
                 fontSize={15}
               >
-                <PostText />
+                 <PostText />
               </Text>
             </Flex>
           )}
