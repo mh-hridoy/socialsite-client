@@ -32,11 +32,7 @@ const LinkPreview = ({ item }) => {
           pt={2}
         >
           {item.image.type == "image/jpeg" ? (
-            <img
-             
-              alt={item.image.title}
-              src={item.image.img}
-            />
+            <img alt={item.image.title} src={item.image.img} />
           ) : item.image.type == "video" ? (
             <video
               style={{
@@ -49,9 +45,9 @@ const LinkPreview = ({ item }) => {
             ></video>
           ) : null}
         </Flex>
-
+          {/* <a style={{wordBreak: "break-word", fontSize: 14 }} >{item?.link}</a> */}
         <Text
-          mt={4}
+        mt={2}
           pl={10}
           display="flex"
           fontWeight={600}
@@ -60,12 +56,14 @@ const LinkPreview = ({ item }) => {
           pr={4}
           fontSize={15}
         >
-          <Avatar
-            name={item?.siteName}
-            objectFit="contain"
-            size="sm"
-            src={item?.favIcon}
-          ></Avatar>
+          {item?.favIcon && (
+            <Avatar
+              name={item?.siteName}
+              objectFit="contain"
+              size="sm"
+              src={item?.favIcon}
+            ></Avatar>
+          )}
           {item?.title}
         </Text>
         <Text pl={10} pr={4} fontSize={15}>

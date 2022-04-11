@@ -139,8 +139,8 @@ const CreateNewFeed = ({
     files.map((file) => {
       Resizer.imageFileResizer(
         file,
-        600,
-        600,
+        1280,
+        720,
         "JPEG",
         100,
         0,

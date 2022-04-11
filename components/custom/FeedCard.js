@@ -495,7 +495,7 @@ const FeedCard = (props) => {
             </Flex>
           )}
 
-          {item?.text && (
+          {item?.text && item?.text != item?.linkData?.link && (
             <Flex wordBreak={"break-word"} maxWidth={"100%"}>
               <Text
                 pl={10}
@@ -600,7 +600,7 @@ const FeedCard = (props) => {
                               objectFit: "cover",
                               objectPosition: "center",
                             }}
-                            src={image.img}
+                            src={image?.img}
                             key={inx}
                             controls={true}
                             autoPlay={false}
