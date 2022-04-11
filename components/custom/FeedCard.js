@@ -13,6 +13,12 @@ import {
   MenuList,
   MenuItem,
   Spinner,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalCloseButton,
+  Textarea,
+  Input,
 } from "@chakra-ui/react"
 import { BsHeart, BsHeartFill, BsChatQuote } from "react-icons/bs"
 import { RiStackshareLine } from "react-icons/ri"
@@ -49,6 +55,9 @@ const FeedCard = (props) => {
   const [unlikeRequest, setUnlikeRequest] = useState(false)
   const [sendUnshareRequest, setSendUnshareRequest] = useState(false)
   const [adminDeleteNow,setAdminDeleteNow] = useState(false)
+   const [showReportModal, setShowReportModal] = useState(false)
+   const [reportText, setReportText] = useState("")
+   const [sendReport, setSendReport] = useState(false)
   const videoRef = useRef(null)
 
   const breakpointColumnsObj = {
@@ -237,8 +246,63 @@ const FeedCard = (props) => {
     
   }
 
+   const { isLoading: reportLoading } = useHttp({
+     fetchNow: sendReport,
+     setFetchNow: setSendReport,
+     method: "post",
+     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/report/${user?._id}`,
+     body: {
+       reason: reportText,
+       reportUser: item?.user?._id,
+       reportedPost: item?._id,
+     },
+     isAuth: true,
+     isToast: true,
+     isEToast: true,
+     cb: () => {
+       setReportText("")
+       setShowReportModal(false)
+     },
+   })
+
+   const reportHandler = () => {
+     setShowReportModal(true)
+   }
+
   return (
     <>
+      <Modal
+        size={"xl"}
+        isOpen={showReportModal}
+        onClose={() => {
+          setShowReportModal(false)
+        }}
+      >
+        <ModalOverlay />
+        <ModalContent p={5} py={10}>
+          <ModalCloseButton _focus={{ boxShadow: "none" }} />
+          <Textarea
+            fontSize={14}
+            value={reportText}
+            onChange={(e) => setReportText(e.target.value)}
+            rows={6}
+            mb={2}
+            required
+            p={2}
+            placeholder="Why you're reporting?"
+            width={"100%"}
+            resize="none"
+          />
+          <Button
+            bg="buttonColor"
+            isLoading={reportLoading}
+            onClick={() => setSendReport(true)}
+          >
+            Submit
+          </Button>
+        </ModalContent>
+      </Modal>
+
       <GalleryModal
         isModalOpen={isModalOpen}
         setCurrentImageArray={setCurrentImageArray}
@@ -339,7 +403,8 @@ const FeedCard = (props) => {
                     _hover={{ bg: "transparent" }}
                     as={Button}
                   >
-                    {isPostDeleting || isAdminPostDeleting && postDeleteId == item?._id ? (
+                    {isPostDeleting ||
+                    (isAdminPostDeleting && postDeleteId == item?._id) ? (
                       <Spinner />
                     ) : (
                       <BsThreeDotsVertical />
@@ -370,6 +435,7 @@ const FeedCard = (props) => {
                     {user?.role == "admin" && (
                       <MenuItem onClick={deleteByAdmin}>Force Delete</MenuItem>
                     )}
+                    <MenuItem onClick={reportHandler}>Report to admin</MenuItem>
                   </MenuList>
                 </Menu>
               </Flex>

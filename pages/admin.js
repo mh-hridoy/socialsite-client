@@ -76,7 +76,7 @@ const Admin = () => {
      isEToast: true,
       isEPush: true,
       epushTo: "/login",
-      cb: (() => {setIsCheckNow(false); setLoading(false); console.log(requestedData) })
+      cb: (() => {setIsCheckNow(false); setLoading(false) })
     })
 
       const { isLoading: _reportsLoading } = useHttp({
@@ -373,7 +373,7 @@ const Admin = () => {
                               </a>
                             ) : report?.reportedPost?.type == "comment" ? (
                               <a
-                                onClick={router.push(
+                                onClick={() => router.push(
                                   `/post/comment/${report?.reportedPost?._id}`
                                 )}
                               >
@@ -381,7 +381,7 @@ const Admin = () => {
                               </a>
                             ) : (
                               <a
-                                onClick={router.push(
+                                onClick={() => router.push(
                                   `/post/${report?.reportedPost?._id}`
                                 )}
                               >
