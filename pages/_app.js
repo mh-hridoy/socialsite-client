@@ -99,7 +99,7 @@ function MyApp({ Component, pageProps }) {
             isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}
           />
-          <Flex width="90%" direction="column">
+          <Flex width="100%" direction="column">
             <Component
               homeData={homeData}
               setHomeData={setHomeData}

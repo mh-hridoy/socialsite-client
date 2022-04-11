@@ -54,8 +54,16 @@ const UserId = (props) => {
           )
           setFetchUserFeed(false)
           const newArray = [...homeData, ...data.post]
-          const withoutDup = [...new Set(newArray)]
-          setHomeData(withoutDup)
+              var result = newArray.filter(function (e) {
+                var key = Object.keys(e)
+                  .map((k) => e[k])
+                  .join("|")
+                if (!this[key]) {
+                  this[key] = true
+                  return true
+                }
+              }, {})
+              setHomeData([...new Set(result)])
           setFetchingAgain(false)
 
           setTotalPage(data.totalPage)
