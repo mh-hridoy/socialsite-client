@@ -69,7 +69,7 @@ const FeedCard = (props) => {
           if (indexOfUrl >= 0) {
             text =
               text.substring(0, indexOfUrl) +
-              `<a href={${link.value}} target={"_blank"}>` +
+              `<a href=${link.value} target="_blank">` +
               text.substring(indexOfUrl, indexOfUrl + link.value.length) +
               "</a>" +
               text.substring(indexOfUrl + link.value.length)
@@ -548,7 +548,7 @@ const FeedCard = (props) => {
             </Flex>
           )}
 
-          {item?.linkData && item?.linkData.image?.img && (
+          {item?.linkData && item?.linkData?.title && (
             <Flex
               alignSelf={"center"}
               onClick={(e) => {
