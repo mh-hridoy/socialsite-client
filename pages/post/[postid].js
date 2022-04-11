@@ -105,7 +105,6 @@ const PostId = (props) => {
     }
   }, [fetchData == true])
 
-  // console.log(item)
   return (
     <>
       <Flex

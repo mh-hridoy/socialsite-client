@@ -60,6 +60,11 @@ const FeedCard = (props) => {
    const [reportText, setReportText] = useState("")
    const [sendReport, setSendReport] = useState(false)
   const videoRef = useRef(null)
+  const pathName = router.pathname
+
+  const isShowQuote =
+    props.hasQuote == true && pathName.indexOf("/post/[postid]") == 0
+
 
   const breakpointColumnsObj = {
     default: 2,
@@ -68,6 +73,7 @@ const FeedCard = (props) => {
 
   // console.log(props.hasQuote)
 
+  
   const PostText = () => {
       const allLinks = FindURL(props?.item?.text)
       let text = props?.item?.text
@@ -472,6 +478,19 @@ const FeedCard = (props) => {
             </Text>
           )}
 
+          {item?.text && item?.text != item?.linkData?.link && (
+            <Flex wordBreak={"break-word"} maxWidth={"100%"}>
+              <Text
+                pl={10}
+                mb={item?.images?.length == 0 ? 5 : 1}
+                pr={4}
+                fontSize={15}
+              >
+                <PostText />
+              </Text>
+            </Flex>
+          )}
+
           {item?.referPost && router.pathname != "/post/[postid]" && (
             <Flex
               onClick={(e) => {
@@ -487,6 +506,7 @@ const FeedCard = (props) => {
               border="1px"
               borderColor="gray.200"
               m={5}
+              mt={1}
               wrap={"wrap"}
               bg={useColorModeValue("gray.200", "#333")}
             >
@@ -498,18 +518,6 @@ const FeedCard = (props) => {
             </Flex>
           )}
 
-          {item?.text && item?.text != item?.linkData?.link && (
-            <Flex wordBreak={"break-word"} maxWidth={"100%"}>
-              <Text
-                pl={10}
-                mb={item?.images?.length == 0 ? 5 : 1}
-                pr={4}
-                fontSize={15}
-              >
-                 <PostText />
-              </Text>
-            </Flex>
-          )}
           {item?.tags && (
             <Flex marginLeft={10} gap={5}>
               {item?.tags.map((item, inx) => {
@@ -637,7 +645,7 @@ const FeedCard = (props) => {
           )}
 
           {/* this is for extras */}
-          {/* {props.hasQuote == true && (
+          {isShowQuote && (
             <Flex
               mt={2}
               mb={8}
@@ -656,7 +664,7 @@ const FeedCard = (props) => {
             >
               <SingleFeed item={item.referPost} />
             </Flex>
-          )} */}
+          )}
 
           {/* footer of a post */}
 
