@@ -11,7 +11,11 @@ const RssFeed = () => {
     }, [])
 
   return (
-    <>
+    <Flex
+      minHeight={"100vh"}
+      maxWidth={"90%"}
+      overflow="auto"
+    >
       {isLoading ? (
         <Flex
           alignItems={"center"}
@@ -28,11 +32,13 @@ const RssFeed = () => {
               Please Check feeds first.
             </Text>
           ) : (
-            <Text>{JSON.stringify(rssFeed, undefined, 2)} </Text>
+            <Text maxWidth={"85%"} wordBreak={"break-all"}>
+              {JSON.stringify(rssFeed, undefined, 2)}{" "}
+            </Text>
           )}
         </>
       )}
-    </>
+    </Flex>
   )
 }
 

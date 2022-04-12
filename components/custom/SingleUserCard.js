@@ -169,46 +169,52 @@ const SingleUserCard = ({ user, userData }) => {
           </Text>
         </Flex>
 
-        <Flex
-          gap={5}
-          alignItems="center"
-          justifyContent="center"
-          cursor="pointer"
-        >
-          {!currentUser?.blockedBy?.includes(userData?._id) && (
+        {currentUser?._id == userInfo?._id && (
+          <Button bg="buttonColor" size="sm" onClick={() => router.push(`/account/myaccount/${userInfo?._id}`)}  >My Account</Button>
+        )}
+
+        {currentUser?._id != userInfo?._id && (
+          <Flex
+            gap={5}
+            alignItems="center"
+            justifyContent="center"
+            cursor="pointer"
+          >
+            {!currentUser?.blockedBy?.includes(userData?._id) && (
+              <Button
+                onClick={
+                  currentUser?.follower?.includes(userData?._id)
+                    ? unFollowHandler
+                    : followHandler
+                }
+                bg="buttonColor"
+                size={"sm"}
+                fontSize={14}
+                isLoading={followLoading || isLoading}
+              >
+                {currentUser?.follower?.includes(userData?._id)
+                  ? "Unfollow"
+                  : "Follow"}
+              </Button>
+            )}
+
             <Button
               onClick={
-                currentUser?.follower?.includes(userData?._id)
-                  ? unFollowHandler
-                  : followHandler
+                currentUser?.blockedBy?.includes(userData?._id)
+                  ? unblockHandler
+                  : blockHandler
               }
               bg="buttonColor"
               size={"sm"}
               fontSize={14}
-              isLoading={followLoading || isLoading}
+              isLoading={isBlocking || isUnblocking}
             >
-              {currentUser?.follower?.includes(userData?._id)
-                ? "Unfollow"
-                : "Follow"}
+              {currentUser?.blockedBy?.includes(userData?._id)
+                ? "Unblocke"
+                : "Block"}
             </Button>
-          )}
-
-          <Button
-            onClick={
-              currentUser?.blockedBy?.includes(userData?._id)
-                ? unblockHandler
-                : blockHandler
-            }
-            bg="buttonColor"
-            size={"sm"}
-            fontSize={14}
-            isLoading={isBlocking || isUnblocking}
-          >
-            {currentUser?.blockedBy?.includes(userData?._id)
-              ? "Unblocke"
-              : "Block"}
-          </Button>
-        </Flex>
+          </Flex>
+        )}
       </Flex>
     </>
   )
