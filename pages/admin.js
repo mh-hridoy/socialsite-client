@@ -268,8 +268,11 @@ const Admin = () => {
       ) : (
         <>
           <WithHeader headerName="List of Users And Controls!">
-            <Tabs isFitted variant="enclosed">
-              <TabList mb="1em">
+            <Tabs>
+              <TabList
+                
+                mb="1em"
+              >
                 <Tab _focus={{ boxShadow: "none" }}>Users</Tab>
                 <Tab _focus={{ boxShadow: "none" }}>Reports</Tab>
               </TabList>
@@ -281,7 +284,8 @@ const Admin = () => {
                   widht="100%"
                 >
                   <Button
-                  size={"sm"} fontSize={15}
+                    size={"sm"}
+                    fontSize={15}
                     bg="buttonColor"
                     onClick={() => setOpenCreateModal(true)}
                   >
@@ -373,17 +377,21 @@ const Admin = () => {
                               </a>
                             ) : report?.reportedPost?.type == "comment" ? (
                               <a
-                                onClick={() => router.push(
-                                  `/post/comment/${report?.reportedPost?._id}`
-                                )}
+                                onClick={() =>
+                                  router.push(
+                                    `/post/comment/${report?.reportedPost?._id}`
+                                  )
+                                }
                               >
                                 Post
                               </a>
                             ) : (
                               <a
-                                onClick={() => router.push(
-                                  `/post/${report?.reportedPost?._id}`
-                                )}
+                                onClick={() =>
+                                  router.push(
+                                    `/post/${report?.reportedPost?._id}`
+                                  )
+                                }
                               >
                                 Post
                               </a>

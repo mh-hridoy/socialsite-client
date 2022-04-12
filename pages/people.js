@@ -28,7 +28,7 @@ const PeoplePage = () => {
     setFetchBlocked(true)
   }, [])
 
-    const { _ } = useHttp({
+    const { isLoading: userDataLoading } = useHttp({
       fetchNow: fetchData,
       setFetchNow: setFetchData,
       url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-users/${userData?._id}`,
@@ -41,7 +41,7 @@ const PeoplePage = () => {
     })
 
 
-    const { isLoading: _blockedData } = useHttp({
+    const { isLoading: blockedDataLoading } = useHttp({
       fetchNow: fetchBlocked,
       setFetchNow: setFetchBlocked,
       url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-blocked-users/${userData?._id}`,
@@ -70,7 +70,11 @@ const PeoplePage = () => {
           ) : (
             <WithHeader headerName="People you may know">
               {/* tabs will be here for all peopl eand blocked people */}
-              <Tabs isFitted variant="enclosed">
+              <Tabs
+                borderRight={"1px"}
+                borderLeft={"1px"}
+                borderColor={useColorModeValue("gray.200", "#333")}
+              >
                 <TabList mb="1em">
                   <Tab _focus={{ boxShadow: "none" }}>People</Tab>
                   <Tab _focus={{ boxShadow: "none" }}>Blocked List</Tab>
@@ -83,6 +87,16 @@ const PeoplePage = () => {
                     widht="100%"
                     minHeight={"100vh"}
                   >
+                    {userDataLoading && (
+                      <Flex
+                        height="100vh"
+                        alignItems={"center"}
+                        justifyContent="center"
+                        width={"100%"}
+                      >
+                        <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
+                      </Flex>
+                    )}
                     <Flex
                       widht="100%"
                       overflowX="hidden"
@@ -100,6 +114,19 @@ const PeoplePage = () => {
                           />
                         )
                       })}
+
+                      {!userDataLoading && users?.length == 0 && (
+                        <Flex
+                          height={"80vh"}
+                          width="100%"
+                          alignItems={"center"}
+                          justifyContent={"center"}
+                        >
+                          <Text fontSize={14} opacity={0.8}>
+                            Nothing to show!
+                          </Text>
+                        </Flex>
+                      )}
                     </Flex>
                   </TabPanel>
                   <TabPanel
@@ -108,6 +135,16 @@ const PeoplePage = () => {
                     borderColor={useColorModeValue("gray.200", "#333")}
                     minHeight={"100vh"}
                   >
+                    {blockedDataLoading && (
+                      <Flex
+                        height="100vh"
+                        alignItems={"center"}
+                        justifyContent="center"
+                        width={"100%"}
+                      >
+                        <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
+                      </Flex>
+                    )}
                     <Flex
                       widht="100%"
                       overflowX="hidden"
@@ -125,6 +162,18 @@ const PeoplePage = () => {
                           />
                         )
                       })}
+                      {!blockedDataLoading && blockedUser?.length == 0 && (
+                        <Flex
+                          height={"80vh"}
+                          width="100%"
+                          alignItems={"center"}
+                          justifyContent={"center"}
+                        >
+                          <Text fontSize={14} opacity={0.8}>
+                            Nothing to show!
+                          </Text>
+                        </Flex>
+                      )}
                     </Flex>
                   </TabPanel>
                 </TabPanels>

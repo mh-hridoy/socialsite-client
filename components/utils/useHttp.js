@@ -34,7 +34,8 @@ const useHttp = ({
   ecb = null,
   rcb = null,
   isSetDefault = true,
-  extraLoad = null
+  extraLoad = null,
+  dispatchType= null
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const token = useSelector((state) => state.user.token)
@@ -119,11 +120,33 @@ const useHttp = ({
             localStorage.removeItem("user")
           }
 
-          if (isDispatch && dispatchFunc !== null && !outDispatch) {
+          if (
+            isDispatch &&
+            dispatchFunc !== null &&
+            !outDispatch &&
+            dispatchType == null
+          ) {
             dispatch(dispatchFunc(data))
+          } 
+          
+          if (
+            isDispatch &&
+            dispatchFunc !== null &&
+            !outDispatch &&
+            dispatchType == "changeData"
+          ) {
+            dispatch(dispatchFunc({...data}))
+            const totalUserData = {user: data, token }
+            localStorage.setItem("user", JSON.stringify(totalUserData))
+
           }
 
-          if (isDispatch && dispatchFunc !== null && outDispatch) {
+          if (
+            isDispatch &&
+            dispatchFunc !== null &&
+            outDispatch &&
+            dispatchType == null
+          ) {
             dispatch(dispatchFunc({ user: null, toke: "" }))
           }
 

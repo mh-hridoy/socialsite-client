@@ -5,6 +5,7 @@ import {
   Text,
   TagLabel,
   Tag,
+  Link,
 } from "@chakra-ui/react"
 
 import Masonry from "react-masonry-css"
@@ -13,9 +14,10 @@ import { MdVerified } from "react-icons/md"
 import _ from "underscore"
 import timeAgo from "../utils/DateConverter"
 import LinkPreview from "./LinkPreview"
+import { find as FindURL } from "linkifyjs"
+import parse from "html-react-parser"
 
-
-const SingleFeed = ({ item, linkData }) => {
+const SingleFeed = ({ item, linkData, showLink }) => {
   const videoRef = useRef(null)
   const breakpointColumnsObj = {
     default: 2,
@@ -24,6 +26,29 @@ const SingleFeed = ({ item, linkData }) => {
 
   if (item == null) {
     return <Text p={4}>Post deleted</Text>
+  }
+
+  const PostText = () => {
+    const allLinks = FindURL(item?.text)
+    let text = item?.text
+
+    if (allLinks.length != 0) {
+      allLinks.forEach((link) => {
+        const indexOfUrl = text.indexOf(link.value)
+        if (indexOfUrl >= 0) {
+          text =
+            text.substring(0, indexOfUrl) +
+            `<a href=${link.value} target="_blank">` +
+            text.substring(indexOfUrl, indexOfUrl + link.value.length) +
+            "</a>" +
+            text.substring(indexOfUrl + link.value.length)
+        }
+      })
+    } else {
+      text = `<p>${text}</p>`
+    }
+
+    return <div> {parse(text)} </div>
   }
 
   return (
@@ -66,7 +91,7 @@ const SingleFeed = ({ item, linkData }) => {
         </Flex>
 
         <Text pl={10} pr={4} fontSize={15}>
-          {item?.text}
+          <PostText />
         </Text>
 
         {item?.tags && (
@@ -147,8 +172,7 @@ const SingleFeed = ({ item, linkData }) => {
             </>
           </Flex>
         )}
-
-
+        {showLink && <LinkPreview item={linkData} />}
       </Flex>
     </Flex>
   )

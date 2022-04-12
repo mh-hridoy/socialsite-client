@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Flex,
   Avatar,
@@ -15,6 +15,11 @@ import {
   Textarea,
   Spinner,
   FormControl,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
 } from "@chakra-ui/react"
 import {
   MdVerified,
@@ -23,7 +28,7 @@ import {
 } from "react-icons/md"
 import dateFormat from "dateformat"
 import AllPost from "../custom/AllPost"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useRouter } from "next/router"
 import { MdOutlineFlipCameraIos } from "react-icons/md"
 import Resizer from "react-image-file-resizer"
@@ -31,6 +36,12 @@ import ReactCrop from "react-image-crop"
 import countReaction from "../utils/countReaction"
 import useHttp from "../utils/useHttp"
 import SingleUserCard from "../custom/SingleUserCard"
+import countyCode from '../utils/countyCode'
+import Select from "react-select"
+import Creatable from "react-select/creatable"
+
+import {changeData} from '../../store/userInfoSlice'
+import FeedCard from '../custom/FeedCard'
 
 const UserAccount = ({
   post,
@@ -70,6 +81,13 @@ const UserAccount = ({
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportText, setReportText] = useState("")
   const [sendReport, setSendReport] = useState(false)
+  const [language, setLanguage] = useState({})
+  const [userTags,setUserTags] = useState([...user?.tagsArr])
+  const [tagsVal, setTagsVal] = useState([])
+  const [sniperPost, setSniperPost] = useState([])
+  const [searchSniper, setSearchSniper] = useState(false)
+
+  const isMyAccount = router.pathname == "/account/myaccount/[user]"
 
   const [crop, setCrop] = useState({
     unit: "%",
@@ -78,6 +96,70 @@ const UserAccount = ({
     width: 50,
     height: 70,
   })
+
+useEffect(() => {
+  setSearchSniper(true)
+}, [])
+
+  const { isLoading: _isSniperLoading } = useHttp({
+    fetchNow: searchSniper,
+    setFetchNow: setSearchSniper,
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/search-sniper/${userAccount?._id}`,
+    isAuth: true,
+    isSetData: true,
+    setData: setSniperPost,
+  })
+
+const selectOption = [
+  { value: "general", label: "General" },
+  { value: "technology", label: "Technology" },
+  { value: "development", label: "Development" },
+  { value: "programming", label: "Programming" },
+  { value: "places", label: "Places" },
+  { value: "universe", label: "Universe" },
+  { value: "nature", label: "Nature" },
+]
+
+const tagsHandler = (tag) => {
+  setUserTags(tag)
+  const tags = []
+  if (tag.length !== 0) {
+    tag.map((item) => tags.push(item.value))
+  }
+  setTagsVal(tags)
+}
+
+  const customStyles = {
+    option: (provided) => ({
+      ...provided,
+      padding: 10,
+      fontSize: 14,
+    }),
+    menu: (provided) => ({
+      ...provided,
+      color: "rgb(29, 155, 240)",
+      backgroundColor: useColorModeValue("#fff", "#1A202C"),
+    }),
+    control: () => ({
+      marginBottom: 10,
+      display: "flex",
+      border: `1px solid ${useColorModeValue("#EDF", "#ffffff44")}`,
+      borderRadius: "5px",
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      fontSize: 14,
+      opacity: 0.6,
+    }),
+
+    singleValue: (provided, state) => {
+      const opacity = state.isDisabled ? 0.5 : 1
+      const transition = "opacity 300ms"
+      const color = useColorModeValue("#000", "#fff")
+
+      return { ...provided, opacity, transition, color }
+    },
+  }
 
   // console.log(cropProfileImage)
 
@@ -178,6 +260,11 @@ const UserAccount = ({
     setProfileModalOpen(false)
   }
 
+  const languageHandler = (e) => {
+    setLanguage(e)
+  }
+
+
   const { isLoading: manageLoading } = useHttp({
     fetchNow: userDataRequest,
     setFetchNow: setUserDataRequest,
@@ -188,6 +275,9 @@ const UserAccount = ({
     isSetData: true,
     setData: setUserData,
     isEToast: true,
+    isDispatch: true,
+    dispatchType: "changeData",
+    dispatchFunc: changeData,
     cb: () => {
       setNameValue("")
       setCoverImage(null)
@@ -199,6 +289,8 @@ const UserAccount = ({
     ecb: () => setIsModalOpen(!isModalOpen),
   })
 
+
+
   const userDataHandler = async () => {
     const userData = {
       profileImage,
@@ -208,6 +300,9 @@ const UserAccount = ({
       locationValue,
       dateOfBirthValue,
       webSiteLinkValue,
+      language,
+      tagsArr: userTags,
+      tags: tagsVal
     }
     setUserUploadedData(userData)
     setUserDataRequest(true)
@@ -509,6 +604,31 @@ const UserAccount = ({
                 onChange={(e) => setWebSiteLinkValue(e.target.value)}
                 id="websiteLink"
               />
+
+              <FormControl htmlFor="language"> Language </FormControl>
+              <Select
+                defaultValue={{
+                  value: user?.userLangVal,
+                  label: user?.userLang,
+                  nativeName: user?.userLangNative,
+                }}
+                styles={customStyles}
+                placeholder="Select Language..."
+                options={countyCode}
+                id="language"
+                onChange={languageHandler}
+              />
+
+              <FormControl htmlFor="tags"> Your Tags </FormControl>
+              <Creatable
+                styles={customStyles}
+                placeholder="Select or Create your tags..."
+                id="tags"
+                value={userTags}
+                isMulti={true}
+                onChange={tagsHandler}
+                options={selectOption}
+              />
             </Flex>
           </Flex>
         </ModalContent>
@@ -654,6 +774,14 @@ const UserAccount = ({
               </Text>{" "}
             </Flex>
           )}
+          {user?.userLang && (
+            <Flex gap={2}>
+              <Text fontSize={14}>Language : </Text>
+              <Text fontSize={14} opacity={0.8}>
+                {user?.userLang}
+              </Text>{" "}
+            </Flex>
+          )}
 
           <Flex mt={5} gap={5}>
             <Text
@@ -686,21 +814,61 @@ const UserAccount = ({
           </Flex>
         </Flex>
 
-        <Text mr={5} p={2} mt={3} fontWeight={600}>
-          Feeds:
-        </Text>
-        <AllPost
-          quoteData={quoteData}
-          setQuoteData={setQuoteData}
-          isCreateModalOpen={isCreateModalOpen}
-          setIsCreateModalOpen={setIsCreateModalOpen}
-          setPage={setPage}
-          totalPage={totalPage}
-          page={page}
-          post={post}
-          setHomeData={setHomeData}
-          user={user}
-        />
+        {/* tabs will be here */}
+        <Tabs>
+          <TabList>
+            <Tab _focus={{ boxShadow: "none" }}>Feeds</Tab>
+            {isMyAccount && <Tab _focus={{ boxShadow: "none" }}>Sniper</Tab>}
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <AllPost
+                quoteData={quoteData}
+                setQuoteData={setQuoteData}
+                isCreateModalOpen={isCreateModalOpen}
+                setIsCreateModalOpen={setIsCreateModalOpen}
+                setPage={setPage}
+                totalPage={totalPage}
+                page={page}
+                post={post}
+                setHomeData={setHomeData}
+                user={user}
+              />
+            </TabPanel>
+            {isMyAccount && (
+              <TabPanel>
+                {searchSniper && (
+                  <Flex
+                    height="100vh"
+                    alignItems={"center"}
+                    justifyContent="center"
+                    width={"100%"}
+                  >
+                    <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
+                  </Flex>
+                )}
+
+                {!searchSniper && sniperPost.length != 0 && (
+                  <Flex minWidth={"100%"} direction="column">
+                    {sniperPost.map((item, inx) => {
+                      return (
+                        <FeedCard
+                          key={inx}
+                          quoteData={quoteData}
+                          setQuoteData={setQuoteData}
+                          isCreateModalOpen={isCreateModalOpen}
+                          setIsCreateModalOpen={setIsCreateModalOpen}
+                          setHomeData={setHomeData}
+                          item={item}
+                        />
+                      )
+                    })}
+                  </Flex>
+                )}
+              </TabPanel>
+            )}
+          </TabPanels>
+        </Tabs>
       </Flex>
     </>
   )

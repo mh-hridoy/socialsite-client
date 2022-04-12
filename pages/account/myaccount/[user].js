@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react"
-import { Flex, useToast, Spinner, Text } from "@chakra-ui/react"
+import {
+  Flex,
+  useToast,
+  Spinner,
+  Text,
+  
+} from "@chakra-ui/react"
 import UserAccount from "../../../components/base/UserAccount"
 import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/router"

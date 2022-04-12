@@ -28,7 +28,6 @@ import Masonry from "react-masonry-css"
 import GalleryModal from "./GalleryModal"
 import { useRouter } from "next/router"
 import { useSelector } from "react-redux"
-import CommentsOfFeed from "./CommentsOfFeed"
 import { MdVerified } from "react-icons/md"
 import _ from "underscore"
 import timeAgo from "../utils/DateConverter"
@@ -37,9 +36,10 @@ import countReaction from "../utils/countReaction"
 import useHttp from "../utils/useHttp"
 import SingleFeed from "../custom/SingleFeed"
 import LinkPreview from "./LinkPreview"
-import {find as FindURL} from 'linkifyjs'
+import { find as FindURL } from "linkifyjs"
 import parse from "html-react-parser"
-
+import LanguageDetect from "languagedetect"
+import axios from 'axios'
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -55,47 +55,87 @@ const FeedCard = (props) => {
   const [reactRequest, setReactRequest] = useState(false)
   const [unlikeRequest, setUnlikeRequest] = useState(false)
   const [sendUnshareRequest, setSendUnshareRequest] = useState(false)
-  const [adminDeleteNow,setAdminDeleteNow] = useState(false)
-   const [showReportModal, setShowReportModal] = useState(false)
-   const [reportText, setReportText] = useState("")
-   const [sendReport, setSendReport] = useState(false)
+  const [adminDeleteNow, setAdminDeleteNow] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportText, setReportText] = useState("")
+  const [sendReport, setSendReport] = useState(false)
+  const [postLanguage, setPostLanguage] = useState(null)
+  const [isOpenTranslate, setIsOpenTranslate] = useState(false)
+  const [getTranslate, setGetTranslate] = useState(false)
+  const [translateText, setTranslateText] = useState("")
   const videoRef = useRef(null)
   const pathName = router.pathname
+  const lngDetector = new LanguageDetect()
 
   const isShowQuote =
     props.hasQuote == true && pathName.indexOf("/post/[postid]") == 0
-
 
   const breakpointColumnsObj = {
     default: 2,
     700: 1,
   }
 
-  // console.log(props.hasQuote)
+  useEffect(() => {
+    if (getTranslate == true) {
+      const getTrans = async () => {
+        try {
+          const {data} = await axios.post(
+            "https://libretranslate.de/translate",
+            { q: props?.item?.text, source: "auto", target: user?.userLangVal },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "accept",
+                Authorization: "authorize",
+              },
+            }
+          )
+          setGetTranslate(false)
+          setTranslateText(data?.translatedText)
+        } catch (e) {
+                    setGetTranslate(false)
 
-  
-  const PostText = () => {
-      const allLinks = FindURL(props?.item?.text)
-      let text = props?.item?.text
-
-      if (allLinks.length != 0) {
-        allLinks.forEach((link) => {
-          const indexOfUrl = text.indexOf(link.value)
-          if (indexOfUrl >= 0) {
-            text =
-              text.substring(0, indexOfUrl) +
-              `<a href=${link.value} target="_blank">` +
-              text.substring(indexOfUrl, indexOfUrl + link.value.length) +
-              "</a>" +
-              text.substring(indexOfUrl + link.value.length)
-          }
-        })
-      }else{
-        text = `<p>${text}</p>`
+          const errorMsg = e.response
+            ? e.response.data.message
+            : "Something went wrong!!!"
+          setTranslateText(errorMsg)
+        }
       }
 
-      return <div> {parse(text)} </div>
-    
+      getTrans()
+    }
+  }, [getTranslate == true])
+
+  // console.log(props.hasQuote)
+
+  useEffect(() => {
+    if (props?.item?.text) {
+      const postLlang = lngDetector.detect(props?.item?.text)
+      setPostLanguage(postLlang[0][0])
+    }
+  }, [props?.item?.text])
+
+  const PostText = () => {
+    const allLinks = FindURL(props?.item?.text)
+    let text = props?.item?.text
+
+    if (allLinks.length != 0) {
+      allLinks.forEach((link) => {
+        const indexOfUrl = text.indexOf(link.value)
+        if (indexOfUrl >= 0) {
+          text =
+            text.substring(0, indexOfUrl) +
+            `<a href=${link.value} target="_blank">` +
+            text.substring(indexOfUrl, indexOfUrl + link.value.length) +
+            "</a>" +
+            text.substring(indexOfUrl + link.value.length)
+        }
+      })
+    } else {
+      text = `<p>${text}</p>`
+    }
+
+    return <div> {parse(text)} </div>
   }
 
   // console.log(PostText)
@@ -252,31 +292,30 @@ const FeedCard = (props) => {
   const deleteByAdmin = () => {
     setPostDeleteId(item._id)
     setAdminDeleteNow(true)
-    
   }
 
-   const { isLoading: reportLoading } = useHttp({
-     fetchNow: sendReport,
-     setFetchNow: setSendReport,
-     method: "post",
-     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/report/${user?._id}`,
-     body: {
-       reason: reportText,
-       reportUser: item?.user?._id,
-       reportedPost: item?._id,
-     },
-     isAuth: true,
-     isToast: true,
-     isEToast: true,
-     cb: () => {
-       setReportText("")
-       setShowReportModal(false)
-     },
-   })
+  const { isLoading: reportLoading } = useHttp({
+    fetchNow: sendReport,
+    setFetchNow: setSendReport,
+    method: "post",
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/report/${user?._id}`,
+    body: {
+      reason: reportText,
+      reportUser: item?.user?._id,
+      reportedPost: item?._id,
+    },
+    isAuth: true,
+    isToast: true,
+    isEToast: true,
+    cb: () => {
+      setReportText("")
+      setShowReportModal(false)
+    },
+  })
 
-   const reportHandler = () => {
-     setShowReportModal(true)
-   }
+  const reportHandler = () => {
+    setShowReportModal(true)
+  }
 
   return (
     <>
@@ -450,7 +489,6 @@ const FeedCard = (props) => {
               </Flex>
             </div>
           </Flex>
-
           {item?.postType == "comment" && (
             <Text
               pl={10}
@@ -477,7 +515,6 @@ const FeedCard = (props) => {
               </Text>{" "}
             </Text>
           )}
-
           {item?.text && item?.text != item?.linkData?.link && (
             <Flex wordBreak={"break-word"} maxWidth={"100%"}>
               <Text
@@ -490,7 +527,6 @@ const FeedCard = (props) => {
               </Text>
             </Flex>
           )}
-
           {item?.referPost && router.pathname != "/post/[postid]" && (
             <Flex
               onClick={(e) => {
@@ -510,16 +546,24 @@ const FeedCard = (props) => {
               wrap={"wrap"}
               bg={useColorModeValue("gray.200", "#333")}
             >
-              <SingleFeed item={item.referPost} />
-              {item.referPost?.linkData != undefined &&
-                item.referPost?.linkData.image?.img && (
-                  <LinkPreview item={item.referPost?.linkData} />
-                )}
+              <SingleFeed
+                showLink={
+                  item.referPost?.linkData != undefined &&
+                  item.referPost?.linkData.image?.img
+                }
+                linkData={item.referPost?.linkData}
+                item={item.referPost}
+              />
+
+              {/* <LinkPreview item={item.referPost?.linkData} /> */}
             </Flex>
           )}
-
-          {item?.tags && (
-            <Flex marginLeft={10} gap={5}>
+          {item?.tags?.length != 0 && (
+            <Flex
+              mb={item?.images?.length != 0 ? 2 : 10}
+              marginLeft={10}
+              gap={5}
+            >
               {item?.tags.map((item, inx) => {
                 return (
                   <Tag
@@ -535,6 +579,46 @@ const FeedCard = (props) => {
               })}
             </Flex>
           )}
+          {user?.userLang && user?.userLang?.toLowerCase() != postLanguage && (
+            <Flex
+              onClick={(e) => {
+                e.stopPropagation()
+                setIsOpenTranslate(!isOpenTranslate)
+                setGetTranslate(true)
+              }}
+              mb={isOpenTranslate ? 1 : 4}
+              fontSize={12}
+              ml={10}
+            >
+              <a>{isOpenTranslate ? "Hide" : "See"} translation</a>
+            </Flex>
+          )}
+
+          {isOpenTranslate && (
+            <Flex
+              p={2}
+              rounded="md"
+              mb={6}
+              ml={10}
+              bg={useColorModeValue("gray.200", "#333")}
+            >
+              {getTranslate && (
+                <Flex
+                  width="100%"
+                  alignItems={"center"}
+                  justifyContent="center"
+                >
+                  <Spinner color={"rgb(29, 155, 240)"} size={"sm"} />
+                </Flex>
+              )}
+              {!getTranslate && (
+                <Text fontSize={14} wordBreak={"break-word"}>
+                  {translateText}
+                </Text>
+              )}
+            </Flex>
+          )}
+
           {item?.images && item?.images.length !== 0 && (
             <Flex
               py={3}
@@ -624,7 +708,6 @@ const FeedCard = (props) => {
               </>
             </Flex>
           )}
-
           {item?.linkData && item?.linkData?.title && (
             <Flex
               alignSelf={"center"}
@@ -643,7 +726,6 @@ const FeedCard = (props) => {
               <LinkPreview item={item?.linkData} />
             </Flex>
           )}
-
           {/* this is for extras */}
           {isShowQuote && (
             <Flex
@@ -665,9 +747,7 @@ const FeedCard = (props) => {
               <SingleFeed item={item.referPost} />
             </Flex>
           )}
-
           {/* footer of a post */}
-
           {user != null && (
             <Flex
               onClick={(e) => e.stopPropagation()}

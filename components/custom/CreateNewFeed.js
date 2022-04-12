@@ -19,8 +19,9 @@ import Resizer from "react-image-file-resizer"
 import { AiOutlineDelete } from "react-icons/ai"
 import axios from "axios"
 import { useSelector } from "react-redux"
-import Select from "react-select"
+// import Select from "react-select"
 import SingleFeed from "./SingleFeed"
+import Creatable from "react-select/creatable"
 
 const CreateNewFeed = ({
   name,
@@ -40,7 +41,7 @@ const CreateNewFeed = ({
   const toast = useToast({ position: "top", isClosable: true })
   const token = useSelector((state) => state.user.token)
   const user = useSelector((state) => state.user.user)
-  const [selectedTag, setSelectedTag] = useState([])
+  const [selectedTag, setSelectedTag] = useState(null)
   const textAreaRef = useRef(null)
 
   const selectOption = [
@@ -165,8 +166,8 @@ const CreateNewFeed = ({
   const postHandler = async () => {
     setIsLoading(true)
     const tags = []
-    if (selectedTag.length !== 0) {
-      selectedTag.map((item) => tags.push(item.value))
+    if (selectedTag?.length !== 0) {
+      selectedTag?.map((item) => tags.push(item.value))
     }
 
     if (feedText || images.length !== 0) {
@@ -188,7 +189,7 @@ const CreateNewFeed = ({
             withCredentials: true,
           }
         )
-        
+
         if (setIsModalOpen != undefined) {
           setIsModalOpen(false)
           const oldData = [...homeData]
@@ -203,7 +204,7 @@ const CreateNewFeed = ({
         setImages([])
         setFeedText("")
         setQuoteData(null)
-        setSelectedTag([])
+        setSelectedTag(null)
         setIsLoading(false)
         toast({
           status: "success",
@@ -251,6 +252,7 @@ const CreateNewFeed = ({
     }),
     control: () => ({
       marginBottom: 10,
+      display: "flex",
     }),
     placeholder: (provided) => ({
       ...provided,
@@ -297,16 +299,16 @@ const CreateNewFeed = ({
             width={"100%"}
             resize="none"
           />
-
-          <Select
+          <Creatable
             styles={customStyles}
             input={{ backgroundColor: "rgb(29, 155, 240)" }}
             placeholder="Select tags..."
             onChange={(e) => setSelectedTag(e)}
+            value={selectedTag}
             isMulti={true}
+            // isSearchable={false}
             options={selectOption}
           />
-
           {isModalOpen && quoteData && (
             <Flex
               boxShadow={"sm"}
@@ -315,9 +317,18 @@ const CreateNewFeed = ({
               borderColor="gray.200"
               m={5}
               wrap={"wrap"}
+              maxHeight={300}
+              overflow="auto"
               bg={useColorModeValue("gray.200", "#333")}
             >
-              <SingleFeed item={quoteData} />
+              <SingleFeed
+                showLink={
+                  quoteData?.linkData != undefined &&
+                  quoteData?.linkData.image?.img
+                }
+                linkData={quoteData?.linkData}
+                item={quoteData}
+              />
             </Flex>
           )}
         </Flex>
