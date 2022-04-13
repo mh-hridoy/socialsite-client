@@ -760,7 +760,11 @@ const tagsHandler = (tag) => {
           {user?.websiteLink && (
             <Flex gap={2}>
               <Text fontSize={14}>Website : </Text>
-              <a fontSize={14} opacity={0.8}>
+              <a
+                onClick={() => window.open(user?.websiteLink)}
+                fontSize={14}
+                opacity={0.8}
+              >
                 {user?.websiteLink}
               </a>{" "}
             </Flex>

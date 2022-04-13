@@ -210,7 +210,7 @@ const SingleUserCard = ({ user, userData }) => {
               isLoading={isBlocking || isUnblocking}
             >
               {currentUser?.blockedBy?.includes(userData?._id)
-                ? "Unblocke"
+                ? "Unblock"
                 : "Block"}
             </Button>
           </Flex>
