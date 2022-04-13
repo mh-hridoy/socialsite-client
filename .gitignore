@@ -4,6 +4,9 @@
 /node_modules
 /.pnp
 .pnp.js
+__test__
+jest.config.js
+cypress
 
 # testing
 /coverage
@@ -11,6 +14,7 @@
 # next.js
 /.next/
 /out/
+
 
 # production
 /build

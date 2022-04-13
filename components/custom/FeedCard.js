@@ -79,13 +79,13 @@ const FeedCard = (props) => {
     if (getTranslate == true) {
       const getTrans = async () => {
         try {
-          const {data} = await axios.post(
-            "https://libretranslate.de/translate",
+          const { data } = await axios.post(
+            "https://translate.argosopentech.com/translate",
             { q: props?.item?.text, source: "auto", target: user?.userLangVal },
             {
               headers: {
                 "Content-Type": "application/json",
-                Accept: "accept",
+                Accept: "*",
                 Authorization: "authorize",
               },
             }

@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "jest --watch",
+    "cypress": "cypress open",
+    "test2": "start-server-and-test start http://localhost:3000 cypress"
   },
   "dependencies": {
     "@badrap/bar-of-progress": "^0.1.2",
@@ -38,7 +41,14 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@testing-library/cypress": "^8.0.2",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^12.1.4",
+    "@testing-library/user-event": "^14.1.0",
+    "cypress": "^9.5.4",
     "eslint": "8.11.0",
-    "eslint-config-next": "12.1.0"
+    "eslint-config-next": "12.1.0",
+    "jest": "^27.5.1",
+    "start-server-and-test": "^1.14.0"
   }
 }

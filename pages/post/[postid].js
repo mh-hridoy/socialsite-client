@@ -131,7 +131,19 @@ const PostId = (props) => {
             </Flex>
           ) : (
             <WithHeader headerName="Feed">
-              <SingleFeed totalComment={allComments.length} item={item} />
+              <SingleFeed
+                quoteData={props.quoteData}
+                totalComment={allComments?.length}
+                setQuoteData={props.setQuoteData}
+                isCreateModalOpen={props.isCreateModalOpen}
+                setIsCreateModalOpen={props.setIsCreateModalOpen}
+                setHomeData={props.setHomeData}
+                comments={allComments}
+                setComments={setAllComments}
+                setPost={setItem}
+                postId={item?._id}
+                item={item}
+              />
               <CommentsOfFeed
                 quoteData={props.quoteData}
                 totalComment={allComments?.length}
