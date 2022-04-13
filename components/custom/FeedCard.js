@@ -111,7 +111,9 @@ const FeedCard = (props) => {
   useEffect(() => {
     if (props?.item?.text) {
       const postLlang = lngDetector.detect(props?.item?.text)
-      setPostLanguage(postLlang[0][0])
+      if(postLlang.length != 0){
+        setPostLanguage(postLlang[0][0])
+      }
     }
   }, [props?.item?.text])
 
@@ -579,20 +581,20 @@ const FeedCard = (props) => {
               })}
             </Flex>
           )}
-          {user?.userLang && user?.userLang?.toLowerCase() != postLanguage && (
-            <Flex
-              onClick={(e) => {
-                e.stopPropagation()
-                setIsOpenTranslate(!isOpenTranslate)
-                setGetTranslate(true)
-              }}
-              mb={isOpenTranslate ? 1 : 4}
-              fontSize={12}
-              ml={10}
-            >
-              <a>{isOpenTranslate ? "Hide" : "See"} translation</a>
-            </Flex>
-          )}
+          {item?.text != " " && item?.text != item?.linkData?.link && user?.userLang && user?.userLang?.toLowerCase() != postLanguage && (
+                <Flex
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIsOpenTranslate(!isOpenTranslate)
+                    setGetTranslate(true)
+                  }}
+                  mb={isOpenTranslate ? 1 : 4}
+                  fontSize={12}
+                  ml={10}
+                >
+                  <a>{isOpenTranslate ? "Hide" : "See"} translation</a>
+                </Flex>
+              )}
 
           {isOpenTranslate && (
             <Flex
