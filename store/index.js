@@ -33,9 +33,9 @@ const StoreProvider = (props) => {
     // console.log(error)
     // Your account is disabled
     if (
-      res.status === 401 ||
-      res.data.message.indexOf("invalid token") == 0 ||
-      res.data.message.indexOf("Your account is disabled. please contatct support") == 0 ||
+      res?.status == 401 ||
+      res?.data.message.indexOf("invalid token") == 0 ||
+      res?.data.message.indexOf("Your account is disabled. please contatct support") == 0 ||
       res.data.message.indexOf("jwt expired") == 0 &&
         res.config &&
         !res.config.__isRetryRequest
