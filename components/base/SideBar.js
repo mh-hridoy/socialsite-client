@@ -9,14 +9,15 @@ import {
   Text,
   Show,
   Button,
- Modal,
-ModalOverlay,
-ModalContent,
-ModalCloseButton
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  Badge,
+  ModalCloseButton,
 } from "@chakra-ui/react"
 
 import { useRouter } from "next/router"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   MdHome,
   MdOutlineRssFeed,
@@ -26,19 +27,64 @@ import {
   MdOutlineAccountCircle,
   MdPeopleOutline,
   MdSearch,
+  MdNotificationsNone,
 } from "react-icons/md"
 import { BsSun } from "react-icons/bs"
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import useHttp from "../utils/useHttp"
 import { logout } from "../../store/userInfoSlice"
+import { storeData, manageData} from "../../store/notificationSlice"
 import CreateNewFeed from "../custom/CreateNewFeed"
+import axios from "axios"
+import io from "socket.io-client"
 
-const SideBar = ({ isModalOpen, setIsModalOpen, quoteData, setQuoteData, homeData, setHomeData }) => {
+const SideBar = ({
+  isModalOpen,
+  setIsModalOpen,
+  quoteData,
+  setQuoteData,
+  homeData,
+  setHomeData,
+}) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const router = useRouter()
   const user = useSelector((state) => state.user.user)
+  const token = useSelector((state) => state.user.token)
   const pathName = router.pathname
   const [logoutRequest, setLogoutRequest] = useState(false)
+  const dispatch = useDispatch()
+  
+  const unread = useSelector((state) => state.notifications.unread)
+
+  useEffect(() => {
+    if (user != null) {
+      const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
+        query: { token: token, userId: user?._id },
+      })
+      socket.on("notification", (data) => {
+        dispatch(manageData(data))
+      })
+
+      socket.on("connect_error", async (err) => {
+        if (err.message == "Authentication error") {
+          try {
+            await axios(`${process.env.NEXT_PUBLIC_MAIN_PROXY}/logout`)
+
+            dispatch(logout({ user: null, token: "" }))
+            localStorage.removeItem("user")
+
+            router.push("/login")
+          } catch (e) {
+            // console.log(e)
+          }
+        } else {
+          socket.connect()
+        }
+      })
+    }
+  }, [user != null])
+
+
 
   const item = [
     {
@@ -65,6 +111,12 @@ const SideBar = ({ isModalOpen, setIsModalOpen, quoteData, setQuoteData, homeDat
       uri: `/search`,
       path: `/search`,
     },
+    {
+      name: "Notifiactions",
+      Icon: MdNotificationsNone,
+      uri: `/notification`,
+      path: `/notification`,
+    },
 
     {
       name: "RSS Feed",
@@ -73,6 +125,30 @@ const SideBar = ({ isModalOpen, setIsModalOpen, quoteData, setQuoteData, homeDat
       path: `/rss-feed`,
     },
   ]
+
+  useEffect(() => {
+    if (user != null) {
+      const fetchNoti = async () => {
+        try {
+          const { data } = await axios.get(
+            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/get-noti/${user._id}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              withCredentials: true,
+            }
+          )
+          dispatch(storeData(data))
+        } catch (e) {
+          console.log(e)
+        }
+      }
+
+      fetchNoti()
+    }
+  }, [user != null])
 
   const { isLoading } = useHttp({
     fetchNow: logoutRequest,
@@ -98,7 +174,7 @@ const SideBar = ({ isModalOpen, setIsModalOpen, quoteData, setQuoteData, homeDat
         size={"xl"}
         isOpen={isModalOpen}
         onClose={() => {
-          setQuoteData(null);
+          setQuoteData(null)
           setIsModalOpen(!isModalOpen)
         }}
       >
@@ -106,14 +182,13 @@ const SideBar = ({ isModalOpen, setIsModalOpen, quoteData, setQuoteData, homeDat
         <ModalContent padding={10}>
           <ModalCloseButton _focus={{ boxShadow: "none" }} />
           <CreateNewFeed
-          homeData={homeData}
-          setHomeData={setHomeData}
-          quoteData={quoteData} 
-          setQuoteData = {setQuoteData}
+            homeData={homeData}
+            setHomeData={setHomeData}
+            quoteData={quoteData}
+            setQuoteData={setQuoteData}
             name="file2"
             isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}
-
           />
         </ModalContent>
       </Modal>
@@ -162,7 +237,34 @@ const SideBar = ({ isModalOpen, setIsModalOpen, quoteData, setQuoteData, homeDat
                   alignItems={"center"}
                   key={inx}
                 >
-                  <Icon size={26} /> <Show above="xl">{name}</Show>
+                  {path == "/notification" ? (
+                    <>
+                      <Text display={"flex"}>
+                        {" "}
+                        <Icon size={26} />
+                        {unread > 0 && (
+                          <Badge
+                            rounded={"full"}
+                            position={"absolute"}
+                            ml="1"
+                            colorScheme="red"
+                          >
+                            {unread}
+                          </Badge>
+                        )}
+                      </Text>
+                      <Show above="xl">{name}</Show>
+                    </>
+                  ) : (
+                    <>
+                      <Icon size={26}>
+                        <Badge ml="1" colorScheme="green">
+                          New
+                        </Badge>
+                      </Icon>
+                      <Show above="xl">{name}</Show>
+                    </>
+                  )}
                 </WrapItem>
               )
             })}
@@ -227,7 +329,7 @@ const SideBar = ({ isModalOpen, setIsModalOpen, quoteData, setQuoteData, homeDat
             py={2}
             alignItems="center"
             justifyContent={"center"}
-            gap={2}
+            gap={1}
             cursor="pointer"
             rounded="full"
             onClick={() => logoutHandler()}

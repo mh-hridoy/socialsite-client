@@ -20,6 +20,7 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  FormErrorMessage
 } from "@chakra-ui/react"
 import {
   MdVerified,
@@ -36,12 +37,12 @@ import ReactCrop from "react-image-crop"
 import countReaction from "../utils/countReaction"
 import useHttp from "../utils/useHttp"
 import SingleUserCard from "../custom/SingleUserCard"
-import countyCode from '../utils/countyCode'
+import countyCode from "../utils/countyCode"
 import Select from "react-select"
 import Creatable from "react-select/creatable"
 
-import {changeData} from '../../store/userInfoSlice'
-import FeedCard from '../custom/FeedCard'
+import { changeData } from "../../store/userInfoSlice"
+import FeedCard from "../custom/FeedCard"
 
 const UserAccount = ({
   post,
@@ -82,10 +83,12 @@ const UserAccount = ({
   const [reportText, setReportText] = useState("")
   const [sendReport, setSendReport] = useState(false)
   const [language, setLanguage] = useState({})
-  const [userTags,setUserTags] = useState([...user?.tagsArr])
+  const [userTags, setUserTags] = useState([...user?.tagsArr])
   const [tagsVal, setTagsVal] = useState([])
   const [sniperPost, setSniperPost] = useState([])
   const [searchSniper, setSearchSniper] = useState(false)
+  const [usernameValue, setUsernameValue] = useState("")
+  const [userErrorMessage, setUserErrorMessage] = useState("")
 
   const isMyAccount = router.pathname == "/account/myaccount/[user]"
 
@@ -97,9 +100,9 @@ const UserAccount = ({
     height: 70,
   })
 
-useEffect(() => {
-  setSearchSniper(true)
-}, [])
+  useEffect(() => {
+    setSearchSniper(true)
+  }, [])
 
   const { isLoading: _isSniperLoading } = useHttp({
     fetchNow: searchSniper,
@@ -110,24 +113,24 @@ useEffect(() => {
     setData: setSniperPost,
   })
 
-const selectOption = [
-  { value: "general", label: "General" },
-  { value: "technology", label: "Technology" },
-  { value: "development", label: "Development" },
-  { value: "programming", label: "Programming" },
-  { value: "places", label: "Places" },
-  { value: "universe", label: "Universe" },
-  { value: "nature", label: "Nature" },
-]
+  const selectOption = [
+    { value: "general", label: "General" },
+    { value: "technology", label: "Technology" },
+    { value: "development", label: "Development" },
+    { value: "programming", label: "Programming" },
+    { value: "places", label: "Places" },
+    { value: "universe", label: "Universe" },
+    { value: "nature", label: "Nature" },
+  ]
 
-const tagsHandler = (tag) => {
-  setUserTags(tag)
-  const tags = []
-  if (tag.length !== 0) {
-    tag.map((item) => tags.push(item.value))
+  const tagsHandler = (tag) => {
+    setUserTags(tag)
+    const tags = []
+    if (tag.length !== 0) {
+      tag.map((item) => tags.push(item.value))
+    }
+    setTagsVal(tags)
   }
-  setTagsVal(tags)
-}
 
   const customStyles = {
     option: (provided) => ({
@@ -264,7 +267,6 @@ const tagsHandler = (tag) => {
     setLanguage(e)
   }
 
-
   const { isLoading: manageLoading } = useHttp({
     fetchNow: userDataRequest,
     setFetchNow: setUserDataRequest,
@@ -286,10 +288,8 @@ const tagsHandler = (tag) => {
       setIsModalOpen(!isModalOpen)
     },
 
-    ecb: () => setIsModalOpen(!isModalOpen),
+    // ecb: () => setIsModalOpen(!isModalOpen),
   })
-
-
 
   const userDataHandler = async () => {
     const userData = {
@@ -302,8 +302,23 @@ const tagsHandler = (tag) => {
       webSiteLinkValue,
       language,
       tagsArr: userTags,
-      tags: tagsVal
+      tags: tagsVal,
+      usernameValue,
     }
+
+    if (usernameValue != "") {
+      if (usernameValue.length <= 4) {
+        return setUserErrorMessage(
+          "Username must contain more than 4 character "
+        );
+      } else if (usernameValue.length >= 15) {
+        return setUserErrorMessage("Username should not exceed 15 character ");
+      }else if(usernameValue.indexOf(" ") != -1) {
+        return setUserErrorMessage("Username should not contain empty spaces. ")
+
+      }
+    }
+    setUserErrorMessage("")
     setUserUploadedData(userData)
     setUserDataRequest(true)
   }
@@ -463,6 +478,8 @@ const tagsHandler = (tag) => {
         isOpen={isModalOpen}
         onClose={() => {
           setProfileImage(null)
+          setUsernameValue("")
+          
           setIsModalOpen(!isModalOpen)
         }}
       >
@@ -570,6 +587,21 @@ const tagsHandler = (tag) => {
                 onChange={(e) => setNameValue(e.target.value)}
                 id="name"
               />
+              <FormControl htmlFor="username"> Username </FormControl>
+              <Input
+                placeholder="username "
+                value={
+                  usernameValue != "" ? usernameValue : user?.usernameValue
+                }
+                onChange={(e) => setUsernameValue(e.target.value)}
+                id="username"
+              />
+              {userErrorMessage != "" && (
+                <Text fontSize={14} color={"red"}>
+                  {" "}
+                  {userErrorMessage}{" "}
+                </Text>
+              )}
               <FormControl htmlFor="bio"> Bio </FormControl>
               <Input
                 value={bioValue != "" ? bioValue : user.bio}
@@ -732,6 +764,7 @@ const tagsHandler = (tag) => {
               <MdVerified color="rgb(29, 155, 240)" />
             )}
           </Text>
+          {user?.userName && <Text fontSize={14} opacity={0.8} >@{user?.userName}</Text>}
 
           {user?.bio && <Text>{user.bio}</Text>}
 

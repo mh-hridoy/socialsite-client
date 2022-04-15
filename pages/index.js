@@ -26,7 +26,7 @@ export default function Home(props) {
         query: { token: token, userId: user?._id },
       })
       socket.on("posts", (data) => {
-        // console.log(data)
+        console.log(data)
         setupAllData(data)
       })
 

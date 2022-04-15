@@ -20,6 +20,7 @@ import {
   Textarea,
   Input,
 } from "@chakra-ui/react"
+import { useInView, InView } from "react-intersection-observer"
 import { BsHeart, BsHeartFill, BsChatQuote } from "react-icons/bs"
 import { RiStackshareLine } from "react-icons/ri"
 import { FiShare } from "react-icons/fi"
@@ -40,6 +41,8 @@ import { find as FindURL } from "linkifyjs"
 import parse from "html-react-parser"
 import LanguageDetect from "languagedetect"
 import axios from 'axios'
+import "linkify-plugin-mention"
+
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -63,7 +66,11 @@ const FeedCard = (props) => {
   const [isOpenTranslate, setIsOpenTranslate] = useState(false)
   const [getTranslate, setGetTranslate] = useState(false)
   const [translateText, setTranslateText] = useState("")
-  const videoRef = useRef(null)
+  const [videoStartTime, setVideoStartTime] = useState(null)
+  const {ref : videoRef, inView : isVideoIn, entry} = useInView({ threshold: 0 })
+  const [totalViews, setTotalViews] = useState(0)
+  const [increaseView,setIncreaseView] = useState(false)
+  const [playingId, setPlayingId] = useState(null)
   const pathName = router.pathname
   const lngDetector = new LanguageDetect()
 
@@ -74,6 +81,18 @@ const FeedCard = (props) => {
     default: 2,
     700: 1,
   }
+// console.log(item)
+  useEffect(() => {
+    let totalView = 0
+    item?.images?.forEach((item) => {
+      if (item?.type?.includes("video")) {
+        totalView += item?.watchedBy?.length
+      }
+    })
+    setTotalViews(totalView || 0)
+  }, [item])
+
+  // console.log(item)
 
   useEffect(() => {
     if (getTranslate == true) {
@@ -127,7 +146,7 @@ const FeedCard = (props) => {
         if (indexOfUrl >= 0) {
           text =
             text.substring(0, indexOfUrl) +
-            `<a href=${link.value} target="_blank">` +
+            `<a ${link.type == "url" && "href="+link.value} target="_blank">` +
             text.substring(indexOfUrl, indexOfUrl + link.value.length) +
             "</a>" +
             text.substring(indexOfUrl + link.value.length)
@@ -138,6 +157,16 @@ const FeedCard = (props) => {
     }
 
     return <div> {parse(text)} </div>
+  }
+
+  const videoRefHandler = async (Inview, entry) => {
+    if (!Inview) {
+   const video = document.querySelector("video")
+      if(!video.paused){
+        await video.pause()
+      }
+    
+    }
   }
 
   // console.log(PostText)
@@ -158,6 +187,35 @@ const FeedCard = (props) => {
   }
 
   // console.log(item)
+
+  const videoStartHandler = (videoId) => {
+    const timeNow = new Date()
+    setVideoStartTime(timeNow)
+    setPlayingId(videoId)
+
+  }
+
+  // increase view
+   const { isLoading: _increaingseView } = useHttp({
+     fetchNow: increaseView,
+     setFetchNow: setIncreaseView,
+     method: "post",
+     body: { user: user?._id, postId : item?._id },
+     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/increase-view/${playingId}`,
+     isAuth: true,
+   })
+
+
+  const videoPauseHandler = () => {
+    var diff = new Date() - videoStartTime
+    var second = Math.floor(diff / 1000)
+
+    if(second > 15) {
+    setIncreaseView(true)
+
+    }    
+
+  }
 
   const likeHandler = async (e) => {
     e.stopPropagation()
@@ -525,7 +583,7 @@ const FeedCard = (props) => {
                 pr={4}
                 fontSize={15}
               >
-                <PostText />
+                <PostText onClick={(e) => e.stopPropagation()} />
               </Text>
             </Flex>
           )}
@@ -581,20 +639,23 @@ const FeedCard = (props) => {
               })}
             </Flex>
           )}
-          {item?.text != " " && item?.text != item?.linkData?.link && user?.userLang && user?.userLang?.toLowerCase() != postLanguage && (
-                <Flex
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setIsOpenTranslate(!isOpenTranslate)
-                    setGetTranslate(true)
-                  }}
-                  mb={isOpenTranslate ? 1 : 4}
-                  fontSize={12}
-                  ml={10}
-                >
-                  <a>{isOpenTranslate ? "Hide" : "See"} translation</a>
-                </Flex>
-              )}
+          {item?.text != " " &&
+            item?.text != item?.linkData?.link &&
+            user?.userLang &&
+            user?.userLang?.toLowerCase() != postLanguage && (
+              <Flex
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setIsOpenTranslate(!isOpenTranslate)
+                  setGetTranslate(true)
+                }}
+                mb={isOpenTranslate ? 1 : 4}
+                fontSize={12}
+                ml={10}
+              >
+                <a>{isOpenTranslate ? "Hide" : "See"} translation</a>
+              </Flex>
+            )}
 
           {isOpenTranslate && (
             <Flex
@@ -646,19 +707,29 @@ const FeedCard = (props) => {
                     />
                   ) : (
                     item?.images[0].type?.includes("video") && (
-                      <video
-                        ref={videoRef}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          cursor: "pointer",
-                          borderRadius: "20px",
-                          height: "300px",
-                          widht: "100%",
-                        }}
-                        src={item?.images[0].img}
-                        controls={true}
-                        autoPlay={false}
-                      ></video>
+                      <InView onChange={videoRefHandler}>
+                        <video
+                          onPlay={() => videoStartHandler(item?.images[0]._id)}
+                          onPause={videoPauseHandler}
+                          ref={videoRef}
+                          onClick={(e) => e.stopPropagation()}
+                          // muted="muted"
+                          style={{
+                            cursor: "pointer",
+                            borderRadius: "20px",
+                            height: "300px",
+                            widht: "100%",
+                          }}
+                          src={item?.images[0].img}
+                          controls={true}
+                          autoPlay={false}
+                        ></video>
+                        {totalViews != 0 && (
+                          <Text pt={2} fontSize={12} opacity={0.7}>
+                            {countReaction(totalViews)} views
+                          </Text>
+                        )}
+                      </InView>
                     )
                   )
                 ) : (
@@ -688,20 +759,26 @@ const FeedCard = (props) => {
                         />
                       ) : (
                         image.type?.includes("video") && (
-                          <video
-                            onClick={(e) => e.stopPropagation()}
-                            style={{
-                              cursor: "pointer",
-                              borderRadius: "20px",
+                          <InView onChange={videoRefHandler}>
+                            <video
+                              // muted="muted"
+                              onPlay={() => videoStartHandler(image._id)}
+                              onPause={(e) => console.log("paussing video")}
+                              ref={videoRef}
+                              onClick={(e) => e.stopPropagation()}
+                              style={{
+                                cursor: "pointer",
+                                borderRadius: "20px",
 
-                              objectFit: "cover",
-                              objectPosition: "center",
-                            }}
-                            src={image?.img}
-                            key={inx}
-                            controls={true}
-                            autoPlay={false}
-                          ></video>
+                                objectFit: "cover",
+                                objectPosition: "center",
+                              }}
+                              src={image?.img}
+                              key={inx}
+                              controls={true}
+                              autoPlay={false}
+                            ></video>
+                          </InView>
                         )
                       )
                     )}

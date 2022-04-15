@@ -143,7 +143,7 @@ const CreateNewFeed = ({
         1280,
         720,
         "JPEG",
-        100,
+        90,
         0,
         (uri) => {
           return setImages([

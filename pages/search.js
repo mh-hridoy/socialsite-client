@@ -58,7 +58,7 @@ const SearchPage = ({
     isEToast: false,
   })
 
-  console.log(usersValue, postValue)
+  // console.log(usersValue, postValue)
 
   useEffect(() => {
     searchRef.current.focus()

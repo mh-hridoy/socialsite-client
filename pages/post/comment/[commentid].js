@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react"
-import { Flex, Spinner, useColorModeValue } from "@chakra-ui/react"
+import {
+  Flex,
+  Spinner,
+  useColorModeValue,
+  Text,
+  Button,
+} from "@chakra-ui/react"
 import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/router"
 import WithHeader from "../../../components/custom/WithHeader"
@@ -24,7 +30,7 @@ const CommentId = (props) => {
   }, [])
 
   useEffect(() => {
-    if (loading == false) {
+    if (loading == false && user != null ) {
       console.log("working on it ")
       const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
         query: { token: token, postId: router.query.postid, userId: user._id },
@@ -112,8 +118,13 @@ const CommentId = (props) => {
         borderColor={useColorModeValue("gray.200", "#333")}
         w={"100%"}
         minHeight="100vh"
+        justifyContent={user == null ? "center" : undefined}
       >
         <Flex
+          borderRight={"1px"}
+          borderLeft={"1px"}
+          borderColor={useColorModeValue("gray.200", "#333")}
+          minHeight="100vh"
           direction="column"
           minWidth={
             user != null ? "100%" : ["100%", "100%", "60%", "50%", "50%"]
@@ -131,20 +142,46 @@ const CommentId = (props) => {
           ) : (
             <WithHeader headerName="Feed">
               <SingleFeed totalComment={allComments.length} item={item} />
-              <CommentsOfFeed
-                quoteData={props.quoteData}
-                totalComment={allComments?.length}
-                setQuoteData={props.setQuoteData}
-                isCreateModalOpen={props.isCreateModalOpen}
-                setIsCreateModalOpen={props.setIsCreateModalOpen}
-                setHomeData={props.setHomeData}
-                comments={allComments}
-                setComments={setAllComments}
-                setPost={setItem}
-                postId={item?._id}
-                item={item}
-              />
+              {user != null && (
+                <CommentsOfFeed
+                  quoteData={props.quoteData}
+                  totalComment={allComments?.length}
+                  setQuoteData={props.setQuoteData}
+                  isCreateModalOpen={props.isCreateModalOpen}
+                  setIsCreateModalOpen={props.setIsCreateModalOpen}
+                  setHomeData={props.setHomeData}
+                  comments={allComments}
+                  setComments={setAllComments}
+                  setPost={setItem}
+                  postId={item?._id}
+                  item={item}
+                />
+              )}
             </WithHeader>
+          )}
+
+          {user == null && (
+            <Flex
+              px={6}
+              rounded="md"
+              py={4}
+              direction="column"
+              gap={4}
+              bg={useColorModeValue("gray.200", "whiteAlpha.400")}
+              mx={5}
+              my={2}
+              alignItems="center"
+              justifyContent={"center"}
+            >
+              <Text>
+                You're not authenticated. Please login to leave a comment or
+                react.
+              </Text>
+
+              <Button bg="buttonColor" onClick={() => router.push("/login")}>
+                Login
+              </Button>
+            </Flex>
           )}
         </Flex>
       </Flex>
