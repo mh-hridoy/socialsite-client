@@ -17,7 +17,7 @@ const Notification = () => {
     }
     try {
            await axios.get(
-             `${process.env.NEXT_PUBLIC_MAIN_PROXY}/read-noti/${user._id}/${noti?._id}`,
+             `${process.env.NEXT_PUBLIC_MAIN_PROXY}/read-noti/${user?._id}/${noti?._id}`,
              {
                headers: {
                  "Content-Type": "application/json",
