@@ -36,6 +36,11 @@ const signupSchema = Yup.object().shape({
   email: Yup.string()
     .email("Invalid email address!")
     .required("Email address is required!"),
+  userName: Yup.string()
+    .min(4, "Full name is too small.")
+    .max(15, "Full name is too large!")
+    .matches("^[_A-z0-9]{1,}$", "Username cannot contain whitespace.")
+    .required("username is required!"),
 })
 
 const Signup = () => {
@@ -91,6 +96,7 @@ const Signup = () => {
                   email: "",
                   password: "",
                   fullName: "",
+                  userName: ""
                 }}
                 onSubmit={signupHandler}
               >
@@ -98,7 +104,7 @@ const Signup = () => {
                   <form onSubmit={handleSubmit}>
                     <VStack spacing={4} align="flex-start">
                       <FormControl>
-                        <FormLabel htmlFor="email">Full Name</FormLabel>
+                        <FormLabel htmlFor="fullName">Full Name</FormLabel>
                         <Field
                           as={Input}
                           id="fullName"
@@ -117,6 +123,30 @@ const Signup = () => {
                           >
                             <AlertIcon />
                             <AlertTitle>{errors.fullName}</AlertTitle>
+                          </Alert>
+                        )}
+                      </FormControl>
+
+                      <FormControl>
+                        <FormLabel htmlFor="userName">Username</FormLabel>
+                        <Field
+                          as={Input}
+                          id="userName"
+                          name="userName"
+                          type="text"
+                          variant="filled"
+                        />
+                        {errors.userName && touched.userName && (
+                          <Alert
+                            px={2}
+                            py={1}
+                            fontSize={12}
+                            rounded
+                            marginTop={2}
+                            status="error"
+                          >
+                            <AlertIcon />
+                            <AlertTitle>{errors.userName}</AlertTitle>
                           </Alert>
                         )}
                       </FormControl>
@@ -172,7 +202,6 @@ const Signup = () => {
                       <FormControl>
                         <FormLabel htmlFor="password">Phone Number</FormLabel>
                         <Field
-                        
                           value={phoneNumber}
                           as={PhoneInput}
                           onChange={(e) => phoneNumberHandler(e)}
@@ -200,7 +229,10 @@ const Signup = () => {
                               "#EDF2F7",
                               "#1A202C"
                             ),
-                            color: useColorModeValue("rgb(29, 155, 240)", "rgb(29, 155, 240)"),
+                            color: useColorModeValue(
+                              "rgb(29, 155, 240)",
+                              "rgb(29, 155, 240)"
+                            ),
                           }}
                           buttonStyle={{
                             border: `1px solid ${useColorModeValue(

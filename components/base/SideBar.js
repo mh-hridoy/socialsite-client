@@ -96,7 +96,7 @@ const SideBar = ({
     {
       name: "Profile",
       Icon: MdOutlineAccountCircle,
-      uri: `/account/myaccount/${user?._id}`,
+      uri: `/account/myaccount/${user?.userName}`,
       path: `/account/myaccount/[user]`,
     },
     {

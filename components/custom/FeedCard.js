@@ -451,8 +451,8 @@ const FeedCard = (props) => {
                 e.stopPropagation()
                 router.push(
                   item.user._id == user._id
-                    ? `/account/myaccount/${item?.user?._id}`
-                    : `/account/${item && item?.user?._id}`
+                    ? `/account/myaccount/${item?.user?.userName}`
+                    : `/account/${item && item?.user?.userName}`
                 )
               }}
             >
@@ -566,8 +566,8 @@ const FeedCard = (props) => {
                   e.stopPropagation()
                   router.push(
                     item?.referPost?.user?._id == user?._id
-                      ? `/account/myaccount/${item?.referPost?.user?._id}`
-                      : `/account/${item?.referPost?.user._id}`
+                      ? `/account/myaccount/${item?.referPost?.user?.userName}`
+                      : `/account/${item?.referPost?.user.userName}`
                   )
                 }}
               >
