@@ -37,8 +37,8 @@ const signupSchema = Yup.object().shape({
     .email("Invalid email address!")
     .required("Email address is required!"),
   userName: Yup.string()
-    .min(4, "Full name is too small.")
-    .max(15, "Full name is too large!")
+    .min(4, "username is too small.")
+    .max(15, "username is too large!")
     .matches("^[_A-z0-9]{1,}$", "Username cannot contain whitespace.")
     .required("username is required!"),
 })
