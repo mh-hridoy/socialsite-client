@@ -4,7 +4,7 @@ import {useSelector} from "react-redux"
 
 const RssFeed = () => {
     const [isLoading, setIsLoading] = useState(true)
-    const rssFeed = useSelector((state) => state.feed.rssFeed)
+    const homeData = useSelector((state) => state.homeData.homeData)
 
     useEffect(() => {
         setIsLoading(!isLoading)
@@ -27,13 +27,13 @@ const RssFeed = () => {
         </Flex>
       ) : (
         <>
-          {!rssFeed ? (
+          {!homeData ? (
             <Text textAlign={"center"} marginTop={20}>
               Please Check feeds first.
             </Text>
           ) : (
             <Text maxWidth={"85%"} wordBreak={"break-all"}>
-              {JSON.stringify(rssFeed, undefined, 2)}{" "}
+              {JSON.stringify(homeData, undefined, 2)}{" "}
             </Text>
           )}
         </>

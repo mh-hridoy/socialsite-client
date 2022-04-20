@@ -3,21 +3,23 @@ import FeedCard from "./FeedCard"
 import { Text, Flex } from "@chakra-ui/react"
 import { useSelector } from "react-redux"
 import { RiShareForwardBoxFill } from "react-icons/ri"
-import { AiOutlineConsoleSql } from "react-icons/ai"
+import { useTranslation } from "react-i18next"
+
 const AllPost = ({
   post,
   setPage,
   page,
   totalPage,
-  setHomeData,
   user,
   quoteData,
   setQuoteData,
   isCreateModalOpen,
   setIsCreateModalOpen,
+  setHomeData : setUserHomeData
 }) => {
   const feedRef = useRef(null)
   const userData = useSelector((state) => state.user.user)
+  const { t } = useTranslation()
 
   const lastFeedRef = useCallback(
     (node) => {
@@ -44,7 +46,7 @@ const AllPost = ({
       <Flex minWidth={"100%"} direction="column">
         {post && post.length !== 0 ? (
           [...new Set(post)].map((item, inx) => {
-                        if (
+            if (
               item?.sharedBy?.includes(user?._id) &&
               item.postType != "quote" &&
               post.length != inx + 1
@@ -70,7 +72,6 @@ const AllPost = ({
                     setQuoteData={setQuoteData}
                     isCreateModalOpen={isCreateModalOpen}
                     setIsCreateModalOpen={setIsCreateModalOpen}
-                    setHomeData={setHomeData}
                     item={item}
                   />
                 </Flex>
@@ -102,7 +103,6 @@ const AllPost = ({
                     setQuoteData={setQuoteData}
                     isCreateModalOpen={isCreateModalOpen}
                     setIsCreateModalOpen={setIsCreateModalOpen}
-                    setHomeData={setHomeData}
                     lastFeedRef={lastFeedRef}
                     key={inx}
                     item={item}
@@ -117,7 +117,7 @@ const AllPost = ({
                   setQuoteData={setQuoteData}
                   isCreateModalOpen={isCreateModalOpen}
                   setIsCreateModalOpen={setIsCreateModalOpen}
-                  setHomeData={setHomeData}
+                  setHomeData={setUserHomeData}
                   key={inx}
                   item={item}
                 />
@@ -130,7 +130,7 @@ const AllPost = ({
                   setQuoteData={setQuoteData}
                   isCreateModalOpen={isCreateModalOpen}
                   setIsCreateModalOpen={setIsCreateModalOpen}
-                  setHomeData={setHomeData}
+                  setHomeData={setUserHomeData}
                   lastFeedRef={lastFeedRef}
                   key={inx}
                   item={item}
@@ -143,7 +143,7 @@ const AllPost = ({
                   setQuoteData={setQuoteData}
                   isCreateModalOpen={isCreateModalOpen}
                   setIsCreateModalOpen={setIsCreateModalOpen}
-                  setHomeData={setHomeData}
+                  setHomeData={setUserHomeData}
                   lastFeedRef={lastFeedRef}
                   key={inx}
                   item={item}
@@ -156,7 +156,7 @@ const AllPost = ({
                   setQuoteData={setQuoteData}
                   isCreateModalOpen={isCreateModalOpen}
                   setIsCreateModalOpen={setIsCreateModalOpen}
-                  setHomeData={setHomeData}
+                  setHomeData={setUserHomeData}
                   key={inx}
                   item={item}
                 />
@@ -164,7 +164,9 @@ const AllPost = ({
             }
           })
         ) : (
-            <Text fontSize={16} mt={10} opacity={0.8} textAlign="center" >Currently there's no post to show! Follow some people to view their posts or create some post.</Text>
+          <Text fontSize={16} mt={10} opacity={0.8} textAlign="center">
+            {t("no post message")}
+          </Text>
         )}
       </Flex>
     </>

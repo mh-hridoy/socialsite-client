@@ -3,19 +3,23 @@ import { Flex, Text, Spinner, useColorModeValue } from "@chakra-ui/react"
 import CreateNewFeed from "../custom/CreateNewFeed"
 import AllPost from "../custom/AllPost"
 import { useRouter } from "next/router"
+import {useSelector} from "react-redux"
+import { useTranslation } from "react-i18next"
+
 const HomeComponent = ({
-  homeData,
   setPage,
   page,
   totalPage,
   fetchingHomeData,
-  setHomeData,
   quoteData,
   setQuoteData,
   isCreateModalOpen,
   setIsCreateModalOpen,
 }) => {
   const router = useRouter()
+  const homeData = useSelector((state) => state.homeData.homeData)
+  const { t, i18n } = useTranslation()
+
   return (
     <Flex
       justifyContent="center"
@@ -29,12 +33,11 @@ const HomeComponent = ({
     >
       <Flex w={"100%"} direction={"column"} gap={4}>
         <CreateNewFeed
-          homeData={homeData}
-          setHomeData={setHomeData}
+          
           name="file"
         />
         <Text fontWeight={600} mb={2}>
-          Recent posts:
+          {t("Recent Post")}
         </Text>
         <AllPost
           // setFetchData={setFetchData}
@@ -46,7 +49,6 @@ const HomeComponent = ({
           totalPage={totalPage}
           page={page}
           post={homeData}
-          setHomeData={setHomeData}
         />
         {fetchingHomeData && page != 1 && (
           <Flex

@@ -42,6 +42,8 @@ import parse from "html-react-parser"
 import LanguageDetect from "languagedetect"
 import axios from 'axios'
 import "linkify-plugin-mention"
+import {setDeletePost} from '../../store/homeDataSlice'
+import { useDispatch } from "react-redux"
 
 const FeedCard = (props) => {
   const [currentImageArray, setCurrentImageArray] = useState([])
@@ -73,6 +75,7 @@ const FeedCard = (props) => {
   const [playingId, setPlayingId] = useState(null)
   const pathName = router.pathname
   const lngDetector = new LanguageDetect()
+  const dispatch = useDispatch()
 
   const isShowQuote =
     props.hasQuote == true && pathName.indexOf("/post/[postid]") == 0
@@ -318,12 +321,24 @@ const FeedCard = (props) => {
     isAuth: true,
     isEToast: true,
     cb: () => {
-      props.setHomeData((prev) => {
-        const allPost = [...prev]
-        const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
-        allPost.splice(indexOfPost, 1)
-        return [...new Set(allPost)]
-      })
+      if(props.setHomeData) {
+         props.setHomeData((prev) => {
+           const allPost = [...prev]
+           const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
+           allPost.splice(indexOfPost, 1)
+           return [...new Set(allPost)]
+         })
+      }else if (props.setComments) {
+        props.setComments((prev) => {
+          const allPost = [...prev]
+          const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
+          allPost.splice(indexOfPost, 1)
+          return [...new Set(allPost)]
+        })
+      } else {
+        dispatch(setDeletePost(item))
+      }
+     
     },
   })
 
@@ -340,12 +355,18 @@ const FeedCard = (props) => {
     isAuth: true,
     isEToast: true,
     cb: () => {
-      props.setHomeData((prev) => {
-        const allPost = [...prev]
-        const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
-        allPost.splice(indexOfPost, 1)
-        return [...new Set(allPost)]
-      })
+           if (props.setHomeData) {
+             props.setHomeData((prev) => {
+               const allPost = [...prev]
+               const indexOfPost = allPost.findIndex(
+                 (itm) => itm?._id == item?._id
+               )
+               allPost.splice(indexOfPost, 1)
+               return [...new Set(allPost)]
+             })
+           } else {
+             dispatch(setDeletePost(item))
+           }
     },
   })
 

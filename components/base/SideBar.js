@@ -14,6 +14,8 @@ import {
   ModalContent,
   Badge,
   ModalCloseButton,
+  Select,
+  FormLabel,
 } from "@chakra-ui/react"
 
 import { useRouter } from "next/router"
@@ -37,14 +39,14 @@ import { storeData, manageData} from "../../store/notificationSlice"
 import CreateNewFeed from "../custom/CreateNewFeed"
 import axios from "axios"
 import io from "socket.io-client"
+import {  useTranslation } from "react-i18next"
 
 const SideBar = ({
   isModalOpen,
   setIsModalOpen,
   quoteData,
   setQuoteData,
-  homeData,
-  setHomeData,
+  
 }) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const router = useRouter()
@@ -53,8 +55,36 @@ const SideBar = ({
   const pathName = router.pathname
   const [logoutRequest, setLogoutRequest] = useState(false)
   const dispatch = useDispatch()
+  const [selectedLanguage, setSelectedLanguage] = useState()
+  const {t, i18n } = useTranslation()
   
   const unread = useSelector((state) => state.notifications.unread)
+
+  const langs = [
+    { value: "ar", label: "Arabic", nativeName: "العربية" },
+    { value: "en", label: "English", nativeName: "English" },
+    { value: "hi", label: "Hindi", nativeName: "हिन्दी" },
+    { value: "es", label: "Spanish", nativeName: "español" },
+    { value: "fr", label: "French", nativeName: "français" },
+    { value: "zh", label: "Chinese", nativeName: "中文" },
+    {
+      value: "ja",
+      label: "Japanese",
+      nativeName: "日本語",
+    },
+    { value: "it", label: "Italian", nativeName: "Italiano" },
+    { value: "ko", label: "Korean", nativeName: "한국어 (韓國語)," },
+    { value: "tr", label: "Turkish", nativeName: "Türkçe" },
+    { value: "ru", label: "Russian", nativeName: "русский язык" },
+  ]
+
+  useEffect(() => {
+    const langName = document.cookie.split("i18next=")[1]
+    
+    setSelectedLanguage(langName)
+  }, [])
+
+
 
   useEffect(() => {
     if (user != null) {
@@ -85,41 +115,40 @@ const SideBar = ({
   }, [user != null])
 
 
-
   const item = [
     {
-      name: "Feeds",
+      name: t("Feeds"),
       Icon: MdHome,
       uri: "/",
       path: `/`,
     },
     {
-      name: "Profile",
+      name: t("Profile"),
       Icon: MdOutlineAccountCircle,
       uri: `/account/myaccount/${user?.userName}`,
       path: `/account/myaccount/[user]`,
     },
     {
-      name: "People",
+      name: t("People"),
       Icon: MdPeopleOutline,
       uri: `/people`,
       path: `/people`,
     },
     {
-      name: "Search",
+      name: t("Search"),
       Icon: MdSearch,
       uri: `/search`,
       path: `/search`,
     },
     {
-      name: "Notifiactions",
+      name: t("Notifications"),
       Icon: MdNotificationsNone,
       uri: `/notification`,
       path: `/notification`,
     },
 
     {
-      name: "RSS Feed",
+      name: t("RSS Feeds"),
       Icon: MdOutlineRssFeed,
       uri: "/rss-feed",
       path: `/rss-feed`,
@@ -182,8 +211,6 @@ const SideBar = ({
         <ModalContent padding={10}>
           <ModalCloseButton _focus={{ boxShadow: "none" }} />
           <CreateNewFeed
-            homeData={homeData}
-            setHomeData={setHomeData}
             quoteData={quoteData}
             setQuoteData={setQuoteData}
             name="file2"
@@ -203,7 +230,7 @@ const SideBar = ({
           px={[0, 0, 10]}
         >
           <Wrap
-            height={"80vh"}
+            height={"90vh"}
             direction={"column"}
             gap={5}
             overflowX="hidden"
@@ -292,7 +319,7 @@ const SideBar = ({
                   />{" "}
                   <Show above="xl">
                     {" "}
-                    <Text>Light Mode</Text>
+                    <Text>{t("Light Mode")}</Text>
                   </Show>
                 </>
               ) : (
@@ -303,10 +330,47 @@ const SideBar = ({
                     size={26}
                   />{" "}
                   <Show above="xl">
-                    <Text>Dark Mode</Text>{" "}
+                    <Text>{t("Dark Mode")}</Text>{" "}
                   </Show>
                 </>
               )}
+            </WrapItem>
+
+            <WrapItem
+              _hover={{
+                backgroundColor: useColorModeValue("gray.100", "#333333"),
+              }}
+              cursor={"pointer"}
+              px={3}
+              fontSize={16}
+              rowGap={2}
+              py={2}
+              rounded="full"
+              gap={2}
+              alignItems={"center"}
+            >
+              <Select
+              dir="ltr"
+                size="sm"
+                onChange={(e) => {
+                  setSelectedLanguage(e.target.value);
+                  i18n.changeLanguage(e.target.value);
+                   if (e.target.value == "ar") {
+                     document.body.dir = "rtl"
+                   } else {
+                     document.body.dir = "ltr"
+                   }
+                }}
+                defaultValue={selectedLanguage}
+              >
+                {langs.map((lang, index) => {
+                  return (
+                    <option key={index} value={lang.value}>
+                      {lang.nativeName}
+                    </option>
+                  )
+                })}
+              </Select>
             </WrapItem>
 
             <Button
@@ -317,7 +381,7 @@ const SideBar = ({
               width={["20px", "20px", "20px", "20px", "200px"]}
               rounded="full"
             >
-              <MdAdd /> <Show above="xl">New</Show>
+              <MdAdd /> <Show above="xl">{t("New")}</Show>
             </Button>
           </Wrap>
 

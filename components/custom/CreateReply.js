@@ -15,25 +15,17 @@ import {
 } from "@chakra-ui/react"
 import { MdOutlineImage, MdOutlineEmojiEmotions } from "react-icons/md"
 import { Picker } from "emoji-mart"
-import Resizer from "react-image-file-resizer"
 import { AiOutlineDelete } from "react-icons/ai"
 import axios from "axios"
 import { useSelector } from "react-redux"
-import SingleFeed from "./SingleFeed"
-import { isDataView } from "underscore"
 
 const CreateReply = ({
   name,
-  setHomeData,
-  homeData,
-  setIsModalOpen,
-  isModalOpen,
-  quoteData,
+
   setComments,
   comments,
   setQuoteData,
-  setItem,
-  item,
+  
   postId,
 }) => {
   const [showEmoji, setShowEmoji] = useState(false)
@@ -124,35 +116,32 @@ const CreateReply = ({
           },
         ])
       }
-      // resolve(reader.result)
       reader.onerror = (error) => reject(error)
     })
   }
 
   const handleImages = (files) => {
+        const reader = new FileReader()
+
     files.map((file) => {
-      Resizer.imageFileResizer(
-        file,
-        600,
-        600,
-        "JPEG",
-        100,
-        0,
-        (uri) => {
-          return setImages([
-            ...images,
-            {
-              name:
-                file.name.split(".").shift() +
-                Date.now() +
-                file.name.split(".").pop(),
-              type: file.type || "image/jpeg",
-              img: uri,
-            },
-          ])
-        },
-        "base64"
-      )
+       return new Promise((resolve, reject) => {
+         reader.readAsDataURL(file)
+         reader.onload = () => {
+           return setImages([
+             ...images,
+             {
+               name:
+                 file.name.split(".").shift() +
+                 Date.now() +
+                 file.name.split(".").pop(),
+               type: file.type || "image/jpeg",
+               img: reader.result,
+             },
+           ])
+         }
+         reader.onerror = (error) => reject(error)
+       })
+     
     })
   }
 

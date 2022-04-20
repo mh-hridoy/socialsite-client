@@ -141,7 +141,7 @@ const PostId = (props) => {
                 setQuoteData={props.setQuoteData}
                 isCreateModalOpen={props.isCreateModalOpen}
                 setIsCreateModalOpen={props.setIsCreateModalOpen}
-                setHomeData={props.setHomeData}
+                // setHomeData={props.setHomeData}
                 comments={allComments}
                 setComments={setAllComments}
                 setPost={setItem}
@@ -155,7 +155,6 @@ const PostId = (props) => {
                   setQuoteData={props.setQuoteData}
                   isCreateModalOpen={props.isCreateModalOpen}
                   setIsCreateModalOpen={props.setIsCreateModalOpen}
-                  setHomeData={props.setHomeData}
                   comments={allComments}
                   setComments={setAllComments}
                   setPost={setItem}

@@ -1,17 +1,10 @@
 import React from "react"
-import { Flex, Avatar, Text, TagLabel, Tag } from "@chakra-ui/react"
+import { Flex, Avatar, Text } from "@chakra-ui/react"
 
-import Masonry from "react-masonry-css"
 
-import { MdVerified } from "react-icons/md"
 import _ from "underscore"
-import timeAgo from "../utils/DateConverter"
 
 const LinkPreview = ({ item }) => {
-  const breakpointColumnsObj = {
-    default: 2,
-    700: 1,
-  }
 
   if (item == null) {
     return <Text p={4}>Post deleted</Text>

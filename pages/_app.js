@@ -1,22 +1,25 @@
-import '../styles/globals.css'
+import "../styles/globals.css"
 import {
   ChakraProvider,
   extendTheme,
   Flex,
   Show,
   withDefaultColorScheme,
-
 } from "@chakra-ui/react"
 import "react-phone-input-2/lib/style.css"
 import "emoji-mart/css/emoji-mart.css"
-import "react-responsive-carousel/lib/styles/carousel.min.css" 
+import "react-responsive-carousel/lib/styles/carousel.min.css"
 import ProgressBar from "@badrap/bar-of-progress"
 import Router from "next/router"
-import StoreProvider from '../store'
-import SideBar from '../components/base/SideBar'
-import { useState } from 'react'
-import RightSideBar from '../components/custom/RightSideBar'
+import StoreProvider from "../store"
+import SideBar from "../components/base/SideBar"
+import { useState } from "react"
+import RightSideBar from "../components/custom/RightSideBar"
 import "react-image-crop/dist/ReactCrop.css"
+import i18next from "i18next"
+import { initReactI18next } from "react-i18next"
+import Backend from "i18next-http-backend"
+import LanguageDetector from "i18next-browser-languagedetector"
 
 const progress = new ProgressBar({
   size: 2,
@@ -71,20 +74,50 @@ const theme = extendTheme(
   })
 )
 
-
 function MyApp({ Component, pageProps }) {
   const [headerName, setHeaderName] = useState("Home")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [quoteData, setQuoteData] = useState(null)
-  const [homeData, setHomeData] = useState([])
-
 
   Router.events.on("routeChangeStart", progress.start)
   Router.events.on("routeChangeComplete", progress.finish)
   Router.events.on("routeChangeError", progress.finish)
 
+  i18next
+    .use(Backend)
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+      supportedLngs: [
+        "ar",
+        "en",
+        "hi",
+        "es",
+        "fr",
+        "zh",
+        "ja",
+        "it",
+        "ko",
+        "tr",
+        "ru",
+      ],
 
-  
+      fallbackLng: "en",
+      debug: false,
+      detection: {
+        order: ["cookie", "htmlTag"],
+        caches: ["cookie"],
+      },
+      react: {
+        useSuspense: false,
+      },
+      backend: {
+        loadPath: "/assets/locales/{{lng}}/translation.json",
+        allowMultiLoading: false,
+        crossDomain: false,
+      },
+    })
+
   return (
     <StoreProvider>
       <ChakraProvider theme={theme}>
@@ -92,8 +125,6 @@ function MyApp({ Component, pageProps }) {
 
         <Flex>
           <SideBar
-            homeData={homeData}
-            setHomeData={setHomeData}
             quoteData={quoteData}
             setQuoteData={setQuoteData}
             isModalOpen={isModalOpen}
@@ -101,8 +132,6 @@ function MyApp({ Component, pageProps }) {
           />
           <Flex width="100%" direction="column">
             <Component
-              homeData={homeData}
-              setHomeData={setHomeData}
               quoteData={quoteData}
               setQuoteData={setQuoteData}
               isCreateModalOpen={isModalOpen}

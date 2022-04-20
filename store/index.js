@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit"
 import userInfoSlice from "./userInfoSlice"
+import homeDataSlice from "./homeDataSlice"
 import notificationSlice from "./notificationSlice"
 import feedSlice from "./feedSlice"
 import { Provider } from "react-redux"
@@ -12,6 +13,7 @@ const store = configureStore({
     user: userInfoSlice,
     feed: feedSlice,
     notifications: notificationSlice,
+    homeData: homeDataSlice
   },
 })
 

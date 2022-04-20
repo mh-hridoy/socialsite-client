@@ -6,12 +6,13 @@ import { useRouter } from "next/router"
 import HomeComponent from "../components/base/HomeComponent"
 import io from "socket.io-client"
 import { logout } from "../store/userInfoSlice"
-import { storeFeed } from "../store/feedSlice"
+import { setAllHomeData, setHomeData } from "../store/homeDataSlice"
 import WithHeader from "../components/custom/WithHeader"
 
 export default function Home(props) {
   const token = useSelector((state) => state.user.token)
-  const [loading, setLoading] = useState(true)
+  const homeData = useSelector((state) => state.homeData.homeData)
+  const [loading, setLoading] = useState(homeData.length > 0 ? false : true)
   const user = useSelector((state) => state.user.user)
   const router = useRouter()
   const dispatch = useDispatch()
@@ -27,7 +28,8 @@ export default function Home(props) {
       })
       socket.on("posts", (data) => {
         // console.log(data)
-        setupAllData(data)
+                  dispatch(setHomeData(data))
+        // setupAllData(data)
       })
 
       socket.on("connect_error", async (err) => {
@@ -57,31 +59,7 @@ export default function Home(props) {
     props.setHeaderName("Home")
   }, [])
 
-  const setupAllData = (post) => {
-    setTimeout(() => {
-      // console.log("socket running")
-      props.setHomeData((prev) => {
-        const newArray = [...prev]
-        // find if the post already exist
-        const indexOfNewPost = newArray.findIndex(
-          (item) => item._id == post._id
-        )
-        // console.log(indexOfNewPost)
-        //if exist replace it with the existing-one
-        if (indexOfNewPost != -1) {
-          newArray[indexOfNewPost] = post
-        } else {
-          newArray.unshift(post)
-        }
-        //else add it to the array
-        dispatch(storeFeed({ data: [...new Set(newArray)] }))
-
-        return [...new Set(newArray)]
-      })
-    }, 3500)
-  }
-
-  // console.log(homeData)
+ 
 
   useEffect(() => {
     if (fetchData == true || page > 1) {
@@ -98,20 +76,8 @@ export default function Home(props) {
               withCredentials: true,
             }
           )
-          const newArray = [...props.homeData, ...data.post]
-
-          var result = newArray.filter(function (e) {
-            var key = Object.keys(e)
-              .map((k) => e[k])
-              .join("|")
-            if (!this[key]) {
-              this[key] = true
-              return true
-            }
-          }, {})
-
-          props.setHomeData([...new Set(result)])
-          dispatch(storeFeed({ data: newArray }))
+          dispatch(setAllHomeData(data.post))
+        
 
           setTotalPage(data.totalPage)
           setFetchingHomeData(false)
@@ -147,7 +113,6 @@ export default function Home(props) {
             </Flex>
           ) : (
             <Flex
-              // border={"1px solid red"}
               minWidth="100%"
               direction="column"
             >
@@ -161,8 +126,7 @@ export default function Home(props) {
                   totalPage={totalPage}
                   page={page}
                   setPage={setPage}
-                  homeData={props.homeData}
-                  setHomeData={props.setHomeData}
+               
                 />
               </WithHeader>
             </Flex>

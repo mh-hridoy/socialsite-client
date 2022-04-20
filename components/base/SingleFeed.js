@@ -1,19 +1,16 @@
 import React from 'react'
 import { Flex, useColorModeValue } from "@chakra-ui/react"
 import FeedCard from '../custom/FeedCard'
-import { useRouter } from 'next/router'
 
 const SingleFeed = ({item, totalComment, quoteData,
 setQuoteData,
 isCreateModalOpen,
 setIsCreateModalOpen,
-setHomeData,
 comments,
 setComments,
 setPost,
 postId}) => {
-  const router = useRouter()
-  // console.log(item)
+
   return (
     <>
       <Flex
@@ -32,7 +29,6 @@ postId}) => {
             setQuoteData={setQuoteData}
             isCreateModalOpen={isCreateModalOpen}
             setIsCreateModalOpen={setIsCreateModalOpen}
-            setHomeData={setHomeData}
             comments={comments}
             setComments={setComments}
             setPost={setPost}
@@ -48,7 +44,6 @@ postId}) => {
             setQuoteData={setQuoteData}
             isCreateModalOpen={isCreateModalOpen}
             setIsCreateModalOpen={setIsCreateModalOpen}
-            setHomeData={setHomeData}
             comments={comments}
             setComments={setComments}
             setPost={setPost}

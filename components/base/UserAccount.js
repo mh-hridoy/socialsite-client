@@ -20,7 +20,6 @@ import {
   TabPanels,
   Tab,
   TabPanel,
-  FormErrorMessage
 } from "@chakra-ui/react"
 import {
   MdVerified,
@@ -29,7 +28,7 @@ import {
 } from "react-icons/md"
 import dateFormat from "dateformat"
 import AllPost from "../custom/AllPost"
-import { useDispatch, useSelector } from "react-redux"
+import {  useSelector } from "react-redux"
 import { useRouter } from "next/router"
 import { MdOutlineFlipCameraIos } from "react-icons/md"
 import Resizer from "react-image-file-resizer"

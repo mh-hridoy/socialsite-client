@@ -10,7 +10,7 @@ const CommentsOfFeed = ({
   postId,
   setPost,
   comments,
-  setHomeData,
+  // setHomeData,
   quoteData,
   setComments,
   setQuoteData,
@@ -89,7 +89,7 @@ const CommentsOfFeed = ({
                 setQuoteData={setQuoteData}
                 isCreateModalOpen={isCreateModalOpen}
                 setIsCreateModalOpen={setIsCreateModalOpen}
-                setHomeData={setHomeData}
+                setComments={setComments}
                 key={inx}
                 item={iteM}
               />

@@ -1,0 +1,16 @@
+{
+  "New": "نيو",
+  "Feeds" : "فيض",
+  "Profile" : "بروفيل",
+  "People" : "اشخاص",
+  "Search" : "بحث",
+  "Notifications" : "إشعار",
+  "RSS Feeds" : "يغذي RSS",
+  "Dark Mode" : "الوضع الداكن",
+  "Light Mode" : "وضع الضوء",
+"Post" : "بريد",
+  "no post message": "حاليا لا توجد وظيفة للعرض! اتبع بعض الأشخاص لعرض منشوراتهم أو إنشاء بعض المنشورات.",
+  "post placeholder": "ماذا يحدث؟",
+  "tags placeholder" : "حدد العلامات.",
+  "Recent Post": "المنشور الاخير"
+}

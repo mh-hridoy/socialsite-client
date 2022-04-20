@@ -222,9 +222,7 @@ const UserId = (props) => {
                     opacity={0.7}
                   >
                     There's nothing to show!{" "}
-                    {/* <a onClick={() => router.push("/")}>
-                      Please go back to top
-                    </a> */}
+                   
                   </Text>
                 )}
               </WithHeader>

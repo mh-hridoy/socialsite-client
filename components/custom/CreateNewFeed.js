@@ -18,15 +18,14 @@ import { Picker } from "emoji-mart"
 import Resizer from "react-image-file-resizer"
 import { AiOutlineDelete } from "react-icons/ai"
 import axios from "axios"
-import { useSelector } from "react-redux"
-// import Select from "react-select"
+import { useSelector, useDispatch } from "react-redux"
 import SingleFeed from "./SingleFeed"
 import Creatable from "react-select/creatable"
+import { setNewPost } from "../../store/homeDataSlice"
+import { useTranslation } from "react-i18next"
 
 const CreateNewFeed = ({
   name,
-  setHomeData,
-  homeData,
   setIsModalOpen,
   isModalOpen,
   quoteData,
@@ -43,6 +42,8 @@ const CreateNewFeed = ({
   const user = useSelector((state) => state.user.user)
   const [selectedTag, setSelectedTag] = useState(null)
   const textAreaRef = useRef(null)
+const dispatch = useDispatch()
+  const { t } = useTranslation()
 
   const selectOption = [
     { value: "general", label: "General" },
@@ -89,7 +90,6 @@ const CreateNewFeed = ({
 
   const fileHandler = (e) => {
     const files = [...e.target.files]
-    // console.log(files[0])
     if (files[0]?.size > 50000000) {
       return toast({
         status: "error",
@@ -107,7 +107,6 @@ const CreateNewFeed = ({
     }
 
     if (files[0]?.type == "" || files[0]?.type.indexOf("image") == 0) {
-      // console.log(files[0])
       handleImages(files)
     } else if (files[0]?.type.indexOf("video") == 0) {
       videoHandler(files[0])
@@ -131,21 +130,16 @@ const CreateNewFeed = ({
           },
         ])
       }
-      // resolve(reader.result)
       reader.onerror = (error) => reject(error)
     })
   }
 
   const handleImages = (files) => {
+    const reader = new FileReader()
     files.map((file) => {
-      Resizer.imageFileResizer(
-        file,
-        1280,
-        720,
-        "JPEG",
-        90,
-        0,
-        (uri) => {
+      return new Promise((resolve, reject) => {
+        reader.readAsDataURL(file)
+        reader.onload = () => {
           return setImages([
             ...images,
             {
@@ -154,12 +148,14 @@ const CreateNewFeed = ({
                 Date.now() +
                 file.name.split(".").pop(),
               type: file.type || "image/jpeg",
-              img: uri,
+              img: reader.result,
             },
           ])
-        },
-        "base64"
-      )
+        }
+        reader.onerror = (error) => reject(error)
+      })
+
+     
     })
   }
 
@@ -192,13 +188,16 @@ const CreateNewFeed = ({
 
         if (setIsModalOpen != undefined) {
           setIsModalOpen(false)
-          const oldData = [...homeData]
-          const newData = [data, ...oldData]
-          setHomeData([...new Set(newData)])
+          // const oldData = [...homeData]
+          // const newData = [data, ...oldData]
+          // setHomeData([...new Set(newData)])
+          dispatch(setNewPost(data))
         } else {
-          const oldData = [...homeData]
-          const newData = [data, ...oldData]
-          setHomeData([...new Set(newData)])
+          // const oldData = [...homeData]
+          // const newData = [data, ...oldData]
+          // setHomeData([...new Set(newData)])
+          dispatch(setNewPost(data))
+
         }
 
         setImages([])
@@ -295,14 +294,14 @@ const CreateNewFeed = ({
             borderColor={useColorModeValue("gray.200", "#333")}
             px={5}
             pt={2}
-            placeholder="What's happening?"
+            placeholder={t("post placeholder")}
             width={"100%"}
             resize="none"
           />
           <Creatable
             styles={customStyles}
             input={{ backgroundColor: "rgb(29, 155, 240)" }}
-            placeholder="Select tags..."
+            placeholder={t("tags placeholder")}
             onChange={(e) => setSelectedTag(e)}
             value={selectedTag}
             isMulti={true}
@@ -453,13 +452,11 @@ const CreateNewFeed = ({
             fontSize={16}
             bg="buttonColor"
           >
-            Post
+            {t("Post")}
           </Button>
         </Flex>
       </Flex>
-      {/* //quote data */}
-
-      {/* quote data ends here */}
+     
     </Flex>
   )
 }
