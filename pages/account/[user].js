@@ -7,6 +7,7 @@ import { logout } from "../../store/userInfoSlice"
 import axios from "axios"
 import io from "socket.io-client"
 import WithHeader from "../../components/custom/WithHeader"
+import { useTranslation } from "react-i18next"
 
 const UserId = (props) => {
   const [loading, setLoading] = useState(true)
@@ -23,6 +24,7 @@ const UserId = (props) => {
   const [fetchUserFeed, setFetchUserFeed] = useState(false)
   const [fetchingAgain, setFetchingAgain] = useState(false)
   const dispatch = useDispatch()
+  const { t } = useTranslation()
 
   useEffect(() => {
     setFfetchUser(true)
@@ -188,7 +190,7 @@ const UserId = (props) => {
             </Flex>
           ) : (
             <Flex direction={"column"} width={"100%"}>
-              <WithHeader totalPost={totalPost} headerName={"User Account"}>
+              <WithHeader totalPost={totalPost} headerName={t("user account")}>
                 <UserAccount
                   quoteData={props.quoteData}
                   setQuoteData={props.setQuoteData}
@@ -221,8 +223,7 @@ const UserId = (props) => {
                     fontSize={14}
                     opacity={0.7}
                   >
-                    There's nothing to show!{" "}
-                   
+                    {t("nothing to show")}
                   </Text>
                 )}
               </WithHeader>

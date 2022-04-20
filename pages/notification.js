@@ -4,12 +4,15 @@ import { Flex, useColorModeValue, Text, Avatar } from "@chakra-ui/react"
 import {useSelector} from 'react-redux'
 import {useRouter} from 'next/router'
 import axios from 'axios'
+import { useTranslation } from "react-i18next"
 
 const Notification = () => {
       const notifications = useSelector((state) => state.notifications.notifications)
         const router = useRouter()
         const user = useSelector((state) => state.user.user)
         const token = useSelector((state) => state.user.token)
+          const { t } = useTranslation()
+
 
   const notiReadHandler =async (noti) => {
     if (noti?.read == true) {
@@ -49,50 +52,51 @@ const Notification = () => {
             justifyContent="center"
           >
             <Text fontSize={14} opacity={0.8}>
-              Notifications will appear here.
+              {t("no noti message")}
             </Text>
           </Flex>
         )}
 
-        {notifications.length != 0 && notifications?.map((item, inx) => {
-          return (
-            <Flex
-              key={inx}
-              px={4}
-              mx={4}
-              rounded="lg"
-              my={2}
-              py={2}
-              onClick={() =>
-                {
+        {notifications.length != 0 &&
+          notifications?.map((item, inx) => {
+            return (
+              <Flex
+                key={inx}
+                px={4}
+                mx={4}
+                rounded="lg"
+                my={2}
+                py={2}
+                onClick={() => {
                   notiReadHandler(item)
                   router.push(
-                  item?.postType == "comment"
-                    ? `/post/comment/${item?.post?._id}`
-                    : `/post/${item?.post?._id}`
-                );
-                
+                    item?.postType == "comment"
+                      ? `/post/comment/${item?.post?._id}`
+                      : `/post/${item?.post?._id}`
+                  )
+                }}
+                boxShadow="sm"
+                border={"1px"}
+                borderColor="gray.200"
+                alignItems={"center"}
+                gap={2}
+                cursor="pointer"
+                bg={
+                  item?.read == true
+                    ? useColorModeValue("gray.200", "whiteAlpha.400")
+                    : undefined
                 }
-              }
-              boxShadow="sm"
-              border={"1px"}
-              borderColor="gray.200"
-              alignItems={"center"}
-              gap={2}
-              cursor="pointer"
-              bg={item?.read == true ? useColorModeValue("gray.200", "whiteAlpha.400") : undefined}
-            >
-              <Avatar
-                src={item?.by?.profilePicture?.img}
-                size="sm"
-                name={"name"}
-              />
-              <Text fontWeight={600}>{item?.by?.fullName}</Text>
-              <Text fontStyle={"italic"}>Mentioned you in a post</Text>
-            </Flex>
-          )
-        })}
-        
+              >
+                <Avatar
+                  src={item?.by?.profilePicture?.img}
+                  size="sm"
+                  name={"name"}
+                />
+                <Text fontWeight={600}>{item?.by?.fullName}</Text>
+                <Text fontStyle={"italic"}>{t("noti title")}</Text>
+              </Flex>
+            )
+          })}
       </Flex>
     </WithHeader>
   )

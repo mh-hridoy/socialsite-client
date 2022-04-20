@@ -17,6 +17,7 @@ import useHttp from "../components/utils/useHttp"
 import {useSelector} from "react-redux"
 import FeedCard from '../components/custom/FeedCard'
 import SingleUserCard from "../components/custom/SingleUserCard"
+import { useTranslation } from "react-i18next"
 
 const SearchPage = ({
   quoteData,
@@ -35,6 +36,7 @@ const SearchPage = ({
   const [searchUsers, setSearchUsers] = useState(false)
   const toast = useToast({ position: "top", isClosable: true })
   const searchRef = useRef(null)
+  const { t } = useTranslation()
 
   //for post
   const { isLoading: isPostLoading } = useHttp({
@@ -112,7 +114,7 @@ const SearchPage = ({
             rounded={"full"}
             fontSize={14}
             ref={searchRef}
-            placeholder="Search about post and people"
+            placeholder={t("search placeholder")}
             id="search"
             _focus={{ boxShadow: "none" }}
             borderColor={useColorModeValue("#1A202C88", "whiteAlpha.400")}
@@ -140,8 +142,8 @@ const SearchPage = ({
         >
           <Tabs width={"100%"} size={"sm"}>
             <TabList _focus={{ boxShadow: "none" }} gap={10}>
-              <Tab _focus={{ boxShadow: "none" }}>Posts</Tab>
-              <Tab _focus={{ boxShadow: "none" }}>People</Tab>
+              <Tab _focus={{ boxShadow: "none" }}>{t("posts")}</Tab>
+              <Tab _focus={{ boxShadow: "none" }}>{t("people")}</Tab>
             </TabList>
             <TabPanels>
               <TabPanel>
@@ -153,7 +155,7 @@ const SearchPage = ({
                     textAlign={"center"}
                   >
                     {" "}
-                    Nothing to show! (Search result will appear here!)
+                    {t("search no result")}
                   </Text>
                 )}
 
@@ -196,7 +198,7 @@ const SearchPage = ({
                     textAlign={"center"}
                   >
                     {" "}
-                    Nothing to show! (Search result will appear here!)
+                    {t("search no result")}
                   </Text>
                 )}
 

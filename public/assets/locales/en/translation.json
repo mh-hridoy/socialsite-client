@@ -12,5 +12,21 @@
   "no post message": "Currently there's no post to show! Follow some people to view their posts or create some post.",
   "post placeholder": "What's happening?",
   "tags placeholder" : "Select tags.",
-  "Recent Post": "Recent Post"
+  "Recent Post": "Recent Post",
+  "nothing to show" : "There's nothing to show!",
+  "following": "Followings",
+  "followers" : "Followers",
+  "sniper" : "Sniper",
+  "home" : "Home",
+  "my account" : "My Account",
+  "user account" : "User Account",
+  "people you know" : "People you may know",
+  "people" : "People",
+  "Blocked" : "Blocked List",
+  "posts": "Posts",
+  "search placeholder" : "Search about post and people...",
+  "search no result" : "Nothing to show! (Search result will appear here!)",
+  "no noti message" : "Notifications will appear here.",
+  "noti title": "Mentioned you in a post"
+
 }

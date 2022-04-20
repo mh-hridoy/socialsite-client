@@ -39,6 +39,7 @@ import SingleUserCard from "../custom/SingleUserCard"
 import countyCode from "../utils/countyCode"
 import Select from "react-select"
 import Creatable from "react-select/creatable"
+import { useTranslation } from "react-i18next"
 
 import { changeData } from "../../store/userInfoSlice"
 import FeedCard from "../custom/FeedCard"
@@ -88,6 +89,7 @@ const UserAccount = ({
   const [searchSniper, setSearchSniper] = useState(false)
   const [usernameValue, setUsernameValue] = useState("")
   const [userErrorMessage, setUserErrorMessage] = useState("")
+  const { t } = useTranslation()
 
   const isMyAccount = router.pathname == "/account/myaccount/[user]"
 
@@ -478,7 +480,7 @@ const UserAccount = ({
         onClose={() => {
           setProfileImage(null)
           setUsernameValue("")
-          
+
           setIsModalOpen(!isModalOpen)
         }}
       >
@@ -763,7 +765,11 @@ const UserAccount = ({
               <MdVerified color="rgb(29, 155, 240)" />
             )}
           </Text>
-          {user?.userName && <Text fontSize={14} opacity={0.8} >@{user?.userName}</Text>}
+          {user?.userName && (
+            <Text fontSize={14} opacity={0.8}>
+              @{user?.userName}
+            </Text>
+          )}
 
           {user?.bio && <Text>{user.bio}</Text>}
 
@@ -830,7 +836,7 @@ const UserAccount = ({
             >
               {countReaction(user.following?.length)}
               <Text opacity={0.8} fontWeight={200}>
-                Followings
+                {t("following")}
               </Text>
             </Text>
 
@@ -844,7 +850,7 @@ const UserAccount = ({
             >
               {countReaction(user.follower?.length)}{" "}
               <Text opacity={0.8} fontWeight={200}>
-                Followers
+                {t("followers")}
               </Text>
             </Text>
           </Flex>
@@ -853,8 +859,10 @@ const UserAccount = ({
         {/* tabs will be here */}
         <Tabs>
           <TabList>
-            <Tab _focus={{ boxShadow: "none" }}>Feeds</Tab>
-            {isMyAccount && <Tab _focus={{ boxShadow: "none" }}>Sniper</Tab>}
+            <Tab _focus={{ boxShadow: "none" }}>{t("Feeds")}</Tab>
+            {isMyAccount && (
+              <Tab _focus={{ boxShadow: "none" }}>{t("sniper")}</Tab>
+            )}
           </TabList>
           <TabPanels>
             <TabPanel>

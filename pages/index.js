@@ -8,6 +8,7 @@ import io from "socket.io-client"
 import { logout } from "../store/userInfoSlice"
 import { setAllHomeData, setHomeData } from "../store/homeDataSlice"
 import WithHeader from "../components/custom/WithHeader"
+import { useTranslation } from "react-i18next"
 
 export default function Home(props) {
   const token = useSelector((state) => state.user.token)
@@ -20,6 +21,7 @@ export default function Home(props) {
   const [totalPage, setTotalPage] = useState(null)
   const [page, setPage] = useState(1)
   const [fetchingHomeData, setFetchingHomeData] = useState(false)
+  const { t } = useTranslation()
 
   useEffect(() => {
     if (!loading) {
@@ -116,7 +118,7 @@ export default function Home(props) {
               minWidth="100%"
               direction="column"
             >
-              <WithHeader headerName={props.headerName}>
+              <WithHeader headerName={t("home")}>
                 <HomeComponent
                   quoteData={props.quoteData}
                   setQuoteData={props.setQuoteData}

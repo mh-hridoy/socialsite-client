@@ -79,7 +79,7 @@ const SideBar = ({
   ]
 
   useEffect(() => {
-    const langName = document.cookie.split("i18next=")[1]
+    const langName = document.cookie.split("i18next=")[1] || "en"
     
     setSelectedLanguage(langName)
   }, [])

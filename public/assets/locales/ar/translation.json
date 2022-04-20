@@ -12,5 +12,21 @@
   "no post message": "حاليا لا توجد وظيفة للعرض! اتبع بعض الأشخاص لعرض منشوراتهم أو إنشاء بعض المنشورات.",
   "post placeholder": "ماذا يحدث؟",
   "tags placeholder" : "حدد العلامات.",
-  "Recent Post": "المنشور الاخير"
+  "Recent Post": "المنشور الاخير",
+  "nothing to show" : "لا يوجد شيء لإظهاره!",
+  "following": "الآتي",
+  "followers" : "متابعون",
+  "sniper" : "قناص",
+  "home" : "مسكن",
+  "my account" : "حسابي",
+  "user account" : "حساب المستخدم",
+  "people you know" : "قد تكون تعرف الناس",
+  "people" : "الناس",
+  "Blocked" : "القائمة المحظورة",
+  "posts": "المشاركات",
+  "search placeholder" : "البحث عن المنشورات والأشخاص ...",
+  "search no result" : "لا شيء للعرض! (ستظهر نتيجة البحث هنا!)",
+  "no noti message" : "ستظهر الإخطارات هنا.",
+    "noti title": "ذكرك في وظيفة"
+
 }
