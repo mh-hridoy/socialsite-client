@@ -27,6 +27,15 @@
   "search placeholder" : "게시물 및 사람 검색...",
   "search no result" : "아무것도 표시할 수 없습니다! (검색 결과가 여기에 표시됩니다!)",
   "no noti message" : "알림이 여기에 표시됩니다.",
-  "noti title": "게시물에서 나를 멘션함"
+  "noti title": "게시물에서 나를 멘션함",
+    "manage account" : "계정 관리",
+  "full name" : "성명",
+  "user name" : "사용자 이름",
+  "bio" : "바이오",
+  "location" : "위치",
+  "date of birth" : "생일",
+  "website" : "웹사이트",
+  "language" : "언어",
+  "your tag" : "내 태그"
 
 }

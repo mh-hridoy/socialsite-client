@@ -27,6 +27,15 @@
   "search placeholder" : "搜索帖子和人员...",
   "search no result" : "没什么可显示的！ （搜索结果会出现在这里！）",
   "no noti message" : "通知将出现在此处。",
-  "noti title": "在帖子中提到了你"
+  "noti title": "在帖子中提到了你",
+    "manage account" : "管理帐户",
+  "full name" : "全名",
+  "user name" : "用户名",
+  "bio" : "生物",
+  "location" : "地点",
+  "date of birth" : "出生日期",
+  "website" : "网站",
+  "language" : "语言",
+  "your tag" : "你的标签"
 
 }

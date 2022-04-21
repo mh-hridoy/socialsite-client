@@ -27,6 +27,16 @@
   "search placeholder" : "Search about post and people...",
   "search no result" : "Nothing to show! (Search result will appear here!)",
   "no noti message" : "Notifications will appear here.",
-  "noti title": "Mentioned you in a post"
+  "noti title": "Mentioned you in a post",
+  "manage account" : "Manage Account",
+  "full name" : "Full Name",
+  "user name" : "Username",
+  "bio" : "Bio",
+  "location" : "Location",
+  "date of birth" : "Date of birth",
+  "website" : "Website",
+  "language" : "Language",
+  "your tag" : "Your tags"
+  
 
 }

@@ -27,6 +27,15 @@
   "search placeholder" : "Buscar sobre publicaciones y personas...",
   "search no result" : "¡Nada que mostrar! (¡El resultado de la búsqueda aparecerá aquí!)",
   "no noti message" : "Las notificaciones aparecerán aquí.",
-  "noti title": "te mencione en una publicacion"
+  "noti title": "te mencione en una publicacion",
+   "manage account" : "administrar cuenta",
+  "full name" : "Nombre completo",
+  "user name" : "Nombre de usuario",
+  "bio" : "biografía",
+  "location" : "Localización",
+  "date of birth" : "Fecha de cumpleaños",
+  "website" : "Sitio web",
+  "language" : "Idioma",
+  "your tag" : "Tus etiquetas"
 
 }

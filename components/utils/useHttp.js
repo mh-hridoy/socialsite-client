@@ -11,6 +11,7 @@ const useHttp = ({
   url = null,
   method = "get",
   body = null,
+
   isAuth = false,
   isSetData = false,
   setData = null,
@@ -88,7 +89,7 @@ const useHttp = ({
           }
 
           if (setFetchNow !== null) {
-            setFetchNow(!fetchNow)
+            setFetchNow(false)
           }
 
           if (isToast) {
@@ -156,7 +157,7 @@ const useHttp = ({
         } catch (err) {
           console.log(err)
           if (setFetchNow !== null) {
-            setFetchNow(!fetchNow)
+            setFetchNow(false)
           }
 
           let errorMsg = err.response
@@ -192,6 +193,8 @@ const useHttp = ({
       }
       fetchData()
     }
+
+    return (() => setFetchNow(false))
   }, [fetchNow, extraLoad != null && extraLoad])
 
   return { isLoading, requestedData }

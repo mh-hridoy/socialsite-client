@@ -74,6 +74,41 @@ const theme = extendTheme(
   })
 )
 
+i18next
+  .use(Backend)
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    supportedLngs: [
+      "ar",
+      "en",
+      "hi",
+      "es",
+      "fr",
+      "zh",
+      "ja",
+      "it",
+      "ko",
+      "tr",
+      "ru",
+    ],
+
+    fallbackLng: "en",
+    debug: false,
+    detection: {
+      order: ["cookie", "htmlTag"],
+      caches: ["cookie"],
+    },
+    react: {
+      useSuspense: false,
+    },
+    backend: {
+      loadPath: "/assets/locales/{{lng}}/translation.json",
+      allowMultiLoading: false,
+      crossDomain: false,
+    },
+  })
+
 function MyApp({ Component, pageProps }) {
   const [headerName, setHeaderName] = useState("Home")
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -83,40 +118,7 @@ function MyApp({ Component, pageProps }) {
   Router.events.on("routeChangeComplete", progress.finish)
   Router.events.on("routeChangeError", progress.finish)
 
-  i18next
-    .use(Backend)
-    .use(LanguageDetector)
-    .use(initReactI18next)
-    .init({
-      supportedLngs: [
-        "ar",
-        "en",
-        "hi",
-        "es",
-        "fr",
-        "zh",
-        "ja",
-        "it",
-        "ko",
-        "tr",
-        "ru",
-      ],
-
-      fallbackLng: "en",
-      debug: false,
-      detection: {
-        order: ["cookie", "htmlTag"],
-        caches: ["cookie"],
-      },
-      react: {
-        useSuspense: false,
-      },
-      backend: {
-        loadPath: "/assets/locales/{{lng}}/translation.json",
-        allowMultiLoading: false,
-        crossDomain: false,
-      },
-    })
+  
 
   return (
     <StoreProvider>

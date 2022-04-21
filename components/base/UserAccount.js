@@ -582,15 +582,14 @@ const UserAccount = ({
               </Flex>
             </Flex>
             <Flex gap={2} mt={14} direction={"column"}>
-              <FormControl htmlFor="name"> Full Name </FormControl>
+              <FormControl htmlFor="name"> {t("full name")} </FormControl>
               <Input
                 value={nameValue != "" ? nameValue : user.fullName}
                 onChange={(e) => setNameValue(e.target.value)}
                 id="name"
               />
-              <FormControl htmlFor="username"> Username </FormControl>
+              <FormControl htmlFor="username"> {t("user name")} </FormControl>
               <Input
-                placeholder="username "
                 value={
                   usernameValue != "" ? usernameValue : user?.usernameValue
                 }
@@ -603,21 +602,24 @@ const UserAccount = ({
                   {userErrorMessage}{" "}
                 </Text>
               )}
-              <FormControl htmlFor="bio"> Bio </FormControl>
+              <FormControl htmlFor="bio"> {t("bio")} </FormControl>
               <Input
                 value={bioValue != "" ? bioValue : user.bio}
                 onChange={(e) => setBioValue(e.target.value)}
                 id="bio"
               />
 
-              <FormControl htmlFor="location"> Location </FormControl>
+              <FormControl htmlFor="location"> {t("location")} </FormControl>
               <Input
                 value={locationValue != "" ? locationValue : user?.location}
                 onChange={(e) => setLocationValue(e.target.value)}
                 id="location"
               />
 
-              <FormControl htmlFor="dateOfBirth"> Date Of Birth </FormControl>
+              <FormControl htmlFor="dateOfBirth">
+                {" "}
+                {t("date of birth")}{" "}
+              </FormControl>
               <Input
                 type={"date"}
                 value={
@@ -629,7 +631,7 @@ const UserAccount = ({
                 id="dateOfBirth"
               />
 
-              <FormControl htmlFor="websiteLink"> Website </FormControl>
+              <FormControl htmlFor="websiteLink"> {t("website")} </FormControl>
               <Input
                 value={
                   webSiteLinkValue != "" ? webSiteLinkValue : user?.websiteLink
@@ -638,7 +640,7 @@ const UserAccount = ({
                 id="websiteLink"
               />
 
-              <FormControl htmlFor="language"> Language </FormControl>
+              <FormControl htmlFor="language"> {t("language")} </FormControl>
               <Select
                 defaultValue={{
                   value: user?.userLangVal,
@@ -652,10 +654,9 @@ const UserAccount = ({
                 onChange={languageHandler}
               />
 
-              <FormControl htmlFor="tags"> Your Tags </FormControl>
+              <FormControl htmlFor="tags"> {t("your tag")} </FormControl>
               <Creatable
                 styles={customStyles}
-                placeholder="Select or Create your tags..."
                 id="tags"
                 value={userTags}
                 isMulti={true}
@@ -710,14 +711,14 @@ const UserAccount = ({
         </Flex>
 
         <Flex justifyContent="flex-end" paddingRight={5}>
-          {userAccount?._id == router.query.user ? (
+          {userAccount?.userName == router.query.user ? (
             <Button
               onClick={() => setIsModalOpen(!isModalOpen)}
               size="sm"
               fontSize={12}
               variant="outline"
             >
-              Manage Account
+              {t("manage account")}
             </Button>
           ) : (
             <Flex gap={4}>

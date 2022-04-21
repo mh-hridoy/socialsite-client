@@ -27,6 +27,15 @@
   "search placeholder" : "Gönderi ve kişiler hakkında ara...",
   "search no result" : "Gösterilecek bir şey yok! (Arama sonucu burada görünecek!)",
   "no noti message" : "Bildirimler burada görünecektir.",
-  "noti title": "Bir gönderide senden bahsetti"
+  "noti title": "Bir gönderide senden bahsetti",
+    "manage account" : "Hesabı yönet",
+  "full name" : "Ad Soyad",
+  "user name" : "Kullanıcı adı",
+  "bio" : "biyo",
+  "location" : "Konum",
+  "date of birth" : "Doğum tarihi",
+  "website" : "İnternet sitesi",
+  "language" : "Dilim",
+  "your tag" : "Etiketleriniz"
 
 }

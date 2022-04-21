@@ -27,6 +27,15 @@
   "search placeholder" : "البحث عن المنشورات والأشخاص ...",
   "search no result" : "لا شيء للعرض! (ستظهر نتيجة البحث هنا!)",
   "no noti message" : "ستظهر الإخطارات هنا.",
-    "noti title": "ذكرك في وظيفة"
+    "noti title": "ذكرك في وظيفة",
+     "manage account" : "إدارة الحساب",
+  "full name" : "الاسم الكامل",
+  "user name" : "اسم المستخدم",
+  "bio" : "السيرة الذاتية",
+  "location" : "موقع",
+  "date of birth" : "تاريخ الولادة",
+  "website" : "موقع الكتروني",
+  "language" : "لغة",
+  "your tag" : "العلامات الخاصة بك"
 
 }

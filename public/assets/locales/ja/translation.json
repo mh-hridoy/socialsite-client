@@ -27,6 +27,15 @@
   "search placeholder" : "投稿と人について検索...",
   "search no result" : "表示するものはありません！ （検索結果はここに表示されます！）",
   "no noti message" : "通知はここに表示されます.",
-  "noti title": "投稿であなたに言及しました"
+  "noti title": "投稿であなたに言及しました",
+    "manage account" : "アカウントの管理",
+  "full name" : "フルネーム",
+  "user name" : "ユーザー名",
+  "bio" : "バイオ",
+  "location" : "位置",
+  "date of birth" : "生年月日",
+  "website" : "Webサイト",
+  "language" : "言語",
+  "your tag" : "あなたのタグ"
 
 }

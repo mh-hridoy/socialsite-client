@@ -27,6 +27,15 @@
   "search placeholder" : "Cerca post e persone...",
   "search no result" : "Niente da mostrare! (Il risultato della ricerca apparirà qui!)",
   "no noti message" : "Le notifiche appariranno qui.",
-  "noti title": "Ti ho menzionato in un post"
+  "noti title": "Ti ho menzionato in un post",
+    "manage account" : "Gestisci profilo",
+  "full name" : "Nome e cognome",
+  "user name" : "Nome utente",
+  "bio" : "bio",
+  "location" : "Posizione",
+  "date of birth" : "Data di nascita",
+  "website" : "Sito web",
+  "language" : "Lingua",
+  "your tag" : "I tuoi tag"
 
 }

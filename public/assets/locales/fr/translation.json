@@ -27,6 +27,15 @@
   "search placeholder" : "Rechercher sur la publication et les personnes...",
   "search no result" : "Rien à montrer ! (Le résultat de la recherche apparaîtra ici !)",
   "no noti message" : "Les notifications apparaîtront ici.",
-  "noti title": "Vous a mentionné dans un post"
+  "noti title": "Vous a mentionné dans un post",
+    "manage account" : "Gérer son compte",
+  "full name" : "Nom complet",
+  "user name" : "Nom d'utilisateur",
+  "bio" : "Bio",
+  "location" : "Emplacement",
+  "date of birth" : "Date de naissance",
+  "website" : "Site Internet",
+  "language" : "Langue",
+  "your tag" : "Vos balises"
 
 }
