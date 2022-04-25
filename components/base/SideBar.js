@@ -15,7 +15,6 @@ import {
   Badge,
   ModalCloseButton,
   Select,
-  FormLabel,
 } from "@chakra-ui/react"
 
 import { useRouter } from "next/router"
@@ -59,6 +58,7 @@ const SideBar = ({
   const {t, i18n } = useTranslation()
   
   const unread = useSelector((state) => state.notifications.unread)
+  const myAccountPath = `/${user?.userName}`
 
   const langs = [
     { value: "ar", label: "Arabic", nativeName: "العربية" },
@@ -125,8 +125,8 @@ const SideBar = ({
     {
       name: t("Profile"),
       Icon: MdOutlineAccountCircle,
-      uri: `/account/myaccount/${user?.userName}`,
-      path: `/account/myaccount/[user]`,
+      uri: `/${user?.userName}`,
+      path: `/[user]`,
     },
     {
       name: t("People"),
@@ -154,6 +154,7 @@ const SideBar = ({
       path: `/rss-feed`,
     },
   ]
+
 
   useEffect(() => {
     if (user != null) {
@@ -254,7 +255,9 @@ const SideBar = ({
                   px={3}
                   rounded="full"
                   onClick={() => router.push(uri)}
-                  fontWeight={pathName == path ? 700 : undefined}
+                  fontWeight={
+                    pathName == path ? 700 : undefined
+                  }
                   _hover={{
                     backgroundColor: useColorModeValue("gray.100", "#333333"),
                   }}

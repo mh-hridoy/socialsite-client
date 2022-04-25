@@ -136,11 +136,7 @@ const SingleUserCard = ({ user, userData }) => {
       >
         <Flex
           onClick={() =>
-            router.push(
-              currentUser?._id == userInfo?._id
-                ? `/account/myaccount/${currentUser?._id}`
-                : `/account/${currentUser?._id}`
-            )
+            router.push(`/${currentUser?.userName}`)
           }
           gap={2}
           cursor="pointer"
@@ -170,7 +166,7 @@ const SingleUserCard = ({ user, userData }) => {
         </Flex>
 
         {currentUser?._id == userInfo?._id && (
-          <Button bg="buttonColor" size="sm" onClick={() => router.push(`/account/myaccount/${userInfo?._id}`)}  >My Account</Button>
+          <Button bg="buttonColor" size="sm" onClick={() => router.push(`/${userInfo?.userName}`)}  >My Account</Button>
         )}
 
         {currentUser?._id != userInfo?._id && (

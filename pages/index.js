@@ -30,6 +30,7 @@ export default function Home(props) {
       })
       socket.on("posts", (data) => {
         // console.log(data)
+        // console.log(data)
                   dispatch(setHomeData(data))
         // setupAllData(data)
       })

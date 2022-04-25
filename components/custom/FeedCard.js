@@ -40,9 +40,9 @@ import LinkPreview from "./LinkPreview"
 import { find as FindURL } from "linkifyjs"
 import parse from "html-react-parser"
 import LanguageDetect from "languagedetect"
-import axios from 'axios'
+import axios from "axios"
 import "linkify-plugin-mention"
-import {setDeletePost} from '../../store/homeDataSlice'
+import { setDeletePost } from "../../store/homeDataSlice"
 import { useDispatch } from "react-redux"
 
 const FeedCard = (props) => {
@@ -69,9 +69,13 @@ const FeedCard = (props) => {
   const [getTranslate, setGetTranslate] = useState(false)
   const [translateText, setTranslateText] = useState("")
   const [videoStartTime, setVideoStartTime] = useState(null)
-  const {ref : videoRef, inView : isVideoIn, entry} = useInView({ threshold: 0 })
+  const {
+    ref: videoRef,
+    inView: isVideoIn,
+    entry,
+  } = useInView({ threshold: 0 })
   const [totalViews, setTotalViews] = useState(0)
-  const [increaseView,setIncreaseView] = useState(false)
+  const [increaseView, setIncreaseView] = useState(false)
   const [playingId, setPlayingId] = useState(null)
   const pathName = router.pathname
   const lngDetector = new LanguageDetect()
@@ -84,7 +88,7 @@ const FeedCard = (props) => {
     default: 2,
     700: 1,
   }
-// console.log(item)
+  // console.log(item)
   useEffect(() => {
     let totalView = 0
     item?.images?.forEach((item) => {
@@ -115,7 +119,7 @@ const FeedCard = (props) => {
           setGetTranslate(false)
           setTranslateText(data?.translatedText)
         } catch (e) {
-                    setGetTranslate(false)
+          setGetTranslate(false)
 
           const errorMsg = e.response
             ? e.response.data.message
@@ -133,7 +137,7 @@ const FeedCard = (props) => {
   useEffect(() => {
     if (props?.item?.text) {
       const postLlang = lngDetector.detect(props?.item?.text)
-      if(postLlang.length != 0){
+      if (postLlang.length != 0) {
         setPostLanguage(postLlang[0][0])
       }
     }
@@ -145,14 +149,21 @@ const FeedCard = (props) => {
 
     if (allLinks.length != 0) {
       allLinks.forEach((link) => {
-        const indexOfUrl = text.indexOf(link.value)
-        if (indexOfUrl >= 0) {
-          text =
-            text.substring(0, indexOfUrl) +
-            `<a ${link.type == "url" && "href="+link.value} target="_blank">` +
-            text.substring(indexOfUrl, indexOfUrl + link.value.length) +
-            "</a>" +
-            text.substring(indexOfUrl + link.value.length)
+        // console.log(link)
+        if (link.type == "url" && item?.linkData?.image?.img) {
+          text = text.replace(text.substring(link.start, link.end), "")
+        } else {
+          const indexOfUrl = text.indexOf(link.value)
+          if (indexOfUrl >= 0) {
+            text =
+              text.substring(0, indexOfUrl) +
+              `<a ${
+                link.type == "url" && "href=" + link.value
+              } target="_blank">` +
+              text.substring(indexOfUrl, indexOfUrl + link.value.length) +
+              "</a>" +
+              text.substring(indexOfUrl + link.value.length)
+          }
         }
       })
     } else {
@@ -164,11 +175,10 @@ const FeedCard = (props) => {
 
   const videoRefHandler = async (Inview, entry) => {
     if (!Inview) {
-   const video = document.querySelector("video")
-      if(!video.paused){
+      const video = document.querySelector("video")
+      if (!video.paused) {
         await video.pause()
       }
-    
     }
   }
 
@@ -195,29 +205,25 @@ const FeedCard = (props) => {
     const timeNow = new Date()
     setVideoStartTime(timeNow)
     setPlayingId(videoId)
-
   }
 
   // increase view
-   const { isLoading: _increaingseView } = useHttp({
-     fetchNow: increaseView,
-     setFetchNow: setIncreaseView,
-     method: "post",
-     body: { user: user?._id, postId : item?._id },
-     url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/increase-view/${playingId}`,
-     isAuth: true,
-   })
-
+  const { isLoading: _increaingseView } = useHttp({
+    fetchNow: increaseView,
+    setFetchNow: setIncreaseView,
+    method: "post",
+    body: { user: user?._id, postId: item?._id },
+    url: `${process.env.NEXT_PUBLIC_MAIN_PROXY}/increase-view/${playingId}`,
+    isAuth: true,
+  })
 
   const videoPauseHandler = () => {
     var diff = new Date() - videoStartTime
     var second = Math.floor(diff / 1000)
 
-    if(second > 15) {
-    setIncreaseView(true)
-
-    }    
-
+    if (second > 15) {
+      setIncreaseView(true)
+    }
   }
 
   const likeHandler = async (e) => {
@@ -321,14 +327,14 @@ const FeedCard = (props) => {
     isAuth: true,
     isEToast: true,
     cb: () => {
-      if(props.setHomeData) {
-         props.setHomeData((prev) => {
-           const allPost = [...prev]
-           const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
-           allPost.splice(indexOfPost, 1)
-           return [...new Set(allPost)]
-         })
-      }else if (props.setComments) {
+      if (props.setHomeData) {
+        props.setHomeData((prev) => {
+          const allPost = [...prev]
+          const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
+          allPost.splice(indexOfPost, 1)
+          return [...new Set(allPost)]
+        })
+      } else if (props.setComments) {
         props.setComments((prev) => {
           const allPost = [...prev]
           const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
@@ -338,7 +344,6 @@ const FeedCard = (props) => {
       } else {
         dispatch(setDeletePost(item))
       }
-     
     },
   })
 
@@ -355,18 +360,16 @@ const FeedCard = (props) => {
     isAuth: true,
     isEToast: true,
     cb: () => {
-           if (props.setHomeData) {
-             props.setHomeData((prev) => {
-               const allPost = [...prev]
-               const indexOfPost = allPost.findIndex(
-                 (itm) => itm?._id == item?._id
-               )
-               allPost.splice(indexOfPost, 1)
-               return [...new Set(allPost)]
-             })
-           } else {
-             dispatch(setDeletePost(item))
-           }
+      if (props.setHomeData) {
+        props.setHomeData((prev) => {
+          const allPost = [...prev]
+          const indexOfPost = allPost.findIndex((itm) => itm?._id == item?._id)
+          allPost.splice(indexOfPost, 1)
+          return [...new Set(allPost)]
+        })
+      } else {
+        dispatch(setDeletePost(item))
+      }
     },
   })
 
@@ -470,11 +473,7 @@ const FeedCard = (props) => {
               gap={2}
               onClick={(e) => {
                 e.stopPropagation()
-                router.push(
-                  item.user._id == user._id
-                    ? `/account/myaccount/${item?.user?.userName}`
-                    : `/account/${item && item?.user?.userName}`
-                )
+                router.push(`/${item && item?.user?.userName}`)
               }}
             >
               <Avatar
@@ -585,11 +584,7 @@ const FeedCard = (props) => {
                 cursor="pointer"
                 onClick={(e) => {
                   e.stopPropagation()
-                  router.push(
-                    item?.referPost?.user?._id == user?._id
-                      ? `/account/myaccount/${item?.referPost?.user?.userName}`
-                      : `/account/${item?.referPost?.user.userName}`
-                  )
+                  router.push(`/${item?.referPost?.user?.userName}`)
                 }}
               >
                 {item?.referPost?.user.fullName}

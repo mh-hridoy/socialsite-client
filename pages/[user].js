@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react"
 import { Flex, useToast, Spinner, Text } from "@chakra-ui/react"
-import UserAccount from "../../components/base/UserAccount"
+import UserAccount from "./../components/base/UserAccount"
 import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/router"
-import { logout } from "../../store/userInfoSlice"
+import { logout } from "./../store/userInfoSlice"
 import axios from "axios"
 import io from "socket.io-client"
-import WithHeader from "../../components/custom/WithHeader"
+import WithHeader from "./../components/custom/WithHeader"
 import { useTranslation } from "react-i18next"
 
 const UserId = (props) => {

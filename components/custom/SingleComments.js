@@ -102,11 +102,7 @@ const SingleComments = ({item}) => {
         cursor="pointer"
         onClick={(e) => {
           e.stopPropagation()
-          router.push(
-            item.user._id == user._id
-              ? `/account/myaccount/${item.user._id}`
-              : `/account/${item.user._id}`
-          )
+          router.push(`/${item.userName}`)
         }}
       >
         <Avatar
