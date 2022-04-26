@@ -91,7 +91,7 @@ const UserAccount = ({
   const [userErrorMessage, setUserErrorMessage] = useState("")
   const { t } = useTranslation()
 
-  const isMyAccount = router.pathname == "/account/myaccount/[user]"
+  const isMyAccount = `/${router?.query?.user}` == `/${userAccount?.userName}`
 
   const [crop, setCrop] = useState({
     unit: "%",
@@ -800,7 +800,7 @@ const UserAccount = ({
             <Flex gap={2}>
               <Text fontSize={14}>Website : </Text>
               <a
-                onClick={() => window.open(user?.websiteLink)}
+                onClick={() => window.open("http://"+user?.websiteLink, "_blank")}
                 fontSize={14}
                 opacity={0.8}
               >
