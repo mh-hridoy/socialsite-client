@@ -57,7 +57,7 @@ likeHandler
           setIsModalOpen(!isModalOpen)
         }}
       >
-        <ModalOverlay />
+        <ModalOverlay bg="blackAlpha.900" />
         <ModalContent
           shadow={"none"}
           alignItems={"center"}
