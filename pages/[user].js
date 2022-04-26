@@ -93,7 +93,7 @@ const UserId = (props) => {
   useEffect(() => {
     if (!loading) {
       const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
-        query: { token: token, userId: router.query.user },
+        query: { token: token, userId: user?.userName },
       })
       socket.on("uesrPosts", (data) => {
         setupAllData(data)

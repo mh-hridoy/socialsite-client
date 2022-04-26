@@ -436,6 +436,14 @@ const FeedCard = (props) => {
       </Modal>
 
       <GalleryModal
+      quoteHandler={quoteHandler}
+        setIsCreateModalOpen = {props.setIsCreateModalOpen}
+        item={item}
+        shareHandler={shareHandler}
+        likeHandler={likeHandler}
+        unLikeHandler={unLikeHandler}
+        unSharehandler = {unSharehandler}
+        totalComment={props.totalComment}
         isModalOpen={isModalOpen}
         setCurrentImageArray={setCurrentImageArray}
         setIsModalOpen={setIsModalOpen}
@@ -640,7 +648,7 @@ const FeedCard = (props) => {
               marginLeft={10}
               gap={5}
             >
-              {item?.tags.map((item, inx) => {
+              {item?.tags?.map((item, inx) => {
                 return (
                   <Tag
                     cursor={"pointer"}

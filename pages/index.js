@@ -26,7 +26,7 @@ export default function Home(props) {
   useEffect(() => {
     if (!loading) {
       const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
-        query: { token: token, userId: user?._id },
+        query: { token: token, userId: user?.userName },
       })
       socket.on("posts", (data) => {
         // console.log(data)

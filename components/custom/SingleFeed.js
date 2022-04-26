@@ -28,28 +28,35 @@ const SingleFeed = ({ item, linkData, showLink }) => {
     return <Text p={4}>Post deleted</Text>
   }
 
-  const PostText = () => {
-    const allLinks = FindURL(item?.text)
-    let text = item?.text
+    const PostText = () => {
+      const allLinks = FindURL(item?.text)
+      let text = item?.text
 
-    if (allLinks.length != 0) {
-      allLinks.forEach((link) => {
-        const indexOfUrl = text.indexOf(link.value)
-        if (indexOfUrl >= 0) {
-          text =
-            text.substring(0, indexOfUrl) +
-            `<a href=${link.value} target="_blank">` +
-            text.substring(indexOfUrl, indexOfUrl + link.value.length) +
-            "</a>" +
-            text.substring(indexOfUrl + link.value.length)
-        }
-      })
-    } else {
-      text = `<p>${text}</p>`
+      if (allLinks.length != 0) {
+        allLinks.forEach((link) => {
+          // console.log(link)
+          if (link.type == "url" && item?.linkData?.image?.img) {
+            text = text.replace(text.substring(link.start, link.end), "")
+          } else {
+            const indexOfUrl = text.indexOf(link.value)
+            if (indexOfUrl >= 0) {
+              text =
+                text.substring(0, indexOfUrl) +
+                `<a ${
+                  link.type == "url" && "href=" + link.value
+                } target="_blank">` +
+                text.substring(indexOfUrl, indexOfUrl + link.value.length) +
+                "</a>" +
+                text.substring(indexOfUrl + link.value.length)
+            }
+          }
+        })
+      } else {
+        text = `<p>${text}</p>`
+      }
+
+      return <div> {parse(text)} </div>
     }
-
-    return <div> {parse(text)} </div>
-  }
 
   return (
     <Flex width={"100%"} direction={"column"} gap={4} position="relative">
