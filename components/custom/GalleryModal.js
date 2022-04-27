@@ -126,7 +126,7 @@ likeHandler
                 >
                   <AiOutlineComment color="white" size={20} />
                   {item?.refComment?.length != 0 && (
-                    <Text fontSize={14}>
+                    <Text color="white" fontSize={14}>
                       {countReaction(totalComment || item?.refComment?.length)}
                     </Text>
                   )}
@@ -149,7 +149,7 @@ likeHandler
                         size={18}
                       />
                       {item?.sharedBy?.length != 0 && (
-                        <Text fontWeight={200} fontSize={14}>
+                        <Text color="white" fontWeight={200} fontSize={14}>
                           {countReaction(
                             item?.sharedBy?.length + item?.quoteBy?.length || 0
                           )}
@@ -201,7 +201,7 @@ likeHandler
                     <BsHeart color="white" size={18} />
                   )}
                   {item?.reactedByUser?.length != 0 && (
-                    <Text fontSize={14}>
+                    <Text color="white" fontSize={14}>
                       {countReaction(item?.reactedByUser?.length)}
                     </Text>
                   )}
