@@ -17,6 +17,7 @@ const CommentsOfFeed = ({
   isCreateModalOpen,
   setIsCreateModalOpen,
   item,
+  nShowRef
 }) => {
   const user = useSelector((state) => state.user.user)
   const router = useRouter()
@@ -85,6 +86,7 @@ const CommentsOfFeed = ({
           comments.map((iteM, inx) => {
             return (
               <FeedCard
+                nShowRef={nShowRef}
                 quoteData={quoteData}
                 setQuoteData={setQuoteData}
                 isCreateModalOpen={isCreateModalOpen}

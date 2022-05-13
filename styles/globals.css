@@ -1,3 +1,6 @@
+.carousel-root {
+    height: 600px;
+}
 .my-masonry-grid {
     display: -webkit-box;
     /* Not needed if autoprefixing */
@@ -39,4 +42,8 @@
         margin-bottom: 15px;
         /* space between items */
     }
+
+        .carousel-root {
+            height: 600px;
+        }
 }

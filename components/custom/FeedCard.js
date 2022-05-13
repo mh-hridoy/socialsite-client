@@ -436,13 +436,15 @@ const FeedCard = (props) => {
       </Modal>
 
       <GalleryModal
-      quoteHandler={quoteHandler}
-        setIsCreateModalOpen = {props.setIsCreateModalOpen}
+        quoteHandler={quoteHandler}
+        setQuoteData={props.setQuoteData}
+        quoteData={props.quoteData}
+        setIsCreateModalOpen={props.setIsCreateModalOpen}
         item={item}
         shareHandler={shareHandler}
         likeHandler={likeHandler}
         unLikeHandler={unLikeHandler}
-        unSharehandler = {unSharehandler}
+        unSharehandler={unSharehandler}
         totalComment={props.totalComment}
         isModalOpen={isModalOpen}
         setCurrentImageArray={setCurrentImageArray}
@@ -603,7 +605,7 @@ const FeedCard = (props) => {
             <Flex wordBreak={"break-word"} maxWidth={"100%"}>
               <Text
                 pl={10}
-                mb={item?.images?.length == 0 ? 5 : 1}
+                mb={item?.images?.length == 0 || props.showTitle ? 5 : 1}
                 pr={4}
                 fontSize={15}
               >
@@ -611,37 +613,40 @@ const FeedCard = (props) => {
               </Text>
             </Flex>
           )}
-          {item?.referPost && router.pathname != "/post/[postid]" && (
-            <Flex
-              onClick={(e) => {
-                e.stopPropagation()
-                if (item?.referPost?.postType == "comment") {
-                  router.push(`/post/comment/${item?.referPost?._id}`)
-                } else {
-                  router.push(`/post/${item?.referPost?._id}`)
-                }
-              }}
-              boxShadow={"sm"}
-              rounded="lg"
-              border="1px"
-              borderColor="gray.200"
-              m={5}
-              mt={1}
-              wrap={"wrap"}
-              bg={useColorModeValue("gray.200", "#333")}
-            >
-              <SingleFeed
-                showLink={
-                  item.referPost?.linkData != undefined &&
-                  item.referPost?.linkData.image?.img
-                }
-                linkData={item.referPost?.linkData}
-                item={item.referPost}
-              />
 
-              {/* <LinkPreview item={item.referPost?.linkData} /> */}
-            </Flex>
-          )}
+          {item?.referPost &&
+            !props.nShowRef &&
+            router.pathname != "/post/[postid]" && (
+              <Flex
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (item?.referPost?.postType == "comment") {
+                    router.push(`/post/comment/${item?.referPost?._id}`)
+                  } else {
+                    router.push(`/post/${item?.referPost?._id}`)
+                  }
+                }}
+                boxShadow={"sm"}
+                rounded="lg"
+                border="1px"
+                borderColor="gray.200"
+                m={5}
+                mt={1}
+                wrap={"wrap"}
+                bg={useColorModeValue("gray.200", "#333")}
+              >
+                <SingleFeed
+                  showLink={
+                    item.referPost?.linkData != undefined &&
+                    item.referPost?.linkData.image?.img
+                  }
+                  linkData={item.referPost?.linkData}
+                  item={item.referPost}
+                />
+
+                {/* <LinkPreview item={item.referPost?.linkData} /> */}
+              </Flex>
+            )}
           {item?.tags?.length != 0 && (
             <Flex
               mb={item?.images?.length != 0 ? 2 : 10}
@@ -706,7 +711,7 @@ const FeedCard = (props) => {
             </Flex>
           )}
 
-          {item?.images && item?.images.length !== 0 && (
+          {item?.images && item?.images.length !== 0 && !props.showTitle && (
             <Flex
               py={3}
               pl={10}

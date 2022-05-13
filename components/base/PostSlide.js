@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react"
-import { Flex, Spinner, useColorModeValue, Text, Button } from "@chakra-ui/react"
+import {
+  Flex,
+  Spinner,
+  useColorModeValue,
+  Text,
+  Button,
+} from "@chakra-ui/react"
 import { useSelector, useDispatch } from "react-redux"
 import { useRouter } from "next/router"
-import WithHeader from "../../components/custom/WithHeader"
-import SingleFeed from "../../components/base/SingleFeed"
+import WithHeader from "./../custom/WithHeader"
+import SingleFeed from "./../base/SingleFeed"
 import axios from "axios"
 import io from "socket.io-client"
-import { logout } from "../../store/userInfoSlice"
-import CommentsOfFeed from "../../components/custom/CommentsOfFeed"
+import { logout} from "../../store/userInfoSlice"
+import CommentsOfFeed from "./../custom/CommentsOfFeed"
 
-const PostId = (props) => {
+const PostSlide = (props) => {
   const [loading, setLoading] = useState(true)
   const user = useSelector((state) => state.user.user)
   const token = useSelector((state) => state.user.token)
@@ -24,11 +30,14 @@ const PostId = (props) => {
     setFetchData(true)
   }, [])
 
-
   useEffect(() => {
     if (loading == false && user != null) {
       const socket = io(process.env.NEXT_PUBLIC_MAIN_PROXY_RAW, {
-        query: { token: token, postId: router.query.postid, userId: user?.userName },
+        query: {
+          token: token,
+          postId: router.query.postid,
+          userId: user?.userName,
+        },
       })
       socket.on("onePost", (data) => {
         manageData(data)
@@ -52,26 +61,24 @@ const PostId = (props) => {
       })
     }
   }, [loading == false])
-    
 
   const manageData = (data) => {
     setTimeout(() => {
-       const oldComments = [...allComments]
-       const indexOfNewComment = oldComments.findIndex(
-         (item) => item._id == data._id
-       )
+      const oldComments = [...allComments]
+      const indexOfNewComment = oldComments.findIndex(
+        (item) => item._id == data._id
+      )
 
-       if (indexOfNewComment != -1) {
-         oldComments[indexOfNewComment] = data
-       } else {
-         oldComments.unshift(data)
-       }
+      if (indexOfNewComment != -1) {
+        oldComments[indexOfNewComment] = data
+      } else {
+        oldComments.unshift(data)
+      }
 
-       const modifiedComments = [...new Set(oldComments)]
+      const modifiedComments = [...new Set(oldComments)]
 
-       setAllComments(modifiedComments)
+      setAllComments(modifiedComments)
     }, 2000)
-  
   }
 
   useEffect(() => {
@@ -81,7 +88,7 @@ const PostId = (props) => {
       const fetchPostData = async () => {
         try {
           const { data } = await axios(
-            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-post/${props.itemId ? props.itemId : postId}`,
+            `${process.env.NEXT_PUBLIC_MAIN_PROXY}/getone-post/${props.itemId}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -136,14 +143,14 @@ const PostId = (props) => {
               <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
             </Flex>
           ) : (
-            <WithHeader headerName="Feed">
+            <>
               <SingleFeed
+              showTitle = {true}
                 quoteData={props.quoteData}
                 totalComment={allComments?.length}
                 setQuoteData={props.setQuoteData}
                 isCreateModalOpen={props.isCreateModalOpen}
                 setIsCreateModalOpen={props.setIsCreateModalOpen}
-                // setHomeData={props.setHomeData}
                 comments={allComments}
                 setComments={setAllComments}
                 setPost={setItem}
@@ -152,6 +159,7 @@ const PostId = (props) => {
               />
               {user != null && (
                 <CommentsOfFeed
+                nShowRef={true}
                   quoteData={props.quoteData}
                   totalComment={allComments?.length}
                   setQuoteData={props.setQuoteData}
@@ -183,10 +191,15 @@ const PostId = (props) => {
                     react.
                   </Text>
 
-                  <Button bg="buttonColor" onClick={() => router.push("/login")} >Login</Button>
+                  <Button
+                    bg="buttonColor"
+                    onClick={() => router.push("/login")}
+                  >
+                    Login
+                  </Button>
                 </Flex>
               )}
-            </WithHeader>
+            </>
           )}
         </Flex>
       </Flex>
@@ -194,4 +207,4 @@ const PostId = (props) => {
   )
 }
 
-export default PostId
+export default PostSlide

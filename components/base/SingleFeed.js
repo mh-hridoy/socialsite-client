@@ -9,6 +9,7 @@ setIsCreateModalOpen,
 comments,
 setComments,
 setPost,
+showTitle,
 postId}) => {
 
   return (
@@ -36,9 +37,11 @@ postId}) => {
             totalComment={totalComment}
             hasQuote={true}
             item={item}
+            showTitle={showTitle}
           />
         ) : (
           <FeedCard
+            showTitle={showTitle}
             quoteData={quoteData}
             totalComment={comments?.length}
             setQuoteData={setQuoteData}
