@@ -249,7 +249,13 @@ const GalleryModal = ({
           </Flex>
 
           <Show above="lg">
-            <Flex bg="white" height="100vh" width={"50%"} overflow="auto">
+            <Flex
+              bg={useColorModeValue("white", "#1A202C")}
+              // bg="white"
+              height="100vh"
+              width={"50%"}
+              overflow="auto"
+            >
               {/* <PostId
                 setQuoteData={setQuoteData}
                 quoteData={quoteData}
