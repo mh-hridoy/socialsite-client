@@ -16,7 +16,7 @@ import {
   AlertIcon,
   AlertTitle,
   Text,
-  useToast,
+  // useToast,
 } from "@chakra-ui/react"
 import * as Yup from "yup"
 import { useRouter } from "next/router"
@@ -94,6 +94,7 @@ const Login = () => {
      setUserId: setUserId,
      isToast: true,
      isEToast: true,
+     shouldHideMessage : true
      
    })
 
@@ -115,7 +116,7 @@ const Login = () => {
 
 
   return (
-    <UnAuth>
+    // <UnAuth>
       <Flex
         width={"100%"}
         minH={"100vh"}
@@ -299,8 +300,22 @@ const Login = () => {
           </Box>
         </Stack>
       </Flex>
-    </UnAuth>
+    // </UnAuth>
   )
 }
 
 export default Login
+
+export const getServerSideProps = async ({ req, res }) => {
+  if (req.cookies.session) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+      props: { isLogin: true },
+    }
+  }
+  return {
+    props: { isLogin: false },
+  }
+}

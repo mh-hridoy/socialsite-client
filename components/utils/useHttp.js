@@ -16,7 +16,7 @@ const useHttp = ({
   isSetData = false,
   setData = null,
   isMessage = false,
-  dataTarget= null,
+  dataTarget = null,
   setMessage = null,
   setUserId = null,
   isDispatch = false,
@@ -36,7 +36,8 @@ const useHttp = ({
   rcb = null,
   isSetDefault = true,
   extraLoad = null,
-  dispatchType= null
+  dispatchType = null,
+  shouldHideMessage = false
 }) => {
   const [isLoading, setIsLoading] = useState(false)
   const token = useSelector((state) => state.user.token)
@@ -70,11 +71,15 @@ const useHttp = ({
             }
           )
 
+          if (shouldHideMessage) {
+            setMessage(null)
+          } 
           setRequestedData(data)
 
-          if (isSetData && setData !== null && dataTarget == null) {
-            setData(data)
-          }
+
+            if (isSetData && setData !== null && dataTarget == null) {
+              setData(data)
+            }
 
           if (isSetData && setData !== null && dataTarget == "follower") {
             setData(data.follower)
@@ -128,18 +133,17 @@ const useHttp = ({
             dispatchType == null
           ) {
             dispatch(dispatchFunc(data))
-          } 
-          
+          }
+
           if (
             isDispatch &&
             dispatchFunc !== null &&
             !outDispatch &&
             dispatchType == "changeData"
           ) {
-            dispatch(dispatchFunc({...data}))
-            const totalUserData = {user: data, token }
+            dispatch(dispatchFunc({ ...data }))
+            const totalUserData = { user: data, token }
             localStorage.setItem("user", JSON.stringify(totalUserData))
-
           }
 
           if (
@@ -169,15 +173,21 @@ const useHttp = ({
           if (ecb != null) {
             ecb()
           }
+           
 
           if (
             errorMsg.indexOf("Your email is not verified") == 0 &&
-            isMessage
+            isMessage &&
+            shouldHideMessage == false
           ) {
+                          console.log(shouldHideMessage)
+
             setUserId(errorMsg.split(".")[1])
             setMessage("Please verify your email to continue...")
             errorMsg = "Please verify your email to continue..."
           }
+
+        
 
           if (isEToast) {
             toast({
@@ -194,7 +204,7 @@ const useHttp = ({
       fetchData()
     }
 
-    return (() => setFetchNow(false))
+    return () => setFetchNow(false)
   }, [fetchNow, extraLoad != null && extraLoad])
 
   return { isLoading, requestedData }
