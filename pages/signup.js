@@ -72,7 +72,7 @@ const Signup = () => {
   }
 
   return (
-    // <UnAuth>
+    <UnAuth>
       <Flex
         minH={"100vh"}
         width={"100%"}
@@ -280,23 +280,10 @@ const Signup = () => {
           </Box>
         </Stack>
       </Flex>
-    // </UnAuth>
+    </UnAuth>
   )
 }
 
 export default Signup
 
-export const getServerSideProps = async ({ req, res }) => {
-  if (req.cookies.session) {
-    return {
-      redirect: {
-        destination: "/",
-      },
-      props: { isLogin: true },
-    }
-  }
-  return {
-    props: { isLogin: false },
-  }
-}
 

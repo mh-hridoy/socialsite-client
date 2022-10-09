@@ -103,13 +103,19 @@ export default function Home(props) {
 
   return (
     <>
-      <Flex w={"100%"}  alignItems={"center"} justifyContent="center">
+      <Flex w={"100%"} alignItems={"center"} justifyContent="center">
         <Flex minWidth={"100%"}>
-          
+          {loading ? (
             <Flex
-              minWidth="100%"
-              direction="column"
+              height="100vh"
+              alignItems={"center"}
+              justifyContent="center"
+              width={"100%"}
             >
+              <Spinner color={"rgb(29, 155, 240)"} size={"xl"} />
+            </Flex>
+          ) : (
+            <Flex minWidth="100%" direction="column">
               <WithHeader headerName={t("home")}>
                 <HomeComponent
                   quoteData={props.quoteData}
@@ -120,27 +126,14 @@ export default function Home(props) {
                   totalPage={totalPage}
                   page={page}
                   setPage={setPage}
-               
                 />
               </WithHeader>
             </Flex>
+          )}
         </Flex>
       </Flex>
     </>
   )
 }
 
-export const getServerSideProps = async ({ req, res }) => {
-  if (!req.cookies.session) {
-    return {
-      redirect: {
-        destination: "/login",
-      },
-      props: { isLogin: true },
-    }
-  }
-  return {
-    props: { isLogin: false },
-  }
-}
 

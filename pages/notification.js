@@ -104,16 +104,3 @@ const Notification = () => {
 
 export default Notification
 
-export const getServerSideProps = async ({ req, res }) => {
-  if (!req.cookies.session) {
-    return {
-      redirect: {
-        destination: "/login",
-      },
-      props: { isLogin: true },
-    }
-  }
-  return {
-    props: { isLogin: false },
-  }
-}

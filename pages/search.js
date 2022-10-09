@@ -233,17 +233,3 @@ const SearchPage = ({
 }
 
 export default SearchPage
-
-export const getServerSideProps = async ({ req, res }) => {
-  if (!req.cookies.session) {
-    return {
-      redirect: {
-        destination: "/login",
-      },
-      props: { isLogin: true },
-    }
-  }
-  return {
-    props: { isLogin: false },
-  }
-}
