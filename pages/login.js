@@ -307,6 +307,7 @@ const Login = () => {
 export default Login
 
 export const getServerSideProps = async ({ req, res }) => {
+  // console.log(req)
   if (req.cookies.session) {
     return {
       redirect: {

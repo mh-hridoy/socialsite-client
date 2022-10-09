@@ -58,16 +58,20 @@ const useHttp = ({
                   headers: {
                     "Content-Type": "application/json",
                     Authorization: isAuth ? `Bearer ${token}` : "",
+                    
                   },
                   withCredentials: true,
+                  
                 }
               : body,
             {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: isAuth ? `Bearer ${token}` : "",
+                
               },
               withCredentials: true,
+              
             }
           )
 
